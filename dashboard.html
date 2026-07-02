@@ -379,7 +379,7 @@
     </div>
     <div class="table-wrap">
       <table id="leadsTable" style="display:none">
-        <thead><tr><th>#</th><th>Email</th><th>Sheet</th><th>Status</th><th>When</th></tr></thead>
+        <thead><tr><th>#</th><th>Email</th><th>Scene</th><th>Photos</th><th>Song</th><th>Status</th><th>When</th></tr></thead>
         <tbody id="leadsBody"></tbody>
       </table>
     </div>
@@ -485,12 +485,23 @@
       const body = document.getElementById('leadsBody');
       data.forEach((row, i) => {
         const when = row.created_at ? new Date(row.created_at).toLocaleDateString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
-        const sheet = row.image_url ? `<a href="${row.image_url}" target="_blank" style="color:var(--gold);text-decoration:none;">View →</a>` : '<span style="color:var(--muted);">—</span>';
+        // photos: may be multiple URLs joined by ' , '
+        let photos = '<span style="color:var(--muted);">—</span>';
+        if (row.photo_urls){
+          const urls = String(row.photo_urls).split(' , ').filter(Boolean);
+          if (urls.length){
+            photos = urls.map((u,n)=>`<a href="${u}" target="_blank" style="color:var(--gold);text-decoration:none;margin-right:8px;">📷 ${n+1}</a>`).join('');
+          }
+        }
+        const song = row.song_url
+          ? `<a href="${row.song_url}" target="_blank" style="color:var(--gold);text-decoration:none;">🎵 Track →</a>`
+          : '<span style="color:var(--muted);">—</span>';
+        const scene = row.scene ? `<span style="color:var(--text);text-transform:capitalize;">${row.scene}</span>` : '<span style="color:var(--muted);">—</span>';
         const status = row.purchased
           ? '<span style="color:var(--green,#3ddc84);font-weight:700;">✓ Purchased</span>'
           : '<span style="color:var(--muted);">Lead</span>';
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${i+1}</td><td><a href="mailto:${row.email}" style="color:var(--text);text-decoration:none;">${row.email||'—'}</a></td><td>${sheet}</td><td>${status}</td><td style="color:var(--muted);white-space:nowrap;">${when}</td>`;
+        tr.innerHTML = `<td>${i+1}</td><td><a href="mailto:${row.email}" style="color:var(--text);text-decoration:none;">${row.email||'—'}</a></td><td>${scene}</td><td>${photos}</td><td>${song}</td><td>${status}</td><td style="color:var(--muted);white-space:nowrap;">${when}</td>`;
         body.appendChild(tr);
       });
       document.getElementById('leadsTable').style.display = 'table';
