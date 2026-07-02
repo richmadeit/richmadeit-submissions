@@ -580,7 +580,7 @@
 
 <div class="hero">
   <h1><span class="d">Your Song.</span> <span class="d">Your Vision.</span><br><span class="a">Your AI Music Video.</span></h1>
-  <p class="hero-sub">AI-Powered · Directed by Rich · 30-Sec Cinematic Videos $50</p>
+  <p class="hero-sub">AI-Powered · Directed by Rich · 30-Sec Cinematic Videos $75</p>
 </div>
 
 <!-- ═══ HERO VIDEO — click to play, full sound ═══ -->
@@ -627,7 +627,7 @@
   <div class="signup-inner">
     <span class="signup-eyebrow">★ See Yourself In The Scene — Free</span>
     <h1 class="signup-title">Put Yourself In The <span class="red">Video</span></h1>
-    <p class="signup-sub">Upload your photo, pick a scene, and see yourself in a <strong>cinematic music-video shot</strong> — free. Love it? Turn it into a full 30-sec video for <strong>$50</strong>, back in 1–24 hours.</p>
+    <p class="signup-sub">Upload your photo, pick a scene, and see yourself in a <strong>cinematic music-video shot</strong> — free. Love it? Turn it into a full 30-sec video for <strong>$75</strong>, back in 1–24 hours.</p>
 
     <div class="char-flow">
       <!-- email (required) -->
@@ -687,7 +687,7 @@
         <div class="char-result-body" style="text-align:center;">There you are — in the scene! 🔥<br>This is just a <strong>first look</strong> — save it (long-press or right-click). When I turn it into your video, the detail, motion, and likeness get taken to a whole other level. 🎬</div>
         <div class="char-director-note">🔥 This preview is just the start. Your finished video is fully directed by me — sharper detail, cinematic quality, and true-to-life likeness, back in 1–24 hours.</div>
         <div class="char-buy-wrap">
-          <a href="https://buy.stripe.com/cNicN52fz7c2b6Q3MxbMQ08" class="char-buy-btn" id="charBuyBtn">Get My 30-Sec Video — $50 →</a>
+          <a href="https://buy.stripe.com/9B6bJ1bQ90NEfn62ItbMQ09" class="char-buy-btn" id="charBuyBtn">Get My 30-Sec Video — $75 →</a>
           <div class="char-buy-note">Not ready yet? No worries — check your email, it's all in there. 🎬</div>
         </div>
       </div>
@@ -777,7 +777,7 @@
     </div>
     <div class="step">
       <div class="step-n">02</div>
-      <h3>Lock In Your $50 Video</h3>
+      <h3>Lock In Your $75 Video</h3>
       <p>Check out in seconds, then upload your song on the next step. Want 60 sec, a full video, or your own face in it? That's custom — just message me.</p>
     </div>
     <div class="step">
@@ -944,7 +944,7 @@
   </div>
 
   <div class="fullvid-note">
-    ⚡ <strong>Real talk:</strong> I prioritize paying customers, so messages without a <strong>$50 order</strong> aren't guaranteed a reply — I stay focused on the people already locked in. The fastest way to get me working on your video is to grab the $50 video above first.
+    ⚡ <strong>Real talk:</strong> I prioritize paying customers, so messages without a <strong>$75 order</strong> aren't guaranteed a reply — I stay focused on the people already locked in. The fastest way to get me working on your video is to grab the $75 video above first.
   </div>
 </section>
 
@@ -983,7 +983,7 @@
 
 <!-- STICKY MOBILE CTA -->
 <div class="mobile-cta-bar">
-  <div class="mcta-text"><strong>30-Sec Video $50</strong>Full videos · message me</div>
+  <div class="mcta-text"><strong>30-Sec Video $75</strong>Full videos · message me</div>
   <a href="#signup">Lock In My Spot →</a>
 </div>
 
@@ -1186,200 +1186,18 @@
 })();
 
 // ════════════════════════════════════════════════════════
-// PRICING CTA → preselect package in the form, then scroll
+// Smooth-scroll any link that points to the signup/scene tool
 // ════════════════════════════════════════════════════════
-document.querySelectorAll('[data-pkgpick]').forEach(a => {
+document.querySelectorAll('a[href="#signup"]').forEach(a => {
   a.addEventListener('click', (e) => {
     e.preventDefault();
-    const pkg = a.getAttribute('data-pkgpick');
-    const radio = document.querySelector(`input[name="package"][value="${pkg}"]`);
-    if (radio) radio.checked = true;
-    document.getElementById('signup').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const el = document.getElementById('signup');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
 
 // ════════════════════════════════════════════════════════
-// SIGNUP FORM — submits to Supabase, fires Meta Pixel
-// ════════════════════════════════════════════════════════
-(function() {
-  const form = document.getElementById('signupForm');
-  if (!form) return;
-
-  // ── show picked file names ──
-  const songInput = document.getElementById('songfile');
-  const songPicked = document.getElementById('songPicked');
-  if (songInput) songInput.addEventListener('change', () => {
-    songPicked.innerHTML = songInput.files && songInput.files[0]
-      ? '<span class="pick-item">🎵 ' + songInput.files[0].name + '</span>' : '';
-  });
-
-  const photoInput = document.getElementById('photofiles');
-  const photoPicked = document.getElementById('photoPicked');
-  if (photoInput) photoInput.addEventListener('change', () => {
-    let files = Array.from(photoInput.files || []);
-    if (files.length > 3) {
-      // cap at 3 — rebuild a DataTransfer with only first 3
-      const dt = new DataTransfer();
-      files.slice(0, 3).forEach(f => dt.items.add(f));
-      photoInput.files = dt.files;
-      files = Array.from(photoInput.files);
-      alert('Max 3 photos — keeping the first 3.');
-    }
-    photoPicked.innerHTML = files.map(f => '<span class="pick-item">📸 ' + f.name + '</span>').join('');
-  });
-
-  function generateOrderNumber() {
-    const digits = Math.floor(1000000 + Math.random() * 9000000);
-    return `RMI-${digits}`;
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('signupBtn');
-
-    if (form.querySelector('input[name="hp"]').value) {
-      document.getElementById('signupForm').classList.add('hide');
-      document.getElementById('signupSuccess').classList.add('show');
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'Locking in your spot...';
-
-    const formData = new FormData(form);
-    const orderNumber = generateOrderNumber();
-    const email = (formData.get('email') || '').trim();
-    const name = (formData.get('name') || '').trim();
-
-    try {
-      if (typeof CONFIG !== 'undefined' && CONFIG.SUPABASE_URL && CONFIG.SUPABASE_URL.indexOf('YOUR_PROJECT') === -1) {
-        const { createClient } = supabase;
-        const db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
-
-        const selectedPackage = (formData.get('package') || '1000').toString();
-        const packageAmount = selectedPackage === '99' ? 99 : (selectedPackage === '700' ? 700 : 1000);
-        const packageName = selectedPackage === '99' ? 'Try Me 30-Sec' : (selectedPackage === '700' ? '720p Cinematic Music Video' : '1080p Cinematic Music Video');
-
-        // ── Upload song + photos to Supabase Storage ──
-        btn.textContent = 'Uploading your files...';
-        const uploaded = { song: '', photos: [] };
-        async function putFile(file, subfolder) {
-          try {
-            const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-            const path = orderNumber + '/' + subfolder + '/' + Date.now() + '_' + safe;
-            const { error: upErr } = await db.storage.from('client-files').upload(path, file, { upsert: true });
-            if (upErr) { console.warn('upload failed', upErr); return ''; }
-            return path;
-          } catch (e) { console.warn(e); return ''; }
-        }
-        const songInput = document.getElementById('songfile');
-        if (songInput && songInput.files && songInput.files[0]) {
-          uploaded.song = await putFile(songInput.files[0], 'audio');
-        }
-        const photoInput = document.getElementById('photofiles');
-        if (photoInput && photoInput.files && photoInput.files.length) {
-          const list = Array.from(photoInput.files).slice(0, 3);
-          for (const p of list) {
-            const path = await putFile(p, 'photos');
-            if (path) uploaded.photos.push(path);
-          }
-        }
-        btn.textContent = 'Locking in your spot...';
-
-        const payload = {
-          name: name,
-          email: email,
-          instagram: (formData.get('instagram') || '').trim(),
-          created_at: new Date().toISOString(),
-          status: 'pending_payment',
-          paid: false,
-          deposit_paid: false,
-          order_number: orderNumber,
-          package: packageName,
-          price_charged: packageAmount,
-          song_file: uploaded.song || '',
-          song_link: (formData.get('song_link') || '').trim(),
-          photo_files: uploaded.photos.join(', '),
-          photo_link: (formData.get('photo_link') || '').trim(),
-          photo_count: uploaded.photos.length,
-        };
-
-        const { error } = await db.from('video_inquiries').insert([payload]);
-        if (error) throw error;
-      } else {
-        console.log('Dev mode — Supabase not configured');
-        await new Promise(r => setTimeout(r, 600));
-      }
-
-      const pkgVal = (new FormData(form).get('package') || '1000').toString();
-      const pkgAmt = pkgVal === '99' ? 99 : (pkgVal === '700' ? 700 : 1000);
-      const pkgNm = pkgVal === '99' ? 'Try Me 30-Sec' : (pkgVal === '700' ? '720p Cinematic Music Video' : '1080p Cinematic Music Video');
-      const pkgEta = pkgVal === '99' ? '1-5 days' : '1-2 weeks';
-
-      localStorage.setItem('rmi_pending_order', JSON.stringify({
-        order_number: orderNumber,
-        name: name,
-        email: email,
-        amount: pkgAmt,
-        package: pkgNm,
-        eta: pkgEta,
-        timestamp: Date.now()
-      }));
-
-      if (typeof fbq !== 'undefined') {
-        fbq('track', 'InitiateCheckout', {
-          content_name: 'RichMadeIt ' + pkgNm,
-          content_category: 'AI Music Video',
-          value: pkgAmt,
-          currency: 'USD'
-        });
-      }
-
-      // ── full video → talk first: send them to Instagram DM ──
-      if (pkgVal !== '99') {
-        const igUser = 'rich_madeit_';
-        const dmText = encodeURIComponent(
-          "Hey Rich! I'm ready for the " + pkgNm + " ($" + pkgAmt + "). My order # is " + orderNumber + " (" + name + ")."
-        );
-        // Opens the IG profile so they can hit Message; order is already saved + tracked
-        const igUrl = 'https://ig.me/m/' + igUser + '?text=' + dmText;
-        btn.textContent = 'Opening Instagram...';
-        window.location.href = igUrl;
-        return;
-      }
-
-      // ── $99 Try Me → Stripe checkout ──
-      const stripeLink = (typeof CONFIG !== 'undefined') ? CONFIG.STRIPE_LINK_99 : '';
-      if (!stripeLink || stripeLink.indexOf('PASTE_YOUR') !== -1) {
-        alert('Payment link not configured yet. Please DM @rich_madeit_ on Instagram — your order # is ' + orderNumber);
-        btn.disabled = false;
-        btn.textContent = 'Try Again →';
-        return;
-      }
-      const separator = stripeLink.indexOf('?') === -1 ? '?' : '&';
-      const stripeUrl = stripeLink
-        + separator
-        + 'prefilled_email=' + encodeURIComponent(email)
-        + '&client_reference_id=' + encodeURIComponent(orderNumber);
-      window.location.href = stripeUrl;
-    } catch (err) {
-      console.error(err);
-      btn.disabled = false;
-      btn.textContent = 'Try Again →';
-      alert('Upload failed. Try smaller photos or DM @rich_madeit_ on Instagram. Error: ' + (err.message || 'unknown'));
-    }
-  });
-
-  document.querySelectorAll('a[href="#signup"]').forEach(a => {
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      document.getElementById('signup').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  });
-})();
-
-// ════════════════════════════════════════════════════════
-//  CHARACTER REFERENCE SHEET  →  photos + email → gpt-image-2 → $50 buy
+//  SCENE PREVIEW  →  photos + email + scene → Nano Banana → $75 video upsell
 //  3 free generations per browser. Email required each time.
 // ════════════════════════════════════════════════════════
 (function(){
@@ -1511,7 +1329,7 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
   });
 
   if (buyBtn) buyBtn.addEventListener('click', () => {
-    if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'30-Sec Video $50', value:50, currency:'USD'});
+    if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'30-Sec Video $75', value:75, currency:'USD'});
   });
 })();
 
