@@ -1411,9 +1411,20 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
   }
 
   const showErr = m => { errEl.textContent = m; errEl.style.display = 'block'; };
-  // no free-generation cap — unlimited previews, repeat customers welcome
-  const used = () => 0;
-  const bump = () => {};
+
+  // Daily soft cap: prevents bots/abuse running up API cost, but resets every
+  // day so real repeat customers are never permanently locked out.
+  const DAILY_CAP = 10;
+  const today = () => new Date().toISOString().slice(0,10); // YYYY-MM-DD
+  const used = () => {
+    try {
+      const raw = JSON.parse(localStorage.getItem('rmi_daily')||'{}');
+      return (raw.date === today()) ? (raw.count||0) : 0;
+    } catch(e){ return 0; }
+  };
+  const bump = () => {
+    try { localStorage.setItem('rmi_daily', JSON.stringify({ date: today(), count: used()+1 })); } catch(e){}
+  };
   function refreshCounter(){
     if (counterEl){ counterEl.textContent = ''; counterEl.style.display = 'none'; }
   }
@@ -1443,6 +1454,12 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
 
   btn.addEventListener('click', async () => {
     errEl.style.display = 'none';
+
+    // daily soft cap — friendly, not a hard lockout
+    if (used() >= DAILY_CAP){
+      return showErr("You've made a lot of previews today! 🔥 Come back tomorrow for more — or grab your full video now below. 👇");
+    }
+
     const email = (emailEl.value||'').trim();
     const files = Array.from(photosEl.files).slice(0,3);
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr('Enter a valid email so we can send it to you.');
