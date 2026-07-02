@@ -280,6 +280,9 @@
     .scene-btn.active { border-color:var(--red,#FF5500); background:rgba(255,85,0,.18); box-shadow:0 0 0 2px rgba(255,85,0,.25); }
     .yt-btn { display:inline-flex; align-items:center; gap:8px; margin:0 0 30px; padding:12px 22px; border-radius:30px; background:#FF0000; color:#fff; font-family:var(--fb); font-weight:700; font-size:1rem; text-decoration:none; transition:transform .15s ease, box-shadow .15s ease; box-shadow:0 4px 18px rgba(255,0,0,.3); }
     .yt-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(255,0,0,.45); }
+    .song-note { margin:14px 0 4px; padding:14px 16px; background:rgba(255,179,0,.10); border:1px solid rgba(255,179,0,.35); border-radius:10px; font-family:var(--fb); font-size:.9rem; line-height:1.55; color:var(--text,#efefef); text-align:left; }
+    .song-note a { color:var(--gold); font-weight:700; text-decoration:none; }
+    .song-note a:hover { text-decoration:underline; }
     .ref-consent { display:flex; align-items:flex-start; gap:9px; font-size:.85rem; color:var(--muted,#888); line-height:1.4; margin:6px 0 4px; cursor:pointer; }
     .ref-consent input { margin-top:2px; accent-color:var(--accent); flex-shrink:0; }
     .ref-counter { text-align:center; font-family:var(--fs); letter-spacing:1px; text-transform:uppercase; font-size:.78rem; color:var(--gold); margin-top:10px; }
@@ -627,7 +630,7 @@
   <div class="signup-inner">
     <span class="signup-eyebrow">★ See Yourself In The Scene — Free</span>
     <h1 class="signup-title">Put Yourself In The <span class="red">Video</span></h1>
-    <p class="signup-sub">Upload your photo, pick a scene, and see yourself in a <strong>cinematic music-video shot</strong> — free. Love it? Turn it into a full 30-sec video for <strong>$75</strong>, back in 1–24 hours.</p>
+    <p class="signup-sub">Upload your photo, pick a scene, and see yourself in a <strong>cinematic music-video shot</strong> — free. Love it? I'll build a full 30-sec video <strong>around your song</strong> for <strong>$75</strong>, back in 1–24 hours. (You'll send your track right after checkout.)</p>
 
     <div class="char-flow">
       <!-- email (required) -->
@@ -686,9 +689,13 @@
         <img id="refImage" alt="Your cinematic scene preview" style="display:block;width:100%;max-width:420px;margin:0 auto 14px;border-radius:14px;" />
         <div class="char-result-body" style="text-align:center;">There you are — in the scene! 🔥<br>This is just a <strong>first look</strong> — save it (long-press or right-click). When I turn it into your video, the detail, motion, and likeness get taken to a whole other level. 🎬</div>
         <div class="char-director-note">🔥 This preview is just the start. Your finished video is fully directed by me — sharper detail, cinematic quality, and true-to-life likeness, back in 1–24 hours.</div>
+        <div class="song-note">
+          🎵 <strong>Where's my song go?</strong> Grab your video below, then send me your track — I'll build your video around it.<br>
+          Send it to <a href="mailto:rich.madeit3@gmail.com">rich.madeit3@gmail.com</a> or <a href="https://wa.me/13464981235" target="_blank" rel="noopener">WhatsApp 346-498-1235</a>. Include the email you used at checkout so I match it to your order.
+        </div>
         <div class="char-buy-wrap">
           <a href="https://buy.stripe.com/9B6bJ1bQ90NEfn62ItbMQ09" class="char-buy-btn" id="charBuyBtn">Get My 30-Sec Video — $75 →</a>
-          <div class="char-buy-note">Not ready yet? No worries — check your email, it's all in there. 🎬</div>
+          <div class="char-buy-note">After checkout, send your song (email or WhatsApp above) and I'll get to work. 🎬</div>
         </div>
       </div>
     </div>
