@@ -1,5 +1,9 @@
-# RichMadeIt Netlify config
-# Functions live in netlify/functions/
+[build]
+  publish = "."
+
 [functions]
+  directory = "netlify/functions"
   node_bundler = "esbuild"
+
+[functions."generate-reference"]
   timeout = 26
