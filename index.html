@@ -1346,6 +1346,20 @@ document.querySelectorAll('a[href="#signup"]').forEach(a => {
       loadEl.style.display = 'none';
       window._rmiLastEmail = email; // remember for song attach
 
+      // Save the lead directly from the page (anon key) so it ALWAYS lands in
+      // the dashboard, independent of the serverless function's env vars.
+      try {
+        if (typeof supabase !== 'undefined' && typeof CONFIG !== 'undefined' && CONFIG.SUPABASE_URL){
+          const _db = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+          _db.from('reference_generations').insert([{
+            email: email,
+            image_url: 'on-page-generated',
+            scene: (selectedScene || ''),
+            purchased: false
+          }]).then(()=>{}).catch(()=>{});
+        }
+      } catch(_e){}
+
       // count it, fire the LEAD event, reveal the result
       bump();
       refreshCounter();
