@@ -646,7 +646,7 @@
       <label class="ref-consent"><input type="checkbox" id="refConsent"> These are my own photos and I have the right to use them.</label>
 
       <button type="button" class="signup-submit" id="refBtn">Generate My Character Sheet 🎬</button>
-      <div class="ref-counter" id="refCounter">3 free generations</div>
+      <div class="ref-counter" id="refCounter" style="display:none"></div>
       <div class="char-err" id="refErr"></div>
 
       <!-- loading -->
@@ -655,12 +655,12 @@
         <div>Building your character… this takes ~30 seconds 🔥</div>
       </div>
 
-      <!-- RESULT: check your email (background function emails the sheet) -->
+      <!-- RESULT: show the generated sheet right here on the page -->
       <div class="char-result" id="refResult">
-        <div class="char-result-badge">★ On Its Way</div>
-        <div style="font-size:2.4rem;text-align:center;margin-bottom:8px;">📬</div>
-        <div class="char-result-body" style="text-align:center;">Your character is being built right now! 🔥<br>Check your <strong>email in about a minute</strong> — your reference sheet plus how to turn it into your video will be waiting for you.</div>
-        <div class="char-director-note">🔥 Ready now? Turn your character into a cinematic 30-second music video — I direct every single one personally, back in 1–24 hours.</div>
+        <div class="char-result-badge">★ Your Preview</div>
+        <img id="refImage" alt="Your character reference sheet" style="display:block;width:100%;max-width:520px;margin:0 auto 14px;border-radius:14px;" />
+        <div class="char-result-body" style="text-align:center;">Here's your character preview! 🔥<br>This is just a <strong>first look</strong> — save it (long-press or right-click). When I turn it into your video, the detail, lighting, and likeness get taken to a whole other level. 🎬</div>
+        <div class="char-director-note">🔥 This preview is just the start. Your finished video is fully directed by me — sharper detail, cinematic quality, and true-to-life likeness, back in 1–24 hours.</div>
         <div class="char-buy-wrap">
           <a href="https://buy.stripe.com/cNicN52fz7c2b6Q3MxbMQ08" class="char-buy-btn" id="charBuyBtn">Get My 30-Sec Video — $50 →</a>
           <div class="char-buy-note">Not ready yet? No worries — check your email, it's all in there. 🎬</div>
@@ -1376,7 +1376,9 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
   const bump = () => { try { localStorage.setItem('rmi_ref_used', String(used()+1)); } catch(e){} };
   function refreshCounter(){
     const left = Math.max(0, MAX_FREE - used());
-    counterEl.textContent = left>0 ? (left + ' free generation' + (left===1?'':'s') + ' left') : 'You\'ve used your 3 free sheets 🔥';
+    // countdown text hidden — keep it clean, no "X left" pressure
+    counterEl.textContent = '';
+    counterEl.style.display = 'none';
     if (left<=0){ btn.disabled = true; btn.textContent = 'Ready for the video? → $50'; btn.onclick = ()=>{ document.getElementById('charBuyBtn').click(); }; }
   }
   refreshCounter();
@@ -1414,19 +1416,32 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
     if (!consentEl.checked) return showErr('Please confirm these are your own photos.');
 
     btn.disabled = true;
-    btn.textContent = 'Sending…';
+    btn.textContent = 'Building your character… ~20 sec 🔥';
+    loadEl.style.display = 'block';
 
     try {
       const images = [];
       for (const f of files){ images.push(await fileToDataURL(f, 1024)); }
 
-      // BACKGROUND function: returns 202 immediately, delivers the sheet by email.
-      await fetch('/.netlify/functions/generate-reference-background', {
+      // SYNCHRONOUS function: generates the sheet and returns the image.
+      const resp = await fetch('/.netlify/functions/generate-reference', {
         method:'POST', headers:{'content-type':'application/json'},
         body: JSON.stringify({ email, images, consent: true })
       });
 
-      // count it, fire the LEAD event, show the "check your email" confirmation
+      const data = await resp.json().catch(()=>({}));
+      if (!resp.ok || !data.image){
+        loadEl.style.display = 'none';
+        btn.disabled=false;
+        btn.textContent='Generate My Character Sheet 🎬';
+        return showErr(data.error || 'The generator hiccuped — try again.');
+      }
+
+      // show the finished sheet right here on the page
+      imgEl.src = data.image;
+      loadEl.style.display = 'none';
+
+      // count it, fire the LEAD event, reveal the result
       bump();
       refreshCounter();
       if (typeof fbq !== 'undefined') fbq('track','Lead',{content_name:'Reference Sheet'});
@@ -1436,6 +1451,7 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
 
       if (used() < MAX_FREE){ btn.disabled=false; btn.textContent='Build Another 🎬'; }
     } catch(e){
+      loadEl.style.display = 'none';
       btn.disabled=false;
       btn.textContent='Generate My Character Sheet 🎬';
       showErr('Something glitched — try again.');
