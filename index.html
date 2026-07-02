@@ -1407,16 +1407,12 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
     });
   }
 
-  const MAX_FREE = 3;
   const showErr = m => { errEl.textContent = m; errEl.style.display = 'block'; };
-  const used = () => { try { return parseInt(localStorage.getItem('rmi_ref_used')||'0',10)||0; } catch(e){ return 0; } };
-  const bump = () => { try { localStorage.setItem('rmi_ref_used', String(used()+1)); } catch(e){} };
+  // no free-generation cap — unlimited previews, repeat customers welcome
+  const used = () => 0;
+  const bump = () => {};
   function refreshCounter(){
-    const left = Math.max(0, MAX_FREE - used());
-    // countdown text hidden — keep it clean, no "X left" pressure
-    counterEl.textContent = '';
-    counterEl.style.display = 'none';
-    if (left<=0){ btn.disabled = true; btn.textContent = 'Ready for the video? → $50'; btn.onclick = ()=>{ document.getElementById('charBuyBtn').click(); }; }
+    if (counterEl){ counterEl.textContent = ''; counterEl.style.display = 'none'; }
   }
   refreshCounter();
 
@@ -1444,8 +1440,6 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
 
   btn.addEventListener('click', async () => {
     errEl.style.display = 'none';
-    if (used() >= MAX_FREE) return;
-
     const email = (emailEl.value||'').trim();
     const files = Array.from(photosEl.files).slice(0,3);
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr('Enter a valid email so we can send it to you.');
@@ -1454,7 +1448,7 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
     if (!consentEl.checked) return showErr('Please confirm these are your own photos.');
 
     btn.disabled = true;
-    btn.textContent = 'Building your character… ~20 sec 🔥';
+    btn.textContent = 'Dropping you into the scene… ~10 sec 🔥';
     loadEl.style.display = 'block';
 
     try {
@@ -1487,7 +1481,7 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
       resultEl.classList.add('show');
       resultEl.scrollIntoView({behavior:'smooth', block:'center'});
 
-      if (used() < MAX_FREE){ btn.disabled=false; btn.textContent='Build Another 🎬'; }
+      btn.disabled=false; btn.textContent='Build Another Scene 🎬';
     } catch(e){
       loadEl.style.display = 'none';
       btn.disabled=false;
