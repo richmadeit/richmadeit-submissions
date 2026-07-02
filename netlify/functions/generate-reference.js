@@ -21,14 +21,45 @@ const ENDPOINT =
   MODEL +
   ":generateContent";
 
-const REFERENCE_PROMPT =
-  "Create a professional character reference sheet based on the person in the " +
-  "provided photo(s). Keep the SAME person's face and identity exactly. Show " +
-  "them from multiple angles on a clean neutral studio background: front view, " +
-  "three-quarter left, three-quarter right, and side profile, plus one full-body " +
-  "standing pose. Consistent identity, consistent wardrobe, even studio lighting, " +
-  "high detail, cinematic. Arrange as a clean, evenly-spaced grid inside a SQUARE " +
-  "1:1 frame, like a film production character sheet. No text, no watermark.";
+// ---------------------------------------------------------------------------
+//  SCENE PRESETS — one tuned prompt per vibe button. The customer taps one;
+//  we own the quality. The person's face/identity is locked from their photo.
+// ---------------------------------------------------------------------------
+const FACE_LOCK =
+  "Using the person in the provided photo(s), keep their exact face, features, " +
+  "skin tone, and likeness perfectly accurate and recognizable. Photorealistic, " +
+  "cinematic lighting, sharp focus, high detail, professional music-video still. " +
+  "Vertical 9:16 composition. No text, no watermark, no logos. ";
+
+const SCENES = {
+  rooftop:
+    "Place them on a city rooftop at night, glowing skyline and neon lights " +
+    "behind them, moody cinematic color grade, confident pose, film-grain.",
+  luxury:
+    "Place them in a luxury lifestyle scene: exotic car, designer fashion, " +
+    "night city backdrop, rich warm lighting, flexing wealth, magazine-quality.",
+  stage:
+    "Place them on stage performing at a concert, spotlights and haze, crowd " +
+    "and phone lights in the background, energetic, dramatic stage lighting.",
+  street:
+    "Place them on a gritty urban street at night, wet pavement reflections, " +
+    "moody film-grain, streetwear, cinematic teal-and-orange grade, hard shadows.",
+  miami:
+    "Place them in a Miami vibe: palm trees, pastel sunset sky, waterfront, " +
+    "designer summer fashion, warm golden-hour glow, vibrant and glossy.",
+  boss:
+    "Place them in a powerful boss scene: dramatic dark backdrop, throne-like " +
+    "chair or executive setting, cinematic rim lighting, commanding presence.",
+};
+
+function buildPrompt(scene, detail) {
+  const base = SCENES[scene] || SCENES.rooftop;
+  let p = FACE_LOCK + base;
+  if (detail && detail.trim()) {
+    p += " Additional details requested: " + detail.trim().slice(0, 200) + ".";
+  }
+  return p;
+}
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST")
@@ -39,6 +70,8 @@ exports.handler = async (event) => {
     const email = (body.email || "").trim();
     const images = body.images; // array of data URLs
     const consent = body.consent;
+    const scene = (body.scene || "rooftop").trim();
+    const detail = (body.detail || "").trim();
 
     if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
       return json(400, { error: "Please enter a valid email." });
@@ -49,8 +82,8 @@ exports.handler = async (event) => {
     if (!process.env.GEMINI_API_KEY)
       return json(500, { error: "Image service not configured." });
 
-    // ---- build the parts: prompt text + each uploaded photo as inlineData ----
-    const parts = [{ text: REFERENCE_PROMPT }];
+    // ---- build the parts: scene prompt + each uploaded photo as inlineData ----
+    const parts = [{ text: buildPrompt(scene, detail) }];
     for (const dataUrl of images.slice(0, 3)) {
       const m = /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/.exec(dataUrl || "");
       if (!m) continue;
@@ -58,6 +91,7 @@ exports.handler = async (event) => {
     }
     if (parts.length < 2)
       return json(400, { error: "Couldn't read that photo — try another." });
+
 
     // ---- call Nano Banana ----
     const resp = await fetch(ENDPOINT, {
@@ -69,7 +103,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         contents: [{ role: "user", parts }],
         generationConfig: {
-          imageConfig: { aspectRatio: "1:1" },
+          imageConfig: { aspectRatio: "9:16" },
         },
       }),
     });
