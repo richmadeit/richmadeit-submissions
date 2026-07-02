@@ -58,7 +58,7 @@ exports.handler = async (event) => {
     const form = new FormData();
     form.append("model", "gpt-image-2");
     form.append("prompt", REFERENCE_PROMPT);   // HARDCODED
-    form.append("quality", "medium");
+    form.append("quality", "low");             // gpt-image-2 low = fast + still sharp
     form.append("size", "1024x1536");          // tall = proper reference-sheet layout
     form.append("moderation", "low");
     form.append("n", "1");
