@@ -278,6 +278,8 @@
     .scene-btn { font-family:var(--fb); font-size:.98rem; font-weight:600; padding:14px 12px; border-radius:12px; border:2px solid rgba(255,255,255,.14); background:rgba(255,255,255,.04); color:var(--text,#efefef); cursor:pointer; transition:all .15s ease; text-align:center; }
     .scene-btn:hover { border-color:rgba(255,85,0,.5); background:rgba(255,85,0,.08); }
     .scene-btn.active { border-color:var(--red,#FF5500); background:rgba(255,85,0,.18); box-shadow:0 0 0 2px rgba(255,85,0,.25); }
+    .yt-btn { display:inline-flex; align-items:center; gap:8px; margin:0 0 30px; padding:12px 22px; border-radius:30px; background:#FF0000; color:#fff; font-family:var(--fb); font-weight:700; font-size:1rem; text-decoration:none; transition:transform .15s ease, box-shadow .15s ease; box-shadow:0 4px 18px rgba(255,0,0,.3); }
+    .yt-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(255,0,0,.45); }
     .ref-consent { display:flex; align-items:flex-start; gap:9px; font-size:.85rem; color:var(--muted,#888); line-height:1.4; margin:6px 0 4px; cursor:pointer; }
     .ref-consent input { margin-top:2px; accent-color:var(--accent); flex-shrink:0; }
     .ref-counter { text-align:center; font-family:var(--fs); letter-spacing:1px; text-transform:uppercase; font-size:.78rem; color:var(--gold); margin-top:10px; }
@@ -703,7 +705,8 @@
 <div class="featured" id="work">
   <div class="sec-tag">The Work</div>
   <div class="sec-h">The Portfolio</div>
-  <p style="color:var(--muted);font-size:.95rem;line-height:1.6;max-width:640px;margin:-16px 0 34px">Real AI music videos, fully directed. Tap any one to watch with sound — full length, no trailers. This is exactly what you get.</p>
+  <p style="color:var(--muted);font-size:.95rem;line-height:1.6;max-width:640px;margin:-16px 0 22px">Real AI music videos, fully directed. Tap any one to preview with sound — this is exactly the quality you get. Want the full versions? Watch them on YouTube.</p>
+  <a href="https://www.youtube.com/watch?v=qh2a5XLlFuY" target="_blank" rel="noopener" class="yt-btn">▶ Watch Full Videos on YouTube</a>
 
   <div class="work-grid">
     <div class="wc wc-hero" data-clip>
