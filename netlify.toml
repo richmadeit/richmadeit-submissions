@@ -1,0 +1,5 @@
+# RichMadeIt Netlify config
+# Functions live in netlify/functions/
+[functions]
+  node_bundler = "esbuild"
+  timeout = 26

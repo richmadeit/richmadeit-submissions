@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Book a Mic Drop — RichMadeIt × 730 Radio</title>
+<meta name="description" content="AI music videos at the RichMadeIt × 730 Radio studio. Studio walk-in performance videos. Quote on review. Limited slots." />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Permanent+Marker&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Supabase JS Client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+/* ============ DESIGN TOKENS ============ */
+:root {
+  --bg-black: #0a0a0a;
+  --bg-darker: #050505;
+  --bg-card: #111111;
+  --bg-card-hover: #181818;
+
+  --richmade-red: #ff4500;
+  --richmade-red-glow: #ff6b35;
+  --richmade-yellow: #ffd700;
+  --radio-white: #f5f5f5;
+  --on-air-red: #ff1a1a;
+
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.45);
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-active: rgba(255, 69, 0, 0.5);
+
+  --shadow-neon: 0 0 20px rgba(255, 69, 0, 0.4), 0 0 40px rgba(255, 69, 0, 0.2);
+  --shadow-white: 0 0 15px rgba(245, 245, 245, 0.3);
+}
+
+/* ============ BASE ============ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  background-color: var(--bg-black);
+  background-image:
+    linear-gradient(rgba(10, 10, 10, 0.88), rgba(10, 10, 10, 0.92)),
+    url('studio-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: var(--text-primary);
+  font-family: 'Manrope', sans-serif;
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Subtle grain overlay for that film/broadcast texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+}
+
+/* ============ TOP BAR ============ */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.topbar-logo {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 22px;
+  color: var(--richmade-red);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+.topbar-logo span { color: var(--radio-white); }
+.topbar-back {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.topbar-back:hover { color: var(--richmade-red); }
+
+/* ============ HERO ============ */
+.hero {
+  position: relative;
+  min-height: 75vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at left, rgba(255, 69, 0, 0.22), transparent 65%),
+    radial-gradient(ellipse at right, rgba(245, 245, 245, 0.08), transparent 65%);
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 60%, var(--bg-black) 100%);
+  pointer-events: none;
+}
+.hero-inner { position: relative; z-index: 2; max-width: 900px; }
+.hero-eyebrow {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 16px;
+  color: var(--richmade-yellow);
+  margin-bottom: 18px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: inline-block;
+  animation: flicker 4s infinite;
+}
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+  52% { opacity: 1; }
+}
+.hero h1 {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(52px, 12vw, 130px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.hero h1 .red {
+  color: var(--richmade-red);
+  text-shadow: var(--shadow-neon);
+}
+.hero h1 .white {
+  color: var(--radio-white);
+  text-shadow: var(--shadow-white);
+}
+.hero-tagline {
+  font-size: clamp(15px, 3vw, 18px);
+  color: var(--text-secondary);
+  max-width: 580px;
+  margin: 0 auto 30px;
+  font-weight: 500;
+}
+.hero-partners {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 18px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.hero-partners .pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--on-air-red);
+  box-shadow: 0 0 10px var(--on-air-red);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.3); }
+}
+.hero-partners .partner-1 { color: var(--richmade-red); }
+.hero-partners .partner-2 { color: var(--radio-white); }
+.hero-partners .x { color: var(--text-muted); }
+
+/* ============ SECTION ============ */
+section.block {
+  padding: 60px 20px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+.section-label {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  color: var(--richmade-yellow);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.section-title {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(32px, 6vw, 48px);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  margin-bottom: 14px;
+}
+.section-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 36px;
+  max-width: 520px;
+}
+
+/* ============ PRICING CARDS ============ */
+.tier-stack { display: flex; flex-direction: column; gap: 14px; }
+.tier-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 22px 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+.tier-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-active);
+  transform: translateY(-2px);
+}
+.tier-card.selected {
+  border-color: var(--richmade-red);
+  background: linear-gradient(135deg, rgba(255, 69, 0, 0.12), transparent);
+  box-shadow: var(--shadow-neon);
+}
+.tier-card .left { flex: 1; }
+.tier-card .tier-name {
+  font-family: 'Anton', sans-serif;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.tier-card .tier-detail {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.tier-card .tier-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--richmade-red);
+  padding: 6px 10px;
+  border: 1px solid var(--richmade-red);
+  border-radius: 4px;
+}
+.tier-card.selected .tier-badge { color: var(--richmade-yellow); border-color: var(--richmade-yellow); }
+.tier-card .popular-badge {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  background: var(--richmade-red);
+  color: var(--bg-black);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 12px;
+  padding: 3px 12px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transform: rotate(-3deg);
+}
+
+/* ============ FORM ============ */
+.form-group { margin-bottom: 24px; }
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.form-label .required { color: var(--richmade-red); }
+.form-input,
+.form-textarea {
+  width: 100%;
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: var(--text-primary);
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  transition: border-color 0.2s;
+}
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--richmade-red);
+}
+.form-textarea { resize: vertical; min-height: 90px; }
+.form-input::placeholder,
+.form-textarea::placeholder { color: var(--text-muted); }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
+
+/* ============ PHOTO UPLOAD ============ */
+.photo-zone {
+  border: 2px dashed var(--border-subtle);
+  border-radius: 14px;
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg-card);
+}
+.photo-zone:hover,
+.photo-zone.dragover {
+  border-color: var(--richmade-red);
+  background: var(--bg-card-hover);
+}
+.photo-zone-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+.photo-zone-text {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.photo-zone-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.photo-input { display: none; }
+
+.photo-previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.photo-preview {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--border-subtle);
+}
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.photo-count {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.photo-count.met { color: var(--richmade-yellow); }
+
+/* ============ ADD-ONS ============ */
+.addon-grid { display: flex; flex-direction: column; gap: 10px; }
+.addon-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.addon-item:hover { background: var(--bg-card-hover); }
+.addon-item.checked {
+  border-color: var(--richmade-red);
+  background: linear-gradient(135deg, rgba(255, 69, 0, 0.1), transparent);
+}
+.addon-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+.addon-checkbox {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--text-muted);
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.addon-item.checked .addon-checkbox {
+  background: var(--richmade-red);
+  border-color: var(--richmade-red);
+}
+.addon-checkbox::after {
+  content: '✓';
+  font-weight: 900;
+  color: var(--bg-black);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.addon-item.checked .addon-checkbox::after { opacity: 1; }
+.addon-name { font-weight: 600; font-size: 15px; }
+.addon-rush { color: var(--richmade-yellow); font-family: 'Permanent Marker', cursive; }
+.addon-price {
+  font-family: 'Anton', sans-serif;
+  font-size: 20px;
+  color: var(--richmade-red);
+  flex-shrink: 0;
+}
+
+/* ============ RULES ============ */
+.rules-box {
+  background: var(--bg-darker);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.rules-box::before {
+  content: 'FYI';
+  position: absolute;
+  top: 14px;
+  right: -28px;
+  background: var(--richmade-yellow);
+  color: var(--bg-black);
+  font-family: 'Permanent Marker', cursive;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  padding: 4px 36px;
+  transform: rotate(20deg);
+}
+.rules-title {
+  font-family: 'Anton', sans-serif;
+  font-size: 22px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  color: var(--richmade-yellow);
+}
+.rules-list { list-style: none; padding: 0; }
+.rules-list li {
+  padding: 6px 0 6px 24px;
+  position: relative;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+.rules-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+.rules-list li.do::before { content: '✓'; color: var(--richmade-yellow); }
+.rules-confirm {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  cursor: pointer;
+  padding: 12px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  border: 2px solid var(--border-subtle);
+  transition: all 0.2s;
+}
+.rules-confirm:hover { background: var(--bg-card-hover); }
+.rules-confirm.checked { border-color: var(--richmade-yellow); }
+.rules-confirm .addon-checkbox { margin-top: 1px; }
+.rules-confirm.checked .addon-checkbox {
+  background: var(--richmade-yellow);
+  border-color: var(--richmade-yellow);
+}
+.rules-confirm.checked .addon-checkbox::after {
+  content: '✓';
+  font-weight: 900;
+  color: var(--bg-black);
+  opacity: 1;
+}
+.rules-confirm-text { font-size: 14px; font-weight: 600; line-height: 1.4; }
+
+/* ============ STICKY PRICE BAR ============ */
+.price-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
+  background: rgba(5, 5, 5, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 2px solid var(--richmade-red);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
+}
+.price-bar-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+}
+.price-bar-amount {
+  font-family: 'Anton', sans-serif;
+  font-size: 32px;
+  color: var(--richmade-yellow);
+  letter-spacing: -0.02em;
+}
+.price-bar-submit {
+  background: var(--richmade-red);
+  color: var(--bg-black);
+  border: none;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-family: 'Anton', sans-serif;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-neon);
+}
+.price-bar-submit:hover:not(:disabled) {
+  background: var(--richmade-red-glow);
+  transform: translateY(-1px);
+}
+.price-bar-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ============ CONFIRMATION SCREEN ============ */
+.confirmation {
+  display: none;
+  min-height: 80vh;
+  padding: 60px 20px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+.confirmation.show { display: flex; }
+.confirmation-inner { max-width: 560px; }
+.confirmation-stamp {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 80px;
+  color: var(--richmade-yellow);
+  margin-bottom: 20px;
+  transform: rotate(-4deg);
+  text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+}
+.confirmation h2 {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(40px, 8vw, 64px);
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+.confirmation p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 30px;
+  text-align: left;
+}
+.payment-option {
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.payment-option .pay-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+}
+.payment-option .pay-value {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  color: var(--richmade-yellow);
+  font-size: 14px;
+  user-select: all;
+}
+.contact-grid {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 520px) { .contact-grid { grid-template-columns: 1fr; } }
+.contact-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+.contact-card .contact-label {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.contact-card.rich .contact-label { color: var(--richmade-red); }
+.contact-card.radio .contact-label { color: var(--radio-white); }
+.contact-card .contact-value {
+  font-size: 13px;
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+/* ============ FOOTER ============ */
+footer {
+  padding: 30px 20px;
+  text-align: center;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ============ MOTION ============ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.6s ease forwards;
+}
+.fade-up:nth-child(1) { animation-delay: 0.1s; }
+.fade-up:nth-child(2) { animation-delay: 0.2s; }
+.fade-up:nth-child(3) { animation-delay: 0.3s; }
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ HIDDEN HONEYPOT ============ */
+.honeypot { position: absolute; left: -9999px; }
+</style>
+</head>
+
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+  <a href="https://richmadeit.netlify.app" class="topbar-logo">Rich<span>MadeIt</span></a>
+  <a href="https://richmadeit.netlify.app" class="topbar-back">← Main Site</a>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <div class="hero-eyebrow fade-up">🎤 Studio Sessions — Limited Slots</div>
+    <h1 class="fade-up">
+      <span class="red">Book a</span><br />
+      <span class="white">Mic Drop</span>
+    </h1>
+    <p class="hero-tagline fade-up">
+      Step up to the mic. Your face, your song, our studio.
+    </p>
+    <div class="hero-partners fade-up">
+      <span class="pulse"></span>
+      <span class="partner-1">RichMadeIt</span>
+      <span class="x">×</span>
+      <span class="partner-2">730 Radio</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FORM ============ -->
+<form
+  id="micdrop-form"
+  enctype="multipart/form-data"
+>
+  <input type="hidden" name="package_tier" id="package_tier" value="" />
+  <input type="hidden" name="package_price" id="package_price" value="" />
+  <input type="hidden" name="addons_selected" id="addons_selected" value="" />
+  <input type="hidden" name="total_price" id="total_price" value="" />
+
+  <!-- TIER SELECTION -->
+  <section class="block" id="step-tier">
+    <div class="section-label">Step 1</div>
+    <h2 class="section-title">Pick Your Drop</h2>
+    <p class="section-subtitle">Three lanes. Pick the one that fits the song.</p>
+
+    <div class="tier-stack">
+      <div class="tier-card" data-tier="snippet" data-price="0" data-detail="45 seconds — Mic Drop Snippet">
+        <div class="left">
+          <div class="tier-name">Mic Drop</div>
+          <div class="tier-detail">45 seconds · 720p</div>
+        </div>
+        <div class="tier-badge">Tier 01</div>
+      </div>
+
+      <div class="tier-card" data-tier="extended" data-price="0" data-detail="90 seconds — Extended Mic Drop">
+        <span class="popular-badge">Most Popular</span>
+        <div class="left">
+          <div class="tier-name">Extended</div>
+          <div class="tier-detail">90 seconds · 720p</div>
+        </div>
+        <div class="tier-badge">Tier 02</div>
+      </div>
+
+      <div class="tier-card" data-tier="full" data-price="0" data-detail="Full Song (max 3:30) — Performance Video">
+        <div class="left">
+          <div class="tier-name">Full Song</div>
+          <div class="tier-detail">Up to 3:30 · 720p</div>
+        </div>
+        <div class="tier-badge">Tier 03</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- YOUR INFO -->
+  <section class="block">
+    <div class="section-label">Step 2</div>
+    <h2 class="section-title">Your Info</h2>
+
+    <div class="form-group">
+      <label class="form-label" for="artist_name">Artist / Stage Name <span class="required">*</span></label>
+      <input class="form-input" type="text" id="artist_name" name="artist_name" required placeholder="What name goes on the credits?" />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone <span class="required">*</span></label>
+        <input class="form-input" type="tel" id="phone" name="phone" required placeholder="(555) 123-4567" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email <span class="required">*</span></label>
+        <input class="form-input" type="email" id="email" name="email" required placeholder="you@email.com" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="instagram">Instagram Handle</label>
+      <input class="form-input" type="text" id="instagram" name="instagram" placeholder="@yourhandle" />
+    </div>
+  </section>
+
+  <!-- SONG -->
+  <section class="block">
+    <div class="section-label">Step 3</div>
+    <h2 class="section-title">Your Song</h2>
+    <p class="section-subtitle">Drop a link — SoundCloud, YouTube, Google Drive, Dropbox, anything streamable.</p>
+
+    <div class="form-group">
+      <label class="form-label" for="song_title">Song Title <span class="required">*</span></label>
+      <input class="form-input" type="text" id="song_title" name="song_title" required placeholder="The name of the track" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="song_link">Song Link <span class="required">*</span></label>
+      <input class="form-input" type="url" id="song_link" name="song_link" required placeholder="https://..." />
+    </div>
+  </section>
+
+  <!-- PHOTOS -->
+  <section class="block">
+    <div class="section-label">Step 4</div>
+    <h2 class="section-title">Reference Photos</h2>
+    <p class="section-subtitle">
+      Upload <strong>3 to 5 photos</strong> of yourself. More angles = better likeness.
+      Include: 1 clear front-facing face shot, 1 side angle, 1 full-body / outfit shot.
+    </p>
+
+    <label for="photos" class="photo-zone" id="photo-zone">
+      <div class="photo-zone-icon">📸</div>
+      <div class="photo-zone-text">Tap to Upload Photos</div>
+      <div class="photo-zone-hint">JPG / PNG · Up to 5 photos · 8MB each</div>
+      <input class="photo-input" type="file" id="photos" name="photos" accept="image/*" multiple required />
+    </label>
+
+    <div class="photo-previews" id="photo-previews"></div>
+    <div class="photo-count" id="photo-count">0 / 3 photos minimum</div>
+  </section>
+
+  <!-- ADD-ONS -->
+  <section class="block">
+    <div class="section-label">Step 5</div>
+    <h2 class="section-title">Add-Ons</h2>
+    <p class="section-subtitle">Stack the ones you want. We'll talk numbers when I reach out.</p>
+
+    <div class="addon-grid" id="addon-grid">
+      <label class="addon-item" data-price="50" data-name="Custom Backdrop">
+        <div class="addon-left">
+          <div class="addon-checkbox"></div>
+          <div class="addon-name">Custom Backdrop Change</div>
+        </div>
+        
+      </label>
+
+      <label class="addon-item" data-price="50" data-name="Outfit Swap">
+        <div class="addon-left">
+          <div class="addon-checkbox"></div>
+          <div class="addon-name">Wardrobe / Outfit Swap</div>
+        </div>
+        
+      </label>
+
+      <label class="addon-item" data-price="50" data-name="B-Roll Pack">
+        <div class="addon-left">
+          <div class="addon-checkbox"></div>
+          <div class="addon-name">B-Roll Cutaway Pack</div>
+        </div>
+        
+      </label>
+
+      <label class="addon-item" data-price="50" data-name="AI Crowd Overlay">
+        <div class="addon-left">
+          <div class="addon-checkbox"></div>
+          <div class="addon-name">AI Hype Crowd / Venue Overlay</div>
+        </div>
+        
+      </label>
+
+      <label class="addon-item" data-price="50" data-name="Lyric Overlay">
+        <div class="addon-left">
+          <div class="addon-checkbox"></div>
+          <div class="addon-name">Lyric Overlay Graphics</div>
+        </div>
+        
+      </label>
+
+      <label class="addon-item" data-price="50" data-name="End Card">
+        <div class="addon-left">
+          <div class="addon-checkbox"></div>
+          <div class="addon-name">Logo / Album Art End Card</div>
+        </div>
+        
+      </label>
+
+      <label class="addon-item" data-price="50" data-name="Rush 24hr">
+        <div class="addon-left">
+          <div class="addon-checkbox"></div>
+          <div class="addon-name"><span class="addon-rush">⚡ Rush</span> · 24-Hour Delivery</div>
+        </div>
+        
+      </label>
+    </div>
+  </section>
+
+  <!-- VIBE -->
+  <section class="block">
+    <div class="section-label">Step 6</div>
+    <h2 class="section-title">The Vibe</h2>
+    <p class="section-subtitle">Quick brief — character details, mood, anything important. Keep it tight.</p>
+
+    <div class="form-group">
+      <label class="form-label" for="vibe_notes">Vibe Notes</label>
+      <textarea class="form-textarea" id="vibe_notes" name="vibe_notes" maxlength="250" placeholder="Ex: Black trench, chains, smoke in the air. Dark menacing energy. Slow zoom on the face."></textarea>
+    </div>
+  </section>
+
+  <!-- RULES -->
+  <section class="block">
+    <div class="section-label">Step 7</div>
+    <h2 class="section-title">Before You Book</h2>
+    <p class="section-subtitle">Quick heads-up on how we work — just so we're on the same page.</p>
+
+    <div class="rules-box">
+      <div class="rules-title">📋 Good to Know</div>
+      <ul class="rules-list">
+        <li>Submissions are reviewed within 24 hours — no payment required yet</li>
+        <li>Once accepted, payment is upfront — Cash App, Zelle, or Apple Pay</li>
+        <li>No refunds once production starts</li>
+        <li>Revisions available for an additional fee</li>
+        <li class="do">Filmed in the RichMadeIt × 730 studio setup</li>
+        <li class="do">720p resolution — for 4K cinematic videos, check out the main RichMadeIt site</li>
+        <li class="do">Delivery timing discussed on the call after we accept</li>
+        <li class="do">You own the final video — post it, sell it, run it up</li>
+      </ul>
+
+      <label class="rules-confirm" id="rules-confirm">
+        <input type="checkbox" id="rules_acknowledged" name="rules_acknowledged" required style="display:none;" />
+        <div class="addon-checkbox"></div>
+        <div class="rules-confirm-text">
+          Got it — submit now, pay only if accepted. Let's go.
+        </div>
+      </label>
+    </div>
+  </section>
+
+  <!-- STICKY SUBMIT BAR -->
+  <div class="price-bar">
+    <div>
+      <div class="price-bar-label">Ready to lock it in?</div>
+      <div class="price-bar-amount" id="total-display" style="font-size:14px;letter-spacing:1px">Quote on review</div>
+    </div>
+    <button type="submit" class="price-bar-submit" id="submit-btn" disabled>Submit for Review</button>
+  </div>
+</form>
+
+<!-- ============ CONFIRMATION ============ -->
+<section class="confirmation" id="confirmation">
+  <div class="confirmation-inner">
+    <div class="confirmation-stamp">SUBMITTED.</div>
+    <h2>We Got It</h2>
+    <p>
+      Your booking is in review. We'll look at your song, photos, and details — make sure it's a fit for the studio — and reach out within <strong style="color: var(--richmade-yellow);">24 hours</strong> to either accept and send a payment link, or let you know it's not the right match.
+    </p>
+    <p>
+      <strong style="color: var(--richmade-yellow);">Important:</strong> No payment is required yet. Don't send anything until you hear back from Rich or 730 Radio directly.
+    </p>
+
+    <div style="background: var(--bg-card); border: 2px solid var(--border-subtle); border-radius: 12px; padding: 20px; margin-top: 30px; text-align: left;">
+      <div style="font-family: 'Permanent Marker', cursive; color: var(--richmade-yellow); font-size: 16px; letter-spacing: 1px; margin-bottom: 12px;">What Happens Next</div>
+      <ol style="list-style: none; padding: 0; counter-reset: step;">
+        <li style="padding: 10px 0 10px 36px; position: relative; font-size: 14px; color: var(--text-secondary); counter-increment: step;"><span style="position: absolute; left: 0; top: 8px; width: 26px; height: 26px; background: var(--richmade-red); color: var(--bg-black); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Anton', sans-serif; font-size: 16px;">1</span>We review your submission (within 24 hours)</li>
+        <li style="padding: 10px 0 10px 36px; position: relative; font-size: 14px; color: var(--text-secondary); counter-increment: step;"><span style="position: absolute; left: 0; top: 8px; width: 26px; height: 26px; background: var(--richmade-red); color: var(--bg-black); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Anton', sans-serif; font-size: 16px;">2</span>We DM you with payment link OR a polite pass</li>
+        <li style="padding: 10px 0 10px 36px; position: relative; font-size: 14px; color: var(--text-secondary); counter-increment: step;"><span style="position: absolute; left: 0; top: 8px; width: 26px; height: 26px; background: var(--richmade-red); color: var(--bg-black); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Anton', sans-serif; font-size: 16px;">3</span>Once payment hits, we start production</li>
+        <li style="padding: 10px 0 10px 36px; position: relative; font-size: 14px; color: var(--text-secondary); counter-increment: step;"><span style="position: absolute; left: 0; top: 8px; width: 26px; height: 26px; background: var(--richmade-red); color: var(--bg-black); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Anton', sans-serif; font-size: 16px;">4</span>Video delivered to your inbox — timing covered on the call</li>
+      </ol>
+    </div>
+
+    <p style="margin-top: 30px; font-size: 13px; color: var(--text-muted);">
+      Reach out if you have questions:
+    </p>
+    <div class="contact-grid">
+      <div class="contact-card rich">
+        <div class="contact-label">RichMadeIt</div>
+        <div class="contact-value">@rich_madeit_</div>
+      </div>
+      <div class="contact-card radio">
+        <div class="contact-label">730 Radio</div>
+        <div class="contact-value">DM on IG</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © RichMadeIt × 730 Radio · Houston, TX
+</footer>
+
+<script>
+/* ============ STATE ============ */
+const state = {
+  tier: null,
+  tierName: null,
+  tierPrice: 0,
+  tierDetail: null,
+  addons: [],
+  photos: [],
+  rulesOk: false,
+};
+
+/* ============ TIER SELECTION ============ */
+document.querySelectorAll('.tier-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.tier = card.dataset.tier;
+    state.tierPrice = parseInt(card.dataset.price);
+    state.tierName = card.querySelector('.tier-name').textContent;
+    state.tierDetail = card.dataset.detail;
+    document.getElementById('package_tier').value = state.tierDetail;
+    document.getElementById('package_price').value = state.tierPrice;
+    updateTotal();
+  });
+});
+
+/* ============ ADD-ONS ============ */
+document.querySelectorAll('.addon-item').forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    item.classList.toggle('checked');
+    const name = item.dataset.name;
+    if (item.classList.contains('checked')) {
+      if (!state.addons.includes(name)) state.addons.push(name);
+    } else {
+      state.addons = state.addons.filter(n => n !== name);
+    }
+    document.getElementById('addons_selected').value = state.addons.join(', ');
+    updateTotal();
+  });
+});
+
+/* ============ PHOTOS ============ */
+const photoInput = document.getElementById('photos');
+const photoZone = document.getElementById('photo-zone');
+const previewContainer = document.getElementById('photo-previews');
+const photoCount = document.getElementById('photo-count');
+const MAX_PHOTOS = 5;
+const MIN_PHOTOS = 3;
+
+photoInput.addEventListener('change', (e) => {
+  handleFiles(e.target.files);
+});
+
+['dragover', 'dragenter'].forEach(evt => {
+  photoZone.addEventListener(evt, e => {
+    e.preventDefault();
+    photoZone.classList.add('dragover');
+  });
+});
+['dragleave', 'drop'].forEach(evt => {
+  photoZone.addEventListener(evt, e => {
+    e.preventDefault();
+    photoZone.classList.remove('dragover');
+  });
+});
+photoZone.addEventListener('drop', e => {
+  if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+});
+
+function handleFiles(fileList) {
+  const newFiles = Array.from(fileList);
+  newFiles.forEach(file => {
+    if (state.photos.length >= MAX_PHOTOS) return;
+    if (!file.type.startsWith('image/')) return;
+    state.photos.push(file);
+  });
+  renderPreviews();
+  updatePhotoInput();
+}
+
+function renderPreviews() {
+  previewContainer.innerHTML = '';
+  state.photos.forEach((file, i) => {
+    const url = URL.createObjectURL(file);
+    const div = document.createElement('div');
+    div.className = 'photo-preview';
+    div.innerHTML = `<img src="${url}" alt="ref ${i+1}" /><button type="button" class="photo-remove" data-i="${i}">×</button>`;
+    previewContainer.appendChild(div);
+  });
+  previewContainer.querySelectorAll('.photo-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.photos.splice(parseInt(btn.dataset.i), 1);
+      renderPreviews();
+      updatePhotoInput();
+    });
+  });
+  const n = state.photos.length;
+  photoCount.textContent = n < MIN_PHOTOS
+    ? `${n} / ${MIN_PHOTOS} photos minimum`
+    : `${n} photo${n > 1 ? 's' : ''} uploaded ✓`;
+  photoCount.classList.toggle('met', n >= MIN_PHOTOS);
+  updateTotal();
+}
+
+function updatePhotoInput() {
+  const dt = new DataTransfer();
+  state.photos.forEach(f => dt.items.add(f));
+  photoInput.files = dt.files;
+}
+
+/* ============ RULES ============ */
+const rulesBox = document.getElementById('rules-confirm');
+const rulesCheckbox = document.getElementById('rules_acknowledged');
+rulesBox.addEventListener('click', (e) => {
+  e.preventDefault();
+  state.rulesOk = !state.rulesOk;
+  rulesBox.classList.toggle('checked', state.rulesOk);
+  rulesCheckbox.checked = state.rulesOk;
+  updateTotal();
+});
+
+/* ============ PRICE TOTAL ============ */
+function updateTotal() {
+  // Prices are now quoted per artist on review — no public totals shown
+  const display = document.getElementById('total-display');
+  if (state.tier) {
+    display.textContent = 'Quote on review';
+  } else {
+    display.textContent = 'Pick a tier to start';
+  }
+  document.getElementById('total_price').value = '';
+
+  const ready = state.tier && state.photos.length >= MIN_PHOTOS && state.rulesOk;
+  document.getElementById('submit-btn').disabled = !ready;
+}
+
+/* ============ SUBMIT ============ */
+// ⚠️ REPLACE THESE TWO VALUES WITH YOUR SUPABASE CREDENTIALS
+// Get them from: Supabase Dashboard → Project Settings → API
+const SUPABASE_URL = 'https://molqlfdjlmnlkscecngz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vbHFsZmRqbG1ubGtzY2Vjbmd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODEzNjMsImV4cCI6MjA5MzE1NzM2M30._CR9A4H7-E7CYzIWdEO4PgRcCgBcORP2wAZqXrXE4Ec';
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const form = document.getElementById('micdrop-form');
+const submitBtn = document.getElementById('submit-btn');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  // Validation
+  if (!state.tier) { alert('Pick a tier to continue'); return; }
+  if (state.photos.length < MIN_PHOTOS) { alert(`Upload at least ${MIN_PHOTOS} photos to continue`); return; }
+  if (!state.rulesOk) { alert('Acknowledge the policies to continue'); return; }
+
+  // Disable button + show loading state
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting...';
+
+  try {
+    // 1. Upload all photos to Supabase Storage
+    const photoUrls = [];
+    const bookingId = crypto.randomUUID();
+
+    for (let i = 0; i < state.photos.length; i++) {
+      const file = state.photos[i];
+      const ext = file.name.split('.').pop();
+      const path = `${bookingId}/photo_${i + 1}.${ext}`;
+
+      const { data: uploadData, error: uploadError } = await supabaseClient
+        .storage
+        .from('micdrop-photos')
+        .upload(path, file, { cacheControl: '3600', upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabaseClient
+        .storage
+        .from('micdrop-photos')
+        .getPublicUrl(path);
+
+      photoUrls.push(urlData.publicUrl);
+    }
+
+    // 2. Insert booking row in database
+    const booking = {
+      id: bookingId,
+      artist_name: document.getElementById('artist_name').value,
+      phone: document.getElementById('phone').value,
+      email: document.getElementById('email').value,
+      instagram: document.getElementById('instagram').value || null,
+      song_title: document.getElementById('song_title').value,
+      song_link: document.getElementById('song_link').value,
+      tier_name: state.tierName,
+      tier_detail: state.tierDetail,
+      tier_price: 0, // Quoted per artist on review
+      addons: state.addons,
+      total_price: 0, // Quoted per artist on review
+      photo_urls: photoUrls,
+      vibe_notes: document.getElementById('vibe_notes').value || null,
+      rules_acknowledged: state.rulesOk,
+      status: 'new'
+    };
+
+    const { error: insertError } = await supabaseClient
+      .from('micdrop_bookings')
+      .insert([booking]);
+
+    if (insertError) throw insertError;
+
+    // 3. Show confirmation screen
+    document.querySelector('form').style.display = 'none';
+    document.querySelector('.hero').style.display = 'none';
+    document.querySelector('.topbar').style.display = 'none';
+    document.getElementById('confirmation').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  } catch (err) {
+    console.error('Submission error:', err);
+    alert('Something went wrong submitting your booking. Please try again or DM @rich_madeit_ directly.\n\nError: ' + (err.message || err));
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit for Review';
+  }
+});
+</script>
+
+</body>
+</html>
