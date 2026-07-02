@@ -52,14 +52,14 @@ exports.handler = async (event) => {
     if (!Array.isArray(images) || images.length < 1) {
       return { statusCode: 400, body: JSON.stringify({ error: "Upload at least one photo." }) };
     }
-    const refs = images.slice(0, 1); // ONE reference image = much faster
+    const refs = images.slice(0, 2); // up to 2 reference photos for better likeness
 
-    // ---- generate the reference sheet (gpt-image-1-mini = fastest) ----
+    // ---- generate the reference sheet (gpt-image-2 = best quality) ----
     const form = new FormData();
-    form.append("model", "gpt-image-1-mini");
+    form.append("model", "gpt-image-2");
     form.append("prompt", REFERENCE_PROMPT);   // HARDCODED
-    form.append("quality", "low");
-    form.append("size", "1024x1024");          // square = faster than tall
+    form.append("quality", "medium");
+    form.append("size", "1024x1536");          // tall = proper reference-sheet layout
     form.append("moderation", "low");
     form.append("n", "1");
     for (let i = 0; i < refs.length; i++) {
@@ -69,10 +69,10 @@ exports.handler = async (event) => {
       form.append("image[]", blob, `ref${i}.png`);
     }
 
-    // hard timeout so we NEVER hit the 60s function ceiling silently —
-    // if OpenAI hangs, we abort at 45s and surface a real error.
+    // hard timeout just under the 60s function ceiling — give gpt-image-2
+    // the maximum time to finish before we abort with a real error.
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 45000);
+    const timer = setTimeout(() => controller.abort(), 55000);
     let resp, data;
     try {
       resp = await fetch("https://api.openai.com/v1/images/edits", {
