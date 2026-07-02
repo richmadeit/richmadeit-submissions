@@ -283,6 +283,16 @@
     .song-note { margin:14px 0 4px; padding:14px 16px; background:rgba(255,179,0,.10); border:1px solid rgba(255,179,0,.35); border-radius:10px; font-family:var(--fb); font-size:.9rem; line-height:1.55; color:var(--text,#efefef); text-align:left; }
     .song-note a { color:var(--gold); font-weight:700; text-decoration:none; }
     .song-note a:hover { text-decoration:underline; }
+    .song-box { margin:4px 0 14px; padding:16px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.12); border-radius:12px; }
+    .up-zone-sm { padding:16px 12px; }
+    .up-zone-sm .up-icon { font-size:1.6rem; }
+    .song-or { text-align:center; color:var(--muted); font-size:.82rem; margin:10px 0; font-family:var(--fb); }
+    .song-save-btn { width:100%; margin-top:12px; padding:12px; border-radius:10px; border:none; background:var(--gold,#FFB300); color:#070707; font-family:var(--fb); font-weight:800; font-size:1rem; cursor:pointer; transition:opacity .15s ease; }
+    .song-save-btn:hover { opacity:.9; }
+    .song-save-btn:disabled { opacity:.6; cursor:default; }
+    .song-status { margin-top:10px; font-family:var(--fb); font-size:.88rem; text-align:center; min-height:1.2em; }
+    .song-status.ok { color:#4ade80; }
+    .song-status.err { color:#f87171; }
     .ref-consent { display:flex; align-items:flex-start; gap:9px; font-size:.85rem; color:var(--muted,#888); line-height:1.4; margin:6px 0 4px; cursor:pointer; }
     .ref-consent input { margin-top:2px; accent-color:var(--accent); flex-shrink:0; }
     .ref-counter { text-align:center; font-family:var(--fs); letter-spacing:1px; text-transform:uppercase; font-size:.78rem; color:var(--gold); margin-top:10px; }
@@ -690,12 +700,29 @@
         <div class="char-result-body" style="text-align:center;">There you are — in the scene! 🔥<br>This is just a <strong>first look</strong> — save it (long-press or right-click). When I turn it into your video, the detail, motion, and likeness get taken to a whole other level. 🎬</div>
         <div class="char-director-note">🔥 This preview is just the start. Your finished video is fully directed by me — sharper detail, cinematic quality, and true-to-life likeness, back in 1–24 hours.</div>
         <div class="song-note">
-          🎵 <strong>Where's my song go?</strong> Grab your video below, then send me your track — I'll build your video around it.<br>
-          Send it to <a href="mailto:rich.madeit3@gmail.com">rich.madeit3@gmail.com</a> or <a href="https://wa.me/13464981235" target="_blank" rel="noopener">WhatsApp 346-498-1235</a>. Include the email you used at checkout so I match it to your order.
+          🎵 <strong>Add your song now</strong> so I have everything ready when you order. Upload the file or paste a link (Suno, Google Drive, Dropbox, etc.).
+        </div>
+        <div class="song-box" id="songBox">
+          <div class="signup-field" style="margin-bottom:10px;">
+            <label>Upload Your Song <span class="opt">MP3 or WAV</span></label>
+            <div class="up-zone up-zone-sm" id="songZone">
+              <input type="file" id="songFile" accept="audio/*,.mp3,.wav,.m4a,.aac">
+              <div class="up-icon">🎵</div>
+              <div class="up-title" id="songTitle">Tap to upload your track</div>
+              <div class="up-picked" id="songPicked"></div>
+            </div>
+          </div>
+          <div class="song-or">— or —</div>
+          <div class="signup-field">
+            <label>Paste a Song Link <span class="opt">Suno, Drive, Dropbox…</span></label>
+            <input type="url" class="inp" id="songLink" placeholder="https://suno.com/song/…">
+          </div>
+          <button type="button" class="song-save-btn" id="songSaveBtn">Attach My Song ✓</button>
+          <div class="song-status" id="songStatus"></div>
         </div>
         <div class="char-buy-wrap">
           <a href="https://buy.stripe.com/9B6bJ1bQ90NEfn62ItbMQ09" class="char-buy-btn" id="charBuyBtn">Get My 30-Sec Video — $75 →</a>
-          <div class="char-buy-note">After checkout, send your song (email or WhatsApp above) and I'll get to work. 🎬</div>
+          <div class="char-buy-note">Song not ready? You can also email it to <a href="mailto:rich.madeit3@gmail.com" style="color:var(--gold)">rich.madeit3@gmail.com</a> or WhatsApp <a href="https://wa.me/13464981235" target="_blank" rel="noopener" style="color:var(--gold)">346-498-1235</a> after checkout. 🎬</div>
         </div>
       </div>
     </div>
@@ -1317,6 +1344,7 @@ document.querySelectorAll('a[href="#signup"]').forEach(a => {
       // show the finished sheet right here on the page
       imgEl.src = data.image;
       loadEl.style.display = 'none';
+      window._rmiLastEmail = email; // remember for song attach
 
       // count it, fire the LEAD event, reveal the result
       bump();
@@ -1338,6 +1366,82 @@ document.querySelectorAll('a[href="#signup"]').forEach(a => {
   if (buyBtn) buyBtn.addEventListener('click', () => {
     if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'30-Sec Video $75', value:75, currency:'USD'});
   });
+
+  // ── SONG ATTACH: upload file to Supabase storage OR save a pasted link,
+  //    then record it against the customer's lead so it shows in the dashboard ──
+  (function(){
+    const songFile   = document.getElementById('songFile');
+    const songLink   = document.getElementById('songLink');
+    const songSave   = document.getElementById('songSaveBtn');
+    const songStatus = document.getElementById('songStatus');
+    const songPicked = document.getElementById('songPicked');
+    const songTitle  = document.getElementById('songTitle');
+    if (!songSave) return;
+
+    const setStatus = (msg, kind) => {
+      songStatus.textContent = msg;
+      songStatus.className = 'song-status' + (kind ? ' ' + kind : '');
+    };
+
+    // show picked filename
+    if (songFile){
+      songFile.addEventListener('change', () => {
+        const f = songFile.files[0];
+        if (f){ songPicked.textContent = '✓ ' + f.name; songTitle.textContent = 'Tap to change track'; }
+        else { songPicked.textContent = ''; }
+      });
+    }
+
+    let db = null;
+    try {
+      if (typeof supabase !== 'undefined' && typeof CONFIG !== 'undefined' && CONFIG.SUPABASE_URL){
+        db = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+      }
+    } catch(e){}
+
+    songSave.addEventListener('click', async () => {
+      const email = (window._rmiLastEmail || '').trim();
+      const file  = songFile && songFile.files[0];
+      const link  = (songLink && songLink.value || '').trim();
+
+      if (!file && !link){
+        return setStatus('Upload a file or paste a link first.', 'err');
+      }
+
+      songSave.disabled = true;
+      setStatus('Saving your song…', '');
+
+      try {
+        let songUrl = link;
+
+        // If a file was chosen, upload it to Supabase storage
+        if (file && db){
+          const safe = (email.replace(/[^a-z0-9]/gi,'_') || 'anon') + '_' + Date.now() + '_' + file.name.replace(/[^a-z0-9._-]/gi,'_');
+          const { error: upErr } = await db.storage.from('client-files').upload('songs/' + safe, file, { upsert: true });
+          if (upErr) throw upErr;
+          const { data: pub } = db.storage.from('client-files').getPublicUrl('songs/' + safe);
+          songUrl = (pub && pub.publicUrl) ? pub.publicUrl : ('songs/' + safe);
+        } else if (file && !db){
+          throw new Error('storage-unavailable');
+        }
+
+        // Attach the song to their lead row (best-effort)
+        if (db && email){
+          // update the most recent lead for this email with the song link
+          await db.from('reference_generations')
+            .update({ song_url: songUrl })
+            .eq('email', email);
+        }
+
+        setStatus('✓ Song attached! Now grab your video below. 🎬', 'ok');
+        songSave.textContent = 'Song Attached ✓';
+      } catch(err){
+        console.error(err);
+        setStatus("Couldn't save it here — no stress, email it to rich.madeit3@gmail.com after checkout.", 'err');
+        songSave.disabled = false;
+      }
+    });
+  })();
 })();
 
 
