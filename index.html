@@ -655,14 +655,15 @@
         <div>Building your character… this takes ~30 seconds 🔥</div>
       </div>
 
-      <!-- RESULT: shows the generated sheet on-page -->
+      <!-- RESULT: check your email (background function emails the sheet) -->
       <div class="char-result" id="refResult">
-        <div class="char-result-badge">★ Your Character Reference Sheet</div>
-        <img id="refImage" class="ref-image" alt="Your character reference sheet">
-        <div class="char-director-note">🔥 Love your character? Turn it into a cinematic 30-second music video — I direct every single one personally, back in 1–24 hours.</div>
+        <div class="char-result-badge">★ On Its Way</div>
+        <div style="font-size:2.4rem;text-align:center;margin-bottom:8px;">📬</div>
+        <div class="char-result-body" style="text-align:center;">Your character is being built right now! 🔥<br>Check your <strong>email in about a minute</strong> — your reference sheet plus how to turn it into your video will be waiting for you.</div>
+        <div class="char-director-note">🔥 Ready now? Turn your character into a cinematic 30-second music video — I direct every single one personally, back in 1–24 hours.</div>
         <div class="char-buy-wrap">
           <a href="https://buy.stripe.com/cNicN52fz7c2b6Q3MxbMQ08" class="char-buy-btn" id="charBuyBtn">Get My 30-Sec Video — $50 →</a>
-          <div class="char-buy-note">Not ready yet? No worries — save your sheet and come back when you're ready. 🎬</div>
+          <div class="char-buy-note">Not ready yet? No worries — check your email, it's all in there. 🎬</div>
         </div>
       </div>
     </div>
@@ -1413,35 +1414,28 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
     if (!consentEl.checked) return showErr('Please confirm these are your own photos.');
 
     btn.disabled = true;
-    loadEl.classList.add('show');
-    resultEl.classList.remove('show');
-
-    // fire the LEAD event as soon as they submit (for ads optimization)
-    if (typeof fbq !== 'undefined') fbq('track','Lead',{content_name:'Reference Sheet'});
+    btn.textContent = 'Sending…';
 
     try {
       const images = [];
       for (const f of files){ images.push(await fileToDataURL(f, 1024)); }
 
-      const r = await fetch('/.netlify/functions/generate-reference', {
+      // BACKGROUND function: returns 202 immediately, delivers the sheet by email.
+      await fetch('/.netlify/functions/generate-reference-background', {
         method:'POST', headers:{'content-type':'application/json'},
         body: JSON.stringify({ email, images, consent: true })
       });
-      const data = await r.json();
-      loadEl.classList.remove('show');
 
-      if (data.error){ btn.disabled=false; btn.textContent='Try Again 🎬'; return showErr(data.error); }
-      if (!data.image){ btn.disabled=false; btn.textContent='Try Again 🎬'; return showErr('No image came back — try again.'); }
-
-      imgEl.src = data.image;
-      resultEl.classList.add('show');
+      // count it, fire the LEAD event, show the "check your email" confirmation
       bump();
       refreshCounter();
+      if (typeof fbq !== 'undefined') fbq('track','Lead',{content_name:'Reference Sheet'});
 
+      resultEl.classList.add('show');
       resultEl.scrollIntoView({behavior:'smooth', block:'center'});
+
       if (used() < MAX_FREE){ btn.disabled=false; btn.textContent='Build Another 🎬'; }
     } catch(e){
-      loadEl.classList.remove('show');
       btn.disabled=false;
       btn.textContent='Generate My Character Sheet 🎬';
       showErr('Something glitched — try again.');
