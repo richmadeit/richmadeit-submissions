@@ -1,0 +1,8 @@
+# ── RichMadeIt Netlify config ──────────────────────────────
+# Functions live in netlify/functions/
+[functions]
+  node_bundler = "esbuild"
+  # extend synchronous function timeout to the Pro-plan max (26s)
+  # NOTE: on Pro you may still need to ask Netlify support to ACTIVATE
+  # the 26s timeout for this site — the config alone often isn't enough.
+  timeout = 26

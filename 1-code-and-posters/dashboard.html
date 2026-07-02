@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — RichMadeIt</title>
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bangers&family=Barlow+Condensed:wght@300;400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg:#060606; --bg2:#0d0d0d; --bg3:#141414; --bg4:#1c1c1c;
+      --accent:#FF5500; --gold:#FFB300; --green:#22c55e; --yellow:#eab308; --red:#ef4444;
+      --logo-red:#D93500;
+      --text:#EFEFEF; --muted:#777; --muted2:#444;
+      --border:rgba(255,85,0,.15); --border2:rgba(255,255,255,.07);
+      --fd:'Bebas Neue',sans-serif; --fs:'Barlow Condensed',sans-serif; --fb:'DM Sans',sans-serif;
+    }
+    body { background:var(--bg); color:var(--text); font-family:var(--fb); min-height:100vh; }
+
+    /* ── LOGIN ─── */
+    #loginScreen {
+      display:flex; align-items:center; justify-content:center;
+      min-height:100vh; background:var(--bg);
+    }
+    .login-box { width:min(100%,380px); padding:40px; background:var(--bg3); border:1px solid var(--border); }
+    .login-logo { font-family:'Bangers',cursive; font-style:italic; font-size:2rem; letter-spacing:2px; color:var(--logo-red); display:inline-flex; align-items:flex-end; gap:2px; line-height:1; margin-bottom:6px; }
+    .logo-flame { display:inline-block; margin-bottom:-2px; margin-left:1px; flex-shrink:0; }
+    .login-sub { font-family:var(--fs); font-size:.75rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:28px; }
+    .login-box label { display:block; font-family:var(--fs); font-size:.72rem; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    .login-box input { width:100%; background:var(--bg4); border:1px solid var(--border2); color:var(--text); font-family:var(--fb); font-size:.95rem; padding:13px 16px; outline:none; margin-bottom:16px; }
+    .login-box input:focus { border-color:var(--accent); }
+    .login-btn { width:100%; background:var(--accent); color:#fff; border:none; font-family:var(--fs); font-size:.88rem; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; padding:14px; cursor:pointer; transition:all .2s; }
+    .login-btn:hover { background:var(--gold); color:#000; }
+    .login-err { font-size:.8rem; color:var(--red); margin-top:10px; display:none; }
+
+    /* ── DASHBOARD ─── */
+    #dashboard { display:none; }
+
+    header { display:flex; align-items:center; justify-content:space-between; padding:16px 32px; background:var(--bg2); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; }
+    .logo { font-family:'Bangers',cursive; font-style:italic; font-size:1.8rem; letter-spacing:2px; color:var(--logo-red); display:inline-flex; align-items:flex-end; gap:2px; line-height:1; }
+    .header-r { display:flex; align-items:center; gap:16px; }
+    .logout-btn { background:none; border:1px solid var(--border2); color:var(--muted); font-family:var(--fs); font-size:.72rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:8px 18px; cursor:pointer; transition:all .2s; }
+    .logout-btn:hover { border-color:var(--muted); color:var(--text); }
+    .refresh-btn { background:var(--accent); color:#fff; border:none; font-family:var(--fs); font-size:.72rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:8px 18px; cursor:pointer; transition:all .2s; }
+    .refresh-btn:hover { background:var(--gold); color:#000; }
+
+    /* ── STATS ─── */
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; padding:20px 32px; max-width:100%; }
+    @media(max-width:700px){ .stats{grid-template-columns:repeat(2,1fr);} }
+    .stat { padding:20px 22px; background:var(--bg3); }
+    .stat-val { font-family:var(--fd); font-size:2.4rem; color:var(--gold); line-height:1; }
+    .stat-label { font-family:var(--fs); font-size:.72rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+
+    /* ── FILTERS ─── */
+    .filters { display:flex; align-items:center; gap:10px; padding:0 32px 16px; flex-wrap:wrap; }
+    .filter-btn { background:none; border:1px solid var(--border2); color:var(--muted); font-family:var(--fs); font-size:.72rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:7px 16px; cursor:pointer; transition:all .2s; }
+    .filter-btn:hover { border-color:rgba(255,85,0,.4); color:var(--text); }
+    .filter-btn.active { background:rgba(255,85,0,.1); border-color:var(--accent); color:var(--accent); }
+
+    /* ── TABLE ─── */
+    .table-wrap { padding:0 32px 40px; overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; }
+    thead tr { border-bottom:2px solid var(--border); }
+    th { font-family:var(--fs); font-size:.68rem; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--muted); padding:10px 12px; text-align:left; white-space:nowrap; }
+    tbody tr { border-bottom:1px solid var(--border2); transition:background .15s; cursor:pointer; }
+    tbody tr:hover { background:rgba(255,85,0,.04); }
+    td { padding:12px 12px; font-size:.84rem; vertical-align:middle; }
+    td.order-num { font-family:var(--fd); font-size:1.1rem; color:var(--muted2); }
+    td.client-name { font-weight:500; }
+    td.artist { font-family:var(--fs); font-size:.88rem; font-weight:700; letter-spacing:.5px; }
+    td.pkg { font-family:var(--fs); font-size:.78rem; font-weight:700; letter-spacing:1px; }
+    td.pkg .p60 { color:var(--muted); }
+    td.pkg .pfull { color:var(--gold); }
+
+    .badge { display:inline-block; font-family:var(--fs); font-size:.62rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:3px 10px; }
+    .badge-paid { background:rgba(34,197,94,.15); color:var(--green); border:1px solid rgba(34,197,94,.3); }
+    .badge-unpaid { background:rgba(234,179,8,.12); color:var(--yellow); border:1px solid rgba(234,179,8,.3); }
+    .badge-pending { background:rgba(255,255,255,.07); color:var(--muted); border:1px solid var(--border2); }
+    .badge-inprog { background:rgba(255,85,0,.12); color:var(--accent); border:1px solid rgba(255,85,0,.3); }
+    .badge-done { background:rgba(34,197,94,.12); color:var(--green); border:1px solid rgba(34,197,94,.25); }
+    .badge-delivered { background:rgba(255,179,0,.12); color:var(--gold); border:1px solid rgba(255,179,0,.3); }
+
+    .deadline-chip { display:inline-block; font-family:var(--fs); font-size:.7rem; font-weight:700; letter-spacing:1px; padding:3px 9px; }
+    .deadline-ok { background:rgba(34,197,94,.12); color:var(--green); }
+    .deadline-warn { background:rgba(234,179,8,.12); color:var(--yellow); }
+    .deadline-late { background:rgba(239,68,68,.15); color:var(--red); }
+    .deadline-none { color:var(--muted2); font-size:.76rem; }
+
+    td.actions { white-space:nowrap; }
+    .act-btn { background:none; border:1px solid var(--border2); color:var(--muted); font-family:var(--fs); font-size:.65rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:5px 12px; cursor:pointer; margin-right:6px; transition:all .15s; }
+    .act-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .act-btn.pay-btn { border-color:rgba(34,197,94,.4); color:var(--green); }
+    .act-btn.pay-btn:hover { background:rgba(34,197,94,.1); }
+
+    /* ── LOADING / EMPTY ─── */
+    .loading { text-align:center; padding:60px; color:var(--muted); font-family:var(--fs); font-size:.85rem; letter-spacing:2px; text-transform:uppercase; }
+    .empty { text-align:center; padding:60px; color:var(--muted2); }
+    .empty h3 { font-family:var(--fd); font-size:1.8rem; letter-spacing:2px; color:var(--muted); margin-bottom:8px; }
+    .empty p { font-size:.84rem; }
+
+    /* ── DETAIL PANEL ─── */
+    .detail-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:500; align-items:flex-start; justify-content:flex-end; overflow-y:auto; }
+    .detail-overlay.on { display:flex; }
+    .detail-panel { width:min(100%,500px); min-height:100vh; background:var(--bg3); border-left:1px solid var(--border); padding:32px; animation:slideIn .25s ease; }
+    @keyframes slideIn { from{transform:translateX(30px);opacity:0} to{transform:translateX(0);opacity:1} }
+    .dp-close { background:none; border:none; color:var(--muted); font-family:var(--fs); font-size:.72rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; margin-bottom:24px; padding:0; }
+    .dp-close:hover { color:var(--accent); }
+    .dp-name { font-family:var(--fd); font-size:2rem; letter-spacing:2px; margin-bottom:4px; }
+    .dp-artist { font-family:var(--fs); font-size:1rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:20px; }
+    .dp-section { margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border2); }
+    .dp-section:last-child { border-bottom:none; }
+    .dp-section-title { font-family:var(--fs); font-size:.68rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+    .dp-row { display:flex; gap:10px; margin-bottom:8px; }
+    .dp-lbl { font-family:var(--fs); font-size:.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted2); min-width:110px; flex-shrink:0; padding-top:1px; }
+    .dp-val { font-size:.84rem; color:var(--text); line-height:1.5; word-break:break-word; }
+    .dp-val a { color:var(--accent); text-decoration:none; }
+    .dp-val a:hover { text-decoration:underline; }
+    .dp-actions { display:flex; flex-direction:column; gap:10px; margin-top:20px; }
+    .dp-pay-btn { background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.4); color:var(--green); font-family:var(--fs); font-size:.78rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:12px; cursor:pointer; transition:all .2s; }
+    .dp-pay-btn:hover { background:rgba(34,197,94,.2); }
+    .dp-status-row { display:flex; gap:8px; flex-wrap:wrap; }
+    .dp-status-btn { background:var(--bg4); border:1px solid var(--border2); color:var(--muted); font-family:var(--fs); font-size:.7rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:8px 14px; cursor:pointer; transition:all .15s; }
+    .dp-status-btn:hover { border-color:var(--accent); color:var(--text); }
+    .dp-status-btn.curr { border-color:var(--accent); color:var(--accent); background:rgba(255,85,0,.08); }
+    /* ── OUTREACH STAGE TRACKER ─── */
+    .stage-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
+    .stage-btn { background:var(--bg4); border:1px solid var(--border2); color:var(--muted); font-family:var(--fs); font-size:.68rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:7px 11px; cursor:pointer; transition:all .15s; border-radius:3px; }
+    .stage-btn:hover { border-color:var(--accent); color:var(--text); }
+    .stage-btn.curr { color:#fff; border-color:transparent; }
+    .stage-btn.curr.s-new { background:var(--muted2); }
+    .stage-btn.curr.s-sent1 { background:var(--accent); }
+    .stage-btn.curr.s-replied { background:#3b82f6; }
+    .stage-btn.curr.s-sent2 { background:var(--accent); }
+    .stage-btn.curr.s-nego { background:var(--gold); color:#000; }
+    .stage-btn.curr.s-won { background:var(--green); }
+    .stage-btn.curr.s-lost { background:var(--red); }
+    /* table pill showing stage at a glance */
+    .stage-pill { display:inline-block; font-family:var(--fs); font-size:.58rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:2px 8px; border-radius:3px; }
+    .stage-pill.s-new { background:rgba(255,255,255,.07); color:var(--muted); border:1px solid var(--border2); }
+    .stage-pill.s-sent1 { background:rgba(255,85,0,.12); color:var(--accent); border:1px solid rgba(255,85,0,.3); }
+    .stage-pill.s-replied { background:rgba(59,130,246,.15); color:#3b82f6; border:1px solid rgba(59,130,246,.35); }
+    .stage-pill.s-sent2 { background:rgba(255,85,0,.18); color:var(--accent); border:1px solid rgba(255,85,0,.4); }
+    .stage-pill.s-nego { background:rgba(255,179,0,.15); color:var(--gold); border:1px solid rgba(255,179,0,.35); }
+    .stage-pill.s-won { background:rgba(34,197,94,.15); color:var(--green); border:1px solid rgba(34,197,94,.35); }
+    .stage-pill.s-lost { background:rgba(239,68,68,.12); color:var(--red); border:1px solid rgba(239,68,68,.3); }
+    .copy-btn { background:var(--bg4); border:1px solid var(--border2); color:var(--muted); font-family:var(--fs); font-size:.7rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:8px 14px; cursor:pointer; transition:all .15s; }
+    .copy-btn:hover { border-color:var(--gold); color:var(--gold); }
+
+    /* ── CALL QUALIFICATION ─── */
+    .dp-qual { background:linear-gradient(135deg, var(--bg4), rgba(255,85,0,.04)); border-left:3px solid var(--accent); padding:18px 18px 14px; margin:0 -2px 20px; }
+    .dp-qual-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; flex-wrap:wrap; }
+    .dp-qual-head .dp-section-title { margin-bottom:0; }
+    .vibe-badge { font-family:var(--fs); font-size:.62rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:5px 11px; border:1px solid; }
+    .vibe-badge.hot { color:var(--red); border-color:var(--red); background:rgba(239,68,68,.1); }
+    .vibe-badge.warm { color:var(--accent); border-color:var(--accent); background:rgba(255,85,0,.1); }
+    .vibe-badge.cold { color:var(--muted); border-color:var(--muted2); background:var(--bg4); }
+    .vibe-badge.none { color:var(--muted2); border-color:var(--border2); }
+    .call-meta { display:flex; gap:14px; margin-bottom:14px; font-family:var(--fs); font-size:.65rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); flex-wrap:wrap; }
+    .call-meta strong { color:var(--gold); font-weight:700; }
+    .qual-q { padding:12px 0; border-bottom:1px dashed var(--border2); }
+    .qual-q:last-of-type { border-bottom:none; }
+    .qual-q-head { display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+    .qual-q-num { font-family:var(--fd); font-size:1.1rem; color:var(--accent); line-height:1; min-width:22px; }
+    .qual-q-label { font-family:var(--fs); font-size:.78rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text); }
+    .qual-q-script { font-size:.78rem; color:var(--muted); font-style:italic; margin:0 0 9px 32px; line-height:1.45; }
+    .qual-chips { display:flex; flex-wrap:wrap; gap:5px; margin-left:32px; }
+    .qual-chip { background:var(--bg4); border:1px solid var(--border2); color:var(--text); padding:6px 10px; font-family:var(--fs); font-size:.7rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:all .15s; user-select:none; }
+    .qual-chip:hover { border-color:var(--accent); color:var(--accent); }
+    .qual-chip.selected { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .qual-chip.selected.kill { background:var(--red); border-color:var(--red); color:#fff; }
+    .qual-chip.selected.gold { background:var(--gold); border-color:var(--gold); color:#000; }
+    .qual-notes { width:100%; background:var(--bg4); border:1px solid var(--border2); color:var(--text); padding:10px 12px; font-family:var(--fb); font-size:.85rem; resize:vertical; min-height:60px; margin-top:10px; outline:none; }
+    .qual-notes:focus { border-color:var(--accent); }
+    .qual-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+    .qual-actions .copy-btn { flex:1; min-width:120px; padding:9px 12px; }
+    .qual-actions .copy-btn.danger:hover { border-color:var(--red); color:var(--red); }
+    /* Vibe dot in table rows */
+    .vibe-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-left:6px; vertical-align:middle; }
+    .vibe-dot.hot { background:var(--red); box-shadow:0 0 6px var(--red); }
+    .vibe-dot.warm { background:var(--accent); }
+    .vibe-dot.cold { background:var(--muted2); }
+
+    /* ── DELETE BUTTONS ─── */
+    .delete-zone { margin-top:24px; padding-top:20px; border-top:1px dashed rgba(239,68,68,.3); }
+    .delete-zone-label { font-family:var(--fs); font-size:.65rem; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--red); margin-bottom:8px; opacity:.7; }
+    .dp-delete-btn { width:100%; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.4); color:var(--red); font-family:var(--fs); font-size:.78rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:12px; cursor:pointer; transition:all .2s; }
+    .dp-delete-btn:hover { background:rgba(239,68,68,.2); border-color:var(--red); }
+    .act-btn.del-btn { border-color:rgba(239,68,68,.3); color:rgba(239,68,68,.7); padding:5px 10px; }
+    .act-btn.del-btn:hover { border-color:var(--red); color:var(--red); background:rgba(239,68,68,.08); }
+    .m-card-actions button.del { border-color:rgba(239,68,68,.3); color:rgba(239,68,68,.7); flex:0 0 auto; min-width:50px; }
+    .m-card-actions button.del:hover { border-color:var(--red); color:var(--red); }
+
+    /* ── PAY MODAL ─── */
+    .pay-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.9); z-index:600; align-items:center; justify-content:center; }
+    .pay-modal.on { display:flex; }
+    .pay-modal-box { width:min(90%,420px); background:var(--bg3); border:1px solid var(--border); padding:32px; }
+    .pay-modal-box h3 { font-family:var(--fd); font-size:1.8rem; letter-spacing:2px; margin-bottom:6px; }
+    .pay-modal-box p { font-size:.84rem; color:var(--muted); margin-bottom:20px; }
+    .pay-modal-box label { display:block; font-family:var(--fs); font-size:.72rem; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    .pay-modal-box input[type=date] { width:100%; background:var(--bg4); border:1px solid var(--border2); color:var(--text); font-family:var(--fb); font-size:.95rem; padding:12px 16px; outline:none; margin-bottom:16px; color-scheme:dark; }
+    .pay-modal-box input[type=date]:focus { border-color:var(--accent); }
+    .pay-modal-btns { display:flex; gap:10px; }
+    .pm-confirm { flex:1; background:var(--green); color:#000; border:none; font-family:var(--fs); font-size:.8rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:12px; cursor:pointer; transition:opacity .2s; }
+    .pm-confirm:hover { opacity:.85; }
+    .pm-cancel { background:none; border:1px solid var(--border2); color:var(--muted); font-family:var(--fs); font-size:.78rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:12px 20px; cursor:pointer; }
+
+    /* ── MOBILE ─── */
+    @media(max-width:768px) {
+      header { padding:12px 16px; }
+      .stats { grid-template-columns:repeat(2,1fr); padding:12px 16px; }
+      .stat { padding:14px 16px; }
+      .stat-val { font-size:1.8rem; }
+      .filters { padding:0 16px 12px; gap:6px; }
+      .filter-btn { font-size:.65rem; padding:6px 12px; }
+      .table-wrap { padding:0 16px 40px; }
+      /* Hide table, show cards instead */
+      table { display:none; }
+      .mobile-cards { display:flex; flex-direction:column; gap:10px; }
+      .m-card { background:var(--bg3); border:1px solid var(--border2); padding:16px; }
+      .m-card.paid-card { border-color:rgba(34,197,94,.3); }
+      .m-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px; }
+      .m-card-name { font-weight:600; font-size:.95rem; }
+      .m-card-artist { font-family:var(--fs); font-size:.8rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--accent); margin-top:2px; }
+      .m-card-pkg { font-family:var(--fs); font-size:.75rem; font-weight:700; color:var(--muted); margin-top:2px; }
+      .m-card-badges { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+      .m-card-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+      .m-card-actions { display:flex; gap:8px; }
+      .m-card-actions button { flex:1; background:var(--bg4); border:1px solid var(--border2); color:var(--muted); font-family:var(--fs); font-size:.72rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:10px; cursor:pointer; }
+      .m-card-actions button.pay { border-color:rgba(34,197,94,.4); color:var(--green); }
+      .setup-notice { margin:12px 16px; }
+      .detail-panel { width:100%; }
+      .login-box { padding:28px 20px; margin:16px; width:auto; }
+    }
+    @media(min-width:769px) { .mobile-cards { display:none; } }
+
+    /* ── TABS ─── */
+    .tabs { display:flex; gap:2px; padding:16px 32px 0; border-bottom:1px solid var(--border); }
+    .tab { font-family:var(--fs); font-size:.78rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding:10px 20px; cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; background:none; border-top:none; border-left:none; border-right:none; }
+    .tab:hover { color:var(--text); }
+    .tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+    /* ── INTAKES ─── */
+    .intake-card { background:var(--bg3); border:1px solid var(--border2); padding:18px 20px; margin:0 32px 10px; display:flex; align-items:center; gap:16px; transition:background .15s; cursor:pointer; }
+    .intake-card:hover { background:rgba(255,85,0,.04); }
+    .intake-order { font-family:var(--fd); font-size:2rem; color:var(--muted2); line-height:1; min-width:52px; }
+    .intake-info { flex:1; }
+    .intake-artist { font-family:var(--fs); font-size:1rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+    .intake-song { font-size:.82rem; color:var(--muted); margin-top:2px; }
+    .intake-meta { display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; }
+    .intake-chip { font-family:var(--fs); font-size:.65rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:3px 9px; background:var(--bg4); color:var(--muted); border:1px solid var(--border2); }
+    .intake-chip.files { color:var(--gold); border-color:rgba(255,179,0,.3); }
+    .intake-actions { display:flex; flex-direction:column; gap:6px; align-items:flex-end; }
+    .intake-date { font-size:.72rem; color:var(--muted2); }
+    .intake-view { background:none; border:1px solid var(--border2); color:var(--muted); font-family:var(--fs); font-size:.68rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:6px 14px; cursor:pointer; transition:all .15s; white-space:nowrap; }
+    .intake-view:hover { border-color:var(--accent); color:var(--accent); }
+    .intake-status { display:flex; gap:6px; }
+    .ist-btn { font-family:var(--fs); font-size:.65rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:4px 10px; cursor:pointer; border:1px solid var(--border2); background:var(--bg4); color:var(--muted); transition:all .15s; }
+    .ist-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .ist-btn.curr { border-color:var(--accent); color:var(--accent); background:rgba(255,85,0,.08); }
+
+    /* Intake detail panel */
+    .intake-detail { background:var(--bg3); border:1px solid var(--border); margin:0 32px 20px; padding:24px; display:none; }
+    .intake-detail.open { display:block; }
+    .id-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:20px; }
+    @media(max-width:600px){ .id-grid{grid-template-columns:1fr;} }
+    .id-row { }
+    .id-label { font-family:var(--fs); font-size:.68rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+    .id-val { font-size:.88rem; color:var(--text); line-height:1.5; word-break:break-word; }
+    .scenes-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:12px; }
+    @media(max-width:600px){ .scenes-grid{grid-template-columns:1fr;} }
+    .scene-card { background:var(--bg4); border:1px solid var(--border2); padding:12px; }
+    .scene-num { font-family:var(--fs); font-size:.65rem; font-weight:700; letter-spacing:2px; color:var(--accent); margin-bottom:6px; }
+    .scene-detail { font-size:.82rem; color:var(--text); line-height:1.5; }
+    .files-link { display:inline-block; margin-top:16px; padding:10px 20px; background:rgba(255,179,0,.1); border:1px solid rgba(255,179,0,.3); color:var(--gold); font-family:var(--fs); font-size:.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; text-decoration:none; transition:all .2s; }
+    .files-link:hover { background:rgba(255,179,0,.2); }
+    @media(max-width:768px){ .intake-card{margin:0 16px 10px;} .intake-detail{margin:0 16px 16px;} .tabs{padding:12px 16px 0;} }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">RichmadeiT<svg class="logo-flame" width="18" height="14" viewBox="0 0 28 20"><path d="M2 4 C6 1,18 2,24 10 C26 14,22 19,14 18" stroke="#FFD700" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="login-sub">Director Dashboard</div>
+    <label>Password</label>
+    <input type="password" id="pwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Enter Dashboard →</button>
+    <div class="login-err" id="loginErr">Wrong password. Try again.</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <header>
+    <div class="logo">RichmadeiT<svg class="logo-flame" width="18" height="14" viewBox="0 0 28 20"><path d="M2 4 C6 1,18 2,24 10 C26 14,22 19,14 18" stroke="#FFD700" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="header-r">
+      <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <div id="setupNotice" class="setup-notice" style="display:none">
+    ⚠ Supabase not configured — running in demo mode with sample data. 
+    Update <strong>config.js</strong> with your Supabase credentials to go live. 
+    See the README for setup instructions.
+  </div>
+
+  <div class="stats" id="statsRow">
+    <div class="stat"><div class="stat-val" id="s-total">0</div><div class="stat-label">Total Inquiries</div></div>
+    <div class="stat"><div class="stat-val" id="s-paid" style="color:var(--green)">0</div><div class="stat-label">Paid / Active</div></div>
+    <div class="stat"><div class="stat-val" id="s-unpaid" style="color:var(--yellow)">0</div><div class="stat-label">Awaiting Payment</div></div>
+    <div class="stat"><div class="stat-val" id="s-revenue" style="color:var(--gold)">$0</div><div class="stat-label">Total Revenue</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('inquiries',this)">📋 Inquiries</button>
+    <button class="tab" onclick="switchTab('intakes',this)">🎬 Production Intakes</button>
+    <button class="tab" onclick="switchTab('leads',this)">🎨 Character Leads</button>
+  </div>
+
+  <!-- INQUIRIES TAB -->
+  <div id="tabInquiries">
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('unpaid',this)">Awaiting Payment</button>
+      <button class="filter-btn" onclick="setFilter('paid',this)">Paid / Active</button>
+      <button class="filter-btn" onclick="setFilter('pending',this)">Pending</button>
+      <button class="filter-btn" onclick="setFilter('in_progress',this)">In Progress</button>
+      <button class="filter-btn" onclick="setFilter('completed',this)">Completed</button>
+    </div>
+    <div class="table-wrap">
+      <div id="tableLoading" class="loading">Loading submissions...</div>
+      <div id="tableEmpty" class="empty" style="display:none">
+        <h3>No Submissions Yet</h3>
+        <p>When artists submit through the signup form, they'll appear here.</p>
+      </div>
+      <div id="mobileCards" class="mobile-cards"></div>
+      <table id="subTable" style="display:none">
+        <thead>
+          <tr>
+            <th>#</th><th>Client</th><th>Artist</th><th>Package</th>
+            <th>Submitted</th><th>Payment</th><th>Deadline</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="subBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- INTAKES TAB -->
+  <div id="tabIntakes" style="display:none">
+    <div style="padding:16px 32px 8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div style="font-family:var(--fs);font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">In order received — #001 first</div>
+      <a href="https://supabase.com/dashboard" target="_blank" style="font-family:var(--fs);font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);text-decoration:none">View Files in Supabase →</a>
+    </div>
+    <div id="intakesLoading" class="loading" style="padding:40px">Loading intakes...</div>
+    <div id="intakesEmpty" class="empty" style="display:none">
+      <h3>No Intakes Yet</h3>
+      <p>Send clients the intake link after they pay: <strong style="color:var(--accent)">yoursite.netlify.app/intake.html</strong></p>
+    </div>
+    <div id="intakesList" style="padding-bottom:40px"></div>
+  </div>
+
+  <!-- CHARACTER LEADS TAB -->
+  <div id="tabLeads" style="display:none">
+    <div style="padding:16px 32px 8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div style="font-family:var(--fs);font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">Everyone who built a character — newest first</div>
+      <div id="leadsCount" style="font-family:var(--fs);font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold)"></div>
+    </div>
+    <div id="leadsLoading" class="loading" style="padding:40px">Loading leads...</div>
+    <div id="leadsEmpty" class="empty" style="display:none">
+      <h3>No Character Leads Yet</h3>
+      <p>When people build a character on your home page, they'll show up here with their email + sheet.</p>
+    </div>
+    <div class="table-wrap">
+      <table id="leadsTable" style="display:none">
+        <thead><tr><th>#</th><th>Email</th><th>Sheet</th><th>Status</th><th>When</th></tr></thead>
+        <tbody id="leadsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- DETAIL SLIDE-IN -->
+<div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+  <div class="detail-panel" id="detailPanel"></div>
+</div>
+
+<!-- PAY MODAL -->
+<div class="pay-modal" id="payModal">
+  <div class="pay-modal-box">
+    <h3>Mark as <span style="color:var(--green)">Paid</span></h3>
+    <p>Enter the amount charged, date payment was received, and your delivery deadline for this client.</p>
+    <label>Price Charged ($)</label>
+    <input type="number" id="priceChargedInput" placeholder="e.g. 350" min="0" step="any" style="width:100%;background:var(--bg4);border:1px solid var(--border2);color:var(--text);font-family:var(--fb);font-size:.95rem;padding:12px 16px;outline:none;margin-bottom:16px;">
+    <label>Date Paid</label>
+    <input type="date" id="paidDateInput" style="margin-bottom:16px;">
+    <label>Delivery Deadline</label>
+    <input type="date" id="deadlineDateInput" style="width:100%;background:var(--bg4);border:1px solid var(--border2);color:var(--text);font-family:var(--fb);font-size:.95rem;padding:12px 16px;outline:none;margin-bottom:16px;">
+    <div class="pay-modal-btns">
+      <button class="pm-cancel" onclick="closePayModal()">Cancel</button>
+      <button class="pm-confirm" onclick="confirmPaid()">Confirm Payment ✓</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let allData = [];
+  let currentFilter = 'all';
+  let activePayId = null;
+  let db = null;
+  let isDemo = false;
+
+  // ── DEMO DATA ─────────────────────────────────────────
+  const DEMO = [
+    { id:'demo1', created_at: new Date(Date.now()-5*86400000).toISOString(), name:'Marcus Johnson', instagram:'@marcjay', email:'marcus@email.com', phone:'713-555-0101', artist_name:'Marc Jay', genre:'rap_hiphop', package:'full_song', song_title:'On Top', song_link:'https://youtube.com', video_vibe:'dark_cinematic,luxury', settings:'mansion_estate,car_driving', color_palette:'dark_black_gold', artist_in_video:'yes_main', paid:true, price_charged:750, date_paid: new Date(Date.now()-3*86400000).toISOString().split('T')[0], deadline_date: new Date(Date.now()+18*86400000).toISOString().split('T')[0], status:'in_progress' },
+    { id:'demo2', created_at: new Date(Date.now()-2*86400000).toISOString(), name:'DeShawn Williams', instagram:'@deshaun_wills', email:'dw@email.com', phone:'832-555-0202', artist_name:'Lil Dee', genre:'drill', package:'60sec', song_title:'Run It Up', song_link:'https://youtube.com', video_vibe:'street_raw', settings:'city_streets', color_palette:'dark_black_gold', artist_in_video:'yes_main', paid:false, date_paid:null, deadline_date:null, status:'pending' },
+    { id:'demo3', created_at: new Date(Date.now()-1*86400000).toISOString(), name:'Keisha Brown', instagram:'@keisha_official', email:'keisha@email.com', phone:'281-555-0303', artist_name:'K. Brown', genre:'rnb', package:'custom', song_title:'Forever Mine', song_link:'https://youtube.com', video_vibe:'love_story,luxury', settings:'mansion_estate', color_palette:'warm_red_orange', artist_in_video:'yes_some', paid:false, date_paid:null, deadline_date:null, status:'pending' },
+  ];
+
+  // ── LOGIN ─────────────────────────────────────────────
+  function doLogin() {
+    const pw = document.getElementById('pwInput').value;
+    const correct = typeof CONFIG !== 'undefined' ? CONFIG.DASHBOARD_PASSWORD : 'richmadeit2024';
+    if (pw === correct) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      initDB();
+      loadData();
+    } else {
+      document.getElementById('loginErr').style.display = 'block';
+    }
+  }
+
+  function logout() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('pwInput').value = '';
+  }
+
+  // ── DB INIT ───────────────────────────────────────────
+  function initDB() {
+    if (typeof CONFIG !== 'undefined' &&
+        CONFIG.SUPABASE_URL &&
+        CONFIG.SUPABASE_URL !== 'https://YOUR_PROJECT_ID.supabase.co') {
+      const { createClient } = supabase;
+      db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+      isDemo = false;
+    } else {
+      isDemo = true;
+      document.getElementById('setupNotice').style.display = 'block';
+    }
+  }
+
+  // ── TAB SWITCHING ─────────────────────────────────────
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tabInquiries').style.display = tab === 'inquiries' ? 'block' : 'none';
+    document.getElementById('tabIntakes').style.display = tab === 'intakes' ? 'block' : 'none';
+    document.getElementById('tabLeads').style.display = tab === 'leads' ? 'block' : 'none';
+    if (tab === 'intakes') loadIntakes();
+    if (tab === 'leads') loadLeads();
+  }
+
+  // ── LOAD CHARACTER LEADS ──────────────────────────────
+  async function loadLeads() {
+    document.getElementById('leadsLoading').style.display = 'block';
+    document.getElementById('leadsEmpty').style.display = 'none';
+    document.getElementById('leadsTable').style.display = 'none';
+    document.getElementById('leadsBody').innerHTML = '';
+    if (isDemo) { document.getElementById('leadsLoading').style.display='none'; document.getElementById('leadsEmpty').style.display='block'; return; }
+    try {
+      const { data, error } = await db.from('reference_generations').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      document.getElementById('leadsLoading').style.display = 'none';
+      if (!data || !data.length) { document.getElementById('leadsEmpty').style.display='block'; return; }
+      document.getElementById('leadsCount').textContent = data.length + ' lead' + (data.length===1?'':'s');
+      const body = document.getElementById('leadsBody');
+      data.forEach((row, i) => {
+        const when = row.created_at ? new Date(row.created_at).toLocaleDateString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
+        const sheet = row.image_url ? `<a href="${row.image_url}" target="_blank" style="color:var(--gold);text-decoration:none;">View →</a>` : '<span style="color:var(--muted);">—</span>';
+        const status = row.purchased
+          ? '<span style="color:var(--green,#3ddc84);font-weight:700;">✓ Purchased</span>'
+          : '<span style="color:var(--muted);">Lead</span>';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td><td><a href="mailto:${row.email}" style="color:var(--text);text-decoration:none;">${row.email||'—'}</a></td><td>${sheet}</td><td>${status}</td><td style="color:var(--muted);white-space:nowrap;">${when}</td>`;
+        body.appendChild(tr);
+      });
+      document.getElementById('leadsTable').style.display = 'table';
+    } catch (e) {
+      document.getElementById('leadsLoading').style.display = 'none';
+      document.getElementById('leadsEmpty').style.display = 'block';
+    }
+  }
+
+  // ── LOAD INTAKES ──────────────────────────────────────
+  async function loadIntakes() {
+    document.getElementById('intakesLoading').style.display = 'block';
+    document.getElementById('intakesEmpty').style.display = 'none';
+    document.getElementById('intakesList').innerHTML = '';
+    if (isDemo) { document.getElementById('intakesLoading').style.display='none'; document.getElementById('intakesEmpty').style.display='block'; return; }
+    try {
+      const { data, error } = await db.from('production_intakes').select('*').order('created_at', { ascending: true });
+      if (error) throw error;
+      document.getElementById('intakesLoading').style.display = 'none';
+      if (!data || !data.length) { document.getElementById('intakesEmpty').style.display = 'block'; return; }
+      renderIntakes(data);
+    } catch(e) { console.error(e); document.getElementById('intakesLoading').style.display='none'; document.getElementById('intakesEmpty').style.display='block'; }
+  }
+
+  function renderIntakes(data) {
+    const list = document.getElementById('intakesList');
+    list.innerHTML = '';
+    data.forEach((row, i) => {
+      const date = new Date(row.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      const pkg = ({ '60sec':'60-Sec', 'full_song':'Full Song', 'custom':'Custom', 'full_650':'Full Song', '60sec_200':'60-Sec' }[row.package] || row.package || '—');
+      const fmt = row.video_format === 'portrait_916' ? '9:16' : '16:9';
+      const detailId = `id-${i}`;
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <div class="intake-card" onclick="toggleIntakeDetail('${detailId}')">
+          <div class="intake-order">#${row.order_num||String(i+1).padStart(3,'0')}</div>
+          <div class="intake-info">
+            <div class="intake-artist">${row.artist_name}</div>
+            <div class="intake-song">${row.song_title} · ${row.genre||''}</div>
+            <div class="intake-meta">
+              <span class="intake-chip">${pkg}</span>
+              <span class="intake-chip">${fmt}</span>
+              <span class="intake-chip files">🎵 ${row.audio_file?'Audio ✓':'No Audio'}</span>
+              <span class="intake-chip files">📸 ${row.photo_count||0} Photos</span>
+              ${row.storyboard_count>0?'<span class="intake-chip files">🎬 Storyboard</span>':''}
+            </div>
+          </div>
+          <div class="intake-actions">
+            <div class="intake-date">${date}</div>
+            <div class="intake-status">
+              ${['received','in_progress','completed'].map(s=>`<button class="ist-btn ${row.status===s?'curr':''}" onclick="event.stopPropagation();updateIntakeStatus('${row.id}','${s}',this)">${s.replace('_',' ')}</button>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="intake-detail" id="${detailId}">
+          <div class="id-grid">
+            <div class="id-row"><div class="id-label">Client</div><div class="id-val">${row.name}</div></div>
+            <div class="id-row"><div class="id-label">Instagram</div><div class="id-val">${row.instagram}</div></div>
+            <div class="id-row"><div class="id-label">Song Length</div><div class="id-val">${row.song_length||'—'}</div></div>
+            <div class="id-row"><div class="id-label">Energy</div><div class="id-val">${row.energy||'—'}</div></div>
+            <div class="id-row"><div class="id-label">Release Date</div><div class="id-val">${row.release_date||'—'}</div></div>
+            <div class="id-row"><div class="id-label">Song Link</div><div class="id-val">${row.song_link?`<a href="${row.song_link}" target="_blank" style="color:var(--accent)">Open</a>`:'—'}</div></div>
+          </div>
+          ${row.lyrics?`<div style="margin-bottom:16px"><div class="id-label" style="margin-bottom:6px">Lyrics</div><div style="background:var(--bg4);padding:14px;font-size:.8rem;line-height:1.8;white-space:pre-wrap;max-height:180px;overflow-y:auto;color:var(--muted)">${row.lyrics}</div></div>`:''}
+          ${buildSceneCards(row.scenes)}
+          ${row.additional_notes?`<div><div class="id-label">Notes</div><div class="id-val" style="margin-top:6px">${row.additional_notes}</div></div>`:''}
+          <a href="https://supabase.com/dashboard/project/${CONFIG.SUPABASE_URL.split('//')[1].split('.')[0]}/storage/buckets/client-files" target="_blank" class="files-link">📁 Open Files: ${row.file_folder}</a>
+        </div>`;
+      list.appendChild(div);
+    });
+  }
+
+  function toggleIntakeDetail(id) { document.getElementById(id).classList.toggle('open'); }
+
+  function buildSceneCards(json) {
+    try {
+      const s = JSON.parse(json||'[]');
+      if (!s.length) return '';
+      return `<div class="id-label" style="margin-bottom:8px">Scenes</div><div class="scenes-grid" style="margin-bottom:16px">${s.map(x=>`<div class="scene-card"><div class="scene-num">Scene ${x.scene}</div><div class="scene-detail"><b>Setting:</b> ${x.setting||'—'}</div><div class="scene-detail"><b>Outfit:</b> ${x.outfit||'—'}</div>${x.notes?`<div class="scene-detail" style="color:var(--muted);margin-top:4px">${x.notes}</div>`:''}</div>`).join('')}</div>`;
+    } catch { return ''; }
+  }
+
+  async function updateIntakeStatus(id, status, btn) {
+    if (!isDemo) { try { await db.from('production_intakes').update({status}).eq('id',id); } catch(e){return;} }
+    btn.closest('.intake-status').querySelectorAll('.ist-btn').forEach(b=>b.classList.remove('curr'));
+    btn.classList.add('curr');
+  }
+
+  // ── LOAD DATA ─────────────────────────────────────────
+  async function loadData() {
+    document.getElementById('tableLoading').style.display = 'block';
+    document.getElementById('subTable').style.display = 'none';
+    document.getElementById('tableEmpty').style.display = 'none';
+
+    if (isDemo) {
+      allData = DEMO;
+    } else {
+      try {
+        const { data, error } = await db
+          .from('video_inquiries')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        allData = data || [];
+      } catch(e) {
+        console.error(e);
+        allData = [];
+      }
+    }
+
+    updateStats();
+    renderTable();
+  }
+
+  // ── STATS ─────────────────────────────────────────────
+  function updateStats() {
+    const paid = allData.filter(r => r.paid);
+    const unpaid = allData.filter(r => !r.paid);
+    // Revenue uses the manual price_charged field set when marking as paid
+    const revenue = paid.reduce((acc, r) => acc + (parseFloat(r.price_charged) || 0), 0);
+    document.getElementById('s-total').textContent = allData.length;
+    document.getElementById('s-paid').textContent = paid.length;
+    document.getElementById('s-unpaid').textContent = unpaid.length;
+    document.getElementById('s-revenue').textContent = '$' + revenue.toLocaleString();
+  }
+
+  // ── FILTER ───────────────────────────────────────────
+  function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTable();
+  }
+
+  function filteredData() {
+    switch(currentFilter) {
+      case 'unpaid': return allData.filter(r => !r.paid);
+      case 'paid': return allData.filter(r => r.paid);
+      case 'pending': return allData.filter(r => r.status === 'pending');
+      case 'in_progress': return allData.filter(r => r.status === 'in_progress');
+      case 'completed': return allData.filter(r => r.status === 'completed' || r.status === 'delivered');
+      default: return allData;
+    }
+  }
+
+  // ── SORT: paid+active first (by deadline asc), then unpaid (by received asc) ──
+  function sortData(data) {
+    return [...data].sort((a, b) => {
+      if (a.paid && !b.paid) return -1;
+      if (!a.paid && b.paid) return 1;
+      if (a.paid && b.paid) {
+        return new Date(a.deadline_date || 0) - new Date(b.deadline_date || 0);
+      }
+      return new Date(a.created_at) - new Date(b.created_at);
+    });
+  }
+
+  // ── RENDER TABLE ──────────────────────────────────────
+  function renderTable() {
+    document.getElementById('tableLoading').style.display = 'none';
+    const data = sortData(filteredData());
+
+    if (data.length === 0) {
+      document.getElementById('tableEmpty').style.display = 'block';
+      document.getElementById('subTable').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('tableEmpty').style.display = 'none';
+    document.getElementById('subTable').style.display = 'table';
+
+    // Mobile cards
+    const mc = document.getElementById('mobileCards');
+    mc.innerHTML = '';
+    data.forEach(row => {
+      const pkg = ({ '60sec':'60-Sec', 'full_song':'Full Song', 'custom':'Custom', 'full_650':'Full Song', '60sec_200':'60-Sec' }[row.package] || row.package || '—');
+      const submitted = new Date(row.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      const card = document.createElement('div');
+      card.className = 'm-card' + (row.paid ? ' paid-card' : '');
+      card.innerHTML = `
+        <div class="m-card-top">
+          <div>
+            <div class="m-card-name">${row.name}${vibeDotHTML(row.id)}</div>
+            <div class="m-card-artist">${row.artist_name || ''}</div>
+            <div class="m-card-pkg">${pkg}</div>
+          </div>
+          <div class="m-card-badges">
+            ${row.paid ? '<span class="badge badge-paid">Paid</span>' : '<span class="badge badge-unpaid">Awaiting</span>'}
+            ${statusChip(row.status)}
+            ${stagePill(row)}
+          </div>
+        </div>
+        <div class="m-card-meta">
+          <span style="font-size:.75rem;color:var(--muted)">Submitted ${submitted}</span>
+          ${deadlineChip(row)}
+        </div>
+        <div class="m-card-actions">
+          ${!row.paid ? `<button class="pay" onclick="openPayModal('${row.id}')">✓ Mark Paid</button>` : ''}
+          <button onclick="openDetail('${row.id}')">View Details</button>
+          <button class="del" onclick="deleteLead('${row.id}','${(row.name||'').replace(/'/g,'').replace(/"/g,'')}')">✕</button>
+        </div>`;
+      mc.appendChild(card);
+    });
+
+    const tbody = document.getElementById('subBody');
+    tbody.innerHTML = '';
+
+    data.forEach((row, i) => {
+      const tr = document.createElement('tr');
+      tr.onclick = (e) => { if (!e.target.classList.contains('act-btn')) openDetail(row.id); };
+
+      const pkgMap = { '60sec':'60-Sec', 'full_song':'Full Song', 'custom':'Custom', 'full_650':'Full Song', '60sec_200':'60-Sec' };
+      const pkgLbl = pkgMap[row.package] || row.package || '—';
+      const pkgClass = (row.package === 'full_song' || row.package === 'full_650') ? 'pfull' : 'p60';
+      const pkg = `<span class="${pkgClass}">${pkgLbl}</span>`;
+
+      const submitted = new Date(row.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+
+      const paidBadge = row.paid
+        ? '<span class="badge badge-paid">Paid</span>'
+        : '<span class="badge badge-unpaid">Awaiting</span>';
+
+      const deadline = deadlineChip(row);
+      const statusBadge = statusChip(row.status);
+
+      const payBtn = !row.paid
+        ? `<button class="act-btn pay-btn" onclick="event.stopPropagation();openPayModal('${row.id}')">Mark Paid</button>`
+        : '';
+
+      tr.innerHTML = `
+        <td class="order-num">${allData.indexOf(allData.find(x=>x.id===row.id))+1}</td>
+        <td class="client-name">${row.name}${vibeDotHTML(row.id)}${stagePill(row)}</td>
+        <td class="artist">${row.artist_name || '—'}</td>
+        <td class="pkg">${pkg}</td>
+        <td>${submitted}</td>
+        <td>${paidBadge}</td>
+        <td>${deadline}</td>
+        <td>${statusBadge}</td>
+        <td class="actions">${payBtn}<button class="act-btn" onclick="event.stopPropagation();openDetail('${row.id}')">Details</button><button class="act-btn del-btn" onclick="event.stopPropagation();deleteLead('${row.id}','${(row.name||'').replace(/'/g,'').replace(/"/g,'')}')">✕</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function deadlineChip(row) {
+    if (!row.paid || !row.deadline_date) return '<span class="deadline-none">—</span>';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const dl = new Date(row.deadline_date);
+    const days = Math.ceil((dl - today) / 86400000);
+    if (days < 0) return `<span class="deadline-chip deadline-late">${Math.abs(days)}d overdue</span>`;
+    if (days <= 5) return `<span class="deadline-chip deadline-warn">${days}d left</span>`;
+    return `<span class="deadline-chip deadline-ok">${days}d left</span>`;
+  }
+
+  function stagePill(row) {
+    const cur = row.lead_stage || 'new';
+    if (cur === 'new') return ''; // don't clutter untouched leads
+    const labels = { sent1:'Sent 1', replied:'Replied', sent2:'Pitched', nego:'Negotiating', won:'Won 🎉', lost:'Dead' };
+    return ` <span class="stage-pill s-${cur}">${labels[cur]||cur}</span>`;
+  }
+
+  function statusChip(status) {
+    const map = {
+      pending: ['badge-pending','Pending'],
+      in_progress: ['badge-inprog','In Progress'],
+      completed: ['badge-done','Completed'],
+      delivered: ['badge-delivered','Delivered'],
+    };
+    const [cls, label] = map[status] || ['badge-pending', status || 'Pending'];
+    return `<span class="badge ${cls}">${label}</span>`;
+  }
+
+  // ── DETAIL PANEL ──────────────────────────────────────
+  function openDetail(id) {
+    const row = allData.find(r => r.id === id);
+    if (!row) return;
+
+    const fmt = v => v ? v.replace(/_/g,' ').replace(/,/g,', ') : '—';
+    const fmtDate = d => d ? new Date(d).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : '—';
+
+    document.getElementById('detailPanel').innerHTML = `
+      <button class="dp-close" onclick="closeDetail()">← Close</button>
+      <div class="dp-name">${row.name}</div>
+      <div class="dp-artist">${row.artist_name || ''}</div>
+
+      <div class="dp-section">
+        <div class="dp-section-title">Contact</div>
+        <div class="dp-row"><span class="dp-lbl">Instagram</span><span class="dp-val">${row.instagram || '—'}</span></div>
+        <div class="dp-row"><span class="dp-lbl">Email</span><span class="dp-val"><a href="mailto:${row.email}">${row.email}</a></span></div>
+        <div class="dp-row"><span class="dp-lbl">Phone</span><span class="dp-val">${row.phone || '—'}</span></div>
+        <button class="copy-btn" onclick="copyContact(${JSON.stringify(row).replace(/'/g,"&#39;")})">Copy Contact Info</button>
+      </div>
+
+      <div class="dp-section">
+        <div class="dp-section-title">Song &amp; Package</div>
+        <div class="dp-row"><span class="dp-lbl">Song</span><span class="dp-val">${row.song_title || '—'}</span></div>
+        <div class="dp-row"><span class="dp-lbl">Link</span><span class="dp-val"><a href="${row.song_link}" target="_blank">${row.song_link || '—'}</a></span></div>
+        <div class="dp-row"><span class="dp-lbl">Package</span><span class="dp-val">${({ '60sec':'60-Sec', 'full_song':'Full Song', 'custom':'Custom', 'full_650':'Full Song', '60sec_200':'60-Sec' }[row.package] || row.package || '—')}</span></div>
+        <div class="dp-row"><span class="dp-lbl">Budget</span><span class="dp-val" style="${row.budget && row.budget!=='exploring' ? 'color:var(--green);font-weight:700;' : (row.budget==='exploring'?'color:var(--muted2);':'')}">${({ '99-199':'$99–$199','200-500':'$200–$500','600+':'$600+ 🔥','exploring':'Just exploring' }[row.budget] || '—')}</span></div>
+        <div class="dp-row"><span class="dp-lbl">Timeline</span><span class="dp-val" style="${row.timeline==='this_week'?'color:var(--gold);font-weight:700;':''}">${({ 'this_week':'This week ⚡','this_month':'This month','planning':'Planning ahead' }[row.timeline] || '—')}</span></div>
+        <div class="dp-row"><span class="dp-lbl">Wants Like</span><span class="dp-val">${row.reference_artist || '—'}</span></div>
+        <div class="dp-row"><span class="dp-lbl">Energy</span><span class="dp-val">${fmt(row.energy)}</span></div>
+        <div class="dp-row"><span class="dp-lbl">Key Moments</span><span class="dp-val">${row.key_moments || '—'}</span></div>
+      </div>
+
+      <div class="dp-section">
+        <div class="dp-section-title">Visual Direction</div>
+        <div class="dp-row"><span class="dp-lbl">Vibe</span><span class="dp-val">${fmt(row.video_vibe)}</span></div>
+        <div class="dp-row"><span class="dp-lbl">Settings</span><span class="dp-val">${fmt(row.settings)}</span></div>
+        <div class="dp-row"><span class="dp-lbl">Colors</span><span class="dp-val">${fmt(row.color_palette)}</span></div>
+        <div class="dp-row"><span class="dp-lbl">In Video?</span><span class="dp-val">${fmt(row.artist_in_video)}</span></div>
+        <div class="dp-row"><span class="dp-lbl">Their Look</span><span class="dp-val">${row.artist_look || '—'}</span></div>
+        <div class="dp-row"><span class="dp-lbl">References</span><span class="dp-val">${row.reference_links || '—'}</span></div>
+        <div class="dp-row"><span class="dp-lbl">Notes</span><span class="dp-val">${row.additional_notes || '—'}</span></div>
+      </div>
+
+      ${renderCloseSection(row)}
+
+      ${renderQualSection(row.id)}
+
+      <div class="dp-section">
+        <div class="dp-section-title">Production Status</div>
+        <div class="dp-row"><span class="dp-lbl">Submitted</span><span class="dp-val">${fmtDate(row.created_at)}</span></div>
+        <div class="dp-row"><span class="dp-lbl">Paid</span><span class="dp-val">${row.paid ? '✅ Yes — ' + fmtDate(row.date_paid) : '⏳ Awaiting Payment'}</span></div>
+        ${row.paid && row.price_charged ? `<div class="dp-row"><span class="dp-lbl">Amount</span><span class="dp-val" style="color:var(--gold);font-weight:700">$${parseFloat(row.price_charged).toLocaleString()}</span></div>` : ''}
+        <div class="dp-row"><span class="dp-lbl">Deadline</span><span class="dp-val">${row.deadline_date ? fmtDate(row.deadline_date) : '—'}</span></div>
+        ${!row.paid ? `<button class="dp-pay-btn" onclick="openPayModal('${row.id}')">✓ Mark as Paid</button>` : ''}
+      </div>
+
+      <div class="dp-section">
+        <div class="dp-section-title">Update Status</div>
+        <div class="dp-status-row">
+          ${['pending','in_progress','completed','delivered'].map(s =>
+            `<button class="dp-status-btn ${row.status===s?'curr':''}" onclick="updateStatus('${row.id}','${s}',this)">${s.replace('_',' ')}</button>`
+          ).join('')}
+        </div>
+      </div>
+
+      <div class="delete-zone">
+        <div class="delete-zone-label">⚠ Danger Zone</div>
+        <button class="dp-delete-btn" onclick="deleteLead('${row.id}','${(row.name||'').replace(/'/g,'').replace(/"/g,'')}')">🗑 Delete This Lead Permanently</button>
+      </div>`;
+
+    document.getElementById('detailOverlay').classList.add('on');
+  }
+
+  function closeDetail() {
+    document.getElementById('detailOverlay').classList.remove('on');
+  }
+
+  function copyContact(row) {
+    const text = `Name: ${row.name}\nInstagram: ${row.instagram}\nEmail: ${row.email}\nPhone: ${row.phone}`;
+    navigator.clipboard.writeText(text).then(() => alert('Contact info copied!'));
+  }
+
+  // ── DELETE LEAD ────────────────────────────────────────
+  async function deleteLead(id, name) {
+    const displayName = name || 'this lead';
+    if (!confirm(`Delete "${displayName}" permanently?\n\nThis removes them from your dashboard and Supabase forever. This cannot be undone.`)) return;
+
+    // Delete from Supabase
+    if (!isDemo && db) {
+      try {
+        const { error } = await db.from('video_inquiries').delete().eq('id', id);
+        if (error) throw error;
+      } catch(e) {
+        console.error('Delete failed:', e);
+        alert('Could not delete from Supabase. Check console.');
+        return;
+      }
+    }
+
+    // Remove from local data
+    allData = allData.filter(r => r.id !== id);
+
+    // Remove their call qualification data from localStorage
+    const all = loadAllQual();
+    delete all[id];
+    localStorage.setItem(QUAL_KEY, JSON.stringify(all));
+
+    // Close detail panel if open for this lead
+    closeDetail();
+
+    // Refresh everything
+    updateStats();
+    renderTable();
+  }
+
+  // ── PAY MODAL ─────────────────────────────────────────
+  function openPayModal(id) {
+    activePayId = id;
+    document.getElementById('paidDateInput').value = new Date().toISOString().split('T')[0];
+    document.getElementById('payModal').classList.add('on');
+  }
+
+  function closePayModal() {
+    document.getElementById('payModal').classList.remove('on');
+    activePayId = null;
+  }
+
+  async function confirmPaid() {
+    const datePaid = document.getElementById('paidDateInput').value;
+    const priceCharged = document.getElementById('priceChargedInput').value;
+    let deadlineDate = document.getElementById('deadlineDateInput').value;
+    if (!datePaid) { alert('Please select a date paid.'); return; }
+    if (!priceCharged || parseFloat(priceCharged) <= 0) { alert('Please enter the amount charged.'); return; }
+    if (!deadlineDate) { alert('Please set a delivery deadline.'); return; }
+
+    const updates = { paid: true, date_paid: datePaid, price_charged: parseFloat(priceCharged), deadline_date: deadlineDate, status: 'in_progress' };
+
+    if (!isDemo) {
+      try {
+        const { error } = await db
+          .from('video_inquiries')
+          .update(updates)
+          .eq('id', activePayId);
+        if (error) throw error;
+      } catch(e) {
+        console.error(e);
+        alert('Error updating. Check console.');
+        return;
+      }
+    }
+
+    // Update local data
+    const idx = allData.findIndex(r => r.id === activePayId);
+    if (idx >= 0) Object.assign(allData[idx], updates);
+
+    closePayModal();
+    closeDetail();
+    updateStats();
+    renderTable();
+  }
+
+  // ── STATUS UPDATE ─────────────────────────────────────
+  async function updateStatus(id, status, btn) {
+    if (!isDemo) {
+      try {
+        const { error } = await db.from('video_inquiries').update({ status }).eq('id', id);
+        if (error) throw error;
+      } catch(e) { console.error(e); return; }
+    }
+    const idx = allData.findIndex(r => r.id === id);
+    if (idx >= 0) allData[idx].status = status;
+    // Update buttons in panel
+    btn.closest('.dp-status-row').querySelectorAll('.dp-status-btn').forEach(b => b.classList.remove('curr'));
+    btn.classList.add('curr');
+    renderTable();
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // ── CALL QUALIFICATION SYSTEM ─────────────────────────────
+  // ══════════════════════════════════════════════════════════
+  // Stored in localStorage. To sync cross-device via Supabase:
+  //   1. Add column: ALTER TABLE video_inquiries ADD COLUMN qualification jsonb;
+  //   2. Set USE_SUPABASE_QUAL = true below
+  const USE_SUPABASE_QUAL = false;
+  const QUAL_KEY = 'richmadeit_call_qual';
+
+  const QUESTIONS = [
+    {
+      id: 'goal',
+      label: 'Goal',
+      script: '"What you trying to do with this video — single, build your brand, go viral?"',
+      options: [
+        { val: 'single', text: 'Single release', score: 2 },
+        { val: 'brand', text: 'Brand building', score: 2 },
+        { val: 'viral', text: 'Going viral', score: 2 },
+        { val: 'tour', text: 'Tour / event promo', score: 2 },
+        { val: 'curious', text: 'Just curious', score: -2, type: 'kill' },
+      ]
+    },
+    {
+      id: 'timeline',
+      label: 'Timeline',
+      script: '"When you trying to have it out? Got a release date?"',
+      options: [
+        { val: 'asap', text: 'ASAP (1–2 wks)', score: 3 },
+        { val: 'month', text: '30 days', score: 2 },
+        { val: 'date', text: 'Set release date', score: 3 },
+        { val: 'flex', text: 'Flexible', score: 1 },
+        { val: 'unsure', text: 'Unsure', score: -1, type: 'kill' },
+      ]
+    },
+    {
+      id: 'budget',
+      label: 'Budget',
+      script: '"You invested in visuals before? What budget you working with?"',
+      options: [
+        { val: '650', text: '$650 Flagship', score: 5, type: 'gold' },
+        { val: '350', text: '$350', score: 3 },
+        { val: '200', text: '$200', score: 2 },
+        { val: '100', text: '$100', score: 1 },
+        { val: 'open', text: 'Open / trust me', score: 4, type: 'gold' },
+        { val: 'free', text: 'Wants free', score: -5, type: 'kill' },
+      ]
+    },
+    {
+      id: 'platform',
+      label: 'Platform',
+      script: '"Where you pushing it — IG, YouTube, TikTok?"',
+      options: [
+        { val: 'ig', text: 'Instagram', score: 1 },
+        { val: 'yt', text: 'YouTube', score: 1 },
+        { val: 'tt', text: 'TikTok', score: 1 },
+        { val: 'all', text: 'All platforms', score: 2 },
+        { val: 'idk', text: "Doesn't know", score: -1, type: 'kill' },
+      ]
+    },
+    {
+      id: 'vision',
+      label: 'Vision',
+      script: '"You got a concept, or you want me to lead the treatment?"',
+      options: [
+        { val: 'clear', text: 'Clear concept', score: 2 },
+        { val: 'some', text: 'Some ideas', score: 1 },
+        { val: 'me', text: 'Wants me to lead', score: 2 },
+        { val: 'none', text: 'No idea', score: -1 },
+      ]
+    },
+    {
+      id: 'prior',
+      label: 'Prior Investment',
+      script: '"You ever paid for visuals or music videos before?"',
+      options: [
+        { val: 'yes-recent', text: 'Yes, recently', score: 3, type: 'gold' },
+        { val: 'yes-old', text: 'Yes, a while ago', score: 1 },
+        { val: 'no', text: 'Never', score: -2, type: 'kill' },
+      ]
+    },
+  ];
+
+  // Load all qualification data
+  function loadAllQual() {
+    try { return JSON.parse(localStorage.getItem(QUAL_KEY) || '{}'); }
+    catch(e) { return {}; }
+  }
+
+  // Get qualification for one lead
+  function getQual(leadId) {
+    const all = loadAllQual();
+    return all[leadId] || { answers: {}, calledAt: null, notes: '' };
+  }
+
+  // Save qualification for one lead
+  function saveQual(leadId, data) {
+    const all = loadAllQual();
+    all[leadId] = data;
+    localStorage.setItem(QUAL_KEY, JSON.stringify(all));
+    if (USE_SUPABASE_QUAL && !isDemo && db) {
+      db.from('video_inquiries').update({ qualification: data }).eq('id', leadId)
+        .then(({error}) => { if(error) console.warn('Supabase qual save failed:', error); });
+    }
+  }
+
+  // Score calculation
+  function getScore(leadId) {
+    const data = getQual(leadId);
+    if (!data.answers) return 0;
+    let score = 0;
+    for (const qId in data.answers) {
+      const q = QUESTIONS.find(x => x.id === qId);
+      if (!q) continue;
+      const opt = q.options.find(o => o.val === data.answers[qId]);
+      if (opt) score += opt.score;
+    }
+    return score;
+  }
+
+  // Vibe calculation
+  function getVibe(leadId) {
+    const data = getQual(leadId);
+    if (!data.calledAt) return null;
+    const score = getScore(leadId);
+    const answered = Object.keys(data.answers || {}).length;
+    if (answered < 3) return 'COLD';
+    if (score >= 10) return 'HOT';
+    if (score >= 5) return 'WARM';
+    return 'COLD';
+  }
+
+  // ── CLOSE THIS LEAD — auto-built DMs from their form answers ─────────────
+  function dmFirstName(row) {
+    const n = (row.name || '').trim().split(/\s+/)[0];
+    return n || 'fam';
+  }
+  function dmTimelinePhrase(row) {
+    return ({ 'this_week':"you're trying to move this week", 'this_month':"you're looking to get this done this month", 'planning':"you're planning your next drop" }[row.timeline] || "you've got something in the works");
+  }
+  function dmPriceLine(row) {
+    // Match the pitch to the budget they picked
+    if (row.budget === '600+') return "the full cinematic video is $600 — that's the whole song, treated like a real film. I only take a few of these a month so the quality stays high";
+    if (row.budget === '200-500') return "the 60-sec cinematic promo is $199, or we step it up to a full cinematic video at $600. Both are real film quality";
+    if (row.budget === '99-199') return "the 30-sec promo is $99 and the 60-sec cinematic cut is $199 — both hit hard for the price";
+    return "I've got a 30-sec promo at $99, a 60-sec cinematic at $199, and full videos at $600 (limited spots)";
+  }
+  function dmRefLine(row) {
+    return row.reference_artist ? ` You mentioned wanting that ${row.reference_artist} feel — I can definitely get you there.` : '';
+  }
+  function buildDMs(row) {
+    const fn = dmFirstName(row);
+    return {
+      opener: `Yo ${fn} 🔥 just saw your submission — appreciate you reaching out. I do cinematic AI music videos, same style I run for Shaq and Rick Ross. Saw ${dmTimelinePhrase(row)} — what's the vibe you're going for with this one?`,
+      pitch: `Bet, I got you.${dmRefLine(row)} Based on what you're going for, ${dmPriceLine(row)}. You wanna lock your spot?`,
+      nudge: `No pressure ${fn} — filling this week's slots and wanted to give you first shot before I open it up. You still trying to get yours done?`,
+      close: `Closing out bookings for the week 🎬 if you're still in, lmk today and I'll get you on the schedule. If timing's off, no worries — I'll hit you when I open the next batch.`,
+    };
+  }
+  function copyDM(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 1400);
+    });
+  }
+  // ── OUTREACH STAGE TRACKER ──────────────────────────────────────────────
+  const STAGES = [
+    { id:'new',     label:'New' },
+    { id:'sent1',   label:'Sent 1' },
+    { id:'replied', label:'Replied' },
+    { id:'sent2',   label:'Sent Pitch' },
+    { id:'nego',    label:'Negotiating' },
+    { id:'won',     label:'Won 🎉' },
+    { id:'lost',    label:'Lost' },
+  ];
+  function leadStage(row) { return row.lead_stage || 'new'; }
+  async function setStage(id, stage, btn) {
+    if (!isDemo) {
+      try {
+        const { error } = await db.from('video_inquiries').update({ lead_stage: stage }).eq('id', id);
+        if (error) throw error;
+      } catch(e) { console.error('stage save failed', e); }
+    }
+    const idx = allData.findIndex(r => r.id === id);
+    if (idx >= 0) allData[idx].lead_stage = stage;
+    // refresh the open detail panel's stage buttons (re-render is simplest + safest)
+    const panel = document.querySelector('.dp-stage-host');
+    if (panel) {
+      panel.querySelectorAll('.stage-btn[data-stage]').forEach(b => {
+        const isCurr = b.dataset.stage === stage;
+        // keep inline-colored action buttons (replied/won/lost) intact, just toggle curr
+        if (b.classList.contains('stage-main')) {
+          b.className = 'stage-btn stage-main' + (isCurr ? ' curr s-'+stage : '');
+        } else {
+          b.classList.toggle('curr', isCurr);
+        }
+      });
+    }
+    renderTable();
+  }
+  // copy + auto-advance stage in one tap — reads message from the global store by key
+  function copyAndMarkKey(btn, key) {
+    const entry = (window.__dmStore || {})[key];
+    if (!entry) { console.warn('DM not found for', key); return; }
+    copyDM(btn, entry.text);
+    const id = entry.id, stage = entry.stage;
+    const cur = (allData.find(r=>r.id===id)||{}).lead_stage || 'new';
+    const order = STAGES.map(s=>s.id);
+    // only advance forward, never backward, and never past 'won'/'lost'
+    if (order.indexOf(stage) > order.indexOf(cur) && cur!=='won' && cur!=='lost') {
+      setStage(id, stage, btn);
+    }
+  }
+  function renderCloseSection(row) {
+    const dms = buildDMs(row);
+    const hot = (row.budget === '600+' || row.budget === '200-500') && row.timeline === 'this_week';
+    const cold = row.budget === 'exploring';
+    const tag = hot
+      ? `<span style="background:var(--gold);color:#000;font-family:var(--fs);font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:3px;">🔥 Hot — call first</span>`
+      : cold
+      ? `<span style="background:var(--bg4);color:var(--muted2);font-family:var(--fs);font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:3px;">Low intent — light touch</span>`
+      : '';
+    const cur = leadStage(row);
+    // each message advances to a stage when copied
+    const steps = [
+      { n: '1', when: 'Within the hour', body: dms.opener, marks: 'sent1' },
+      { n: '2', when: 'After they reply', body: dms.pitch, marks: 'sent2' },
+      { n: '3', when: 'Next day if quiet', body: dms.nudge, marks: 'sent2' },
+      { n: '4', when: '3 days later, then stop', body: dms.close, marks: 'sent2' },
+    ];
+    // Stash messages in a global keyed store so the button never has to inline
+    // the text (apostrophes/emojis in the DM would otherwise break the onclick).
+    window.__dmStore = window.__dmStore || {};
+    steps.forEach(s => { window.__dmStore[row.id + '_' + s.n] = { text: s.body, id: row.id, stage: s.marks }; });
+    // Payment message — pulled from config.js, sent ONLY after they say yes. Marks the lead "won".
+    const cfg = (typeof CONFIG !== 'undefined') ? CONFIG : {};
+    const payMsg = `Bet 🔥 let's lock it in. You can send it however's easiest:\n\nCash App: ${cfg.CASHAPP || ''}\nZelle: ${cfg.ZELLE || ''}\nApple Pay: ${cfg.APPLEPAY || ''}\n\nSoon as it hits I'll get you in the queue and we start building. 🎬`;
+    window.__dmStore[row.id + '_pay'] = { text: payMsg, id: row.id, stage: 'won' };
+    const stageButtons = STAGES.map(s =>
+      `<button class="stage-btn stage-main ${cur===s.id?'curr s-'+s.id:''}" data-stage="${s.id}" onclick="setStage('${row.id}','${s.id}',this)">${s.label}</button>`
+    ).join('');
+    return `
+      <div class="dp-section dp-stage-host" style="background:linear-gradient(135deg, var(--bg4), rgba(255,85,0,.05)); border-left:3px solid var(--accent); padding:16px 16px 14px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+          <div class="dp-section-title" style="margin-bottom:0;">Close This Lead — Ready-to-Send DMs</div>
+          ${tag}
+        </div>
+
+        <div style="font-family:var(--fs); font-size:.66rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted2); margin:4px 0 6px;">Where you're at</div>
+        <div class="stage-row">${stageButtons}</div>
+
+        <div style="font-size:.74rem; color:var(--muted2); margin:14px 0 14px; line-height:1.4;">Auto-filled with their name, timeline & budget. Copy a message → it sends you to that stage automatically, and the color updates so you always know where you left off.${cold ? ' This one picked "just exploring" — send #1, but don\'t chase if they go quiet.' : ''}</div>
+        ${steps.map(s => `
+          <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px dashed var(--border2);">
+            <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:6px;">
+              <span style="font-family:var(--fd); font-size:1rem; color:var(--accent); line-height:1;">${s.n}</span>
+              <span style="font-family:var(--fs); font-size:.7rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted2);">${s.when}</span>
+            </div>
+            <div style="font-size:.86rem; color:var(--text); line-height:1.5; margin:0 0 8px 22px; background:var(--bg3); border:1px solid var(--border2); padding:10px 12px; border-radius:4px;">${s.body.replace(/</g,'&lt;')}</div>
+            <div style="margin-left:22px;">
+              <button class="copy-btn" onclick="copyAndMarkKey(this, '${row.id}_${s.n}')">Copy & Mark Sent ${s.n}</button>
+            </div>
+          </div>
+        `).join('')}
+        <div style="margin-top:6px; padding:12px; background:rgba(34,197,94,.06); border:1px solid rgba(34,197,94,.25); border-radius:5px;">
+          <div style="font-family:var(--fs); font-size:.68rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--green); margin-bottom:4px;">💰 Once they say YES</div>
+          <div style="font-size:.74rem; color:var(--muted2); margin-bottom:10px; line-height:1.4;">Don't send this until they've committed — closing too early kills the deal. This copies your payment handles and marks the lead Won.</div>
+          <button class="copy-btn" onclick="copyAndMarkKey(this, '${row.id}_pay')" style="border-color:rgba(34,197,94,.4);color:var(--green);">Copy Payment Info</button>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;">
+          <button class="stage-btn" data-stage="replied" onclick="setStage('${row.id}','replied',this)" style="border-color:#3b82f6;color:#3b82f6;">✓ They Replied</button>
+          <button class="stage-btn" data-stage="won" onclick="setStage('${row.id}','won',this)" style="border-color:var(--green);color:var(--green);">🎉 Closed / Won</button>
+          <button class="stage-btn" data-stage="lost" onclick="setStage('${row.id}','lost',this)" style="border-color:var(--red);color:var(--red);">Dead / No</button>
+        </div>
+      </div>`;
+  }
+
+  // Render qualification section HTML
+  function renderQualSection(leadId) {
+    return ''; // Call-qualification questions removed — lead qualifying now happens on the form itself.
+  }
+  function _renderQualSection_DISABLED(leadId) {
+    const data = getQual(leadId);
+    const vibe = getVibe(leadId);
+    const vibeClass = vibe ? vibe.toLowerCase() : 'none';
+    const vibeLabel = vibe || 'Not Called';
+    const answered = Object.keys(data.answers || {}).length;
+    const calledDate = data.calledAt ? new Date(data.calledAt).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+
+    return `
+      <div class="dp-section dp-qual">
+        <div class="dp-qual-head">
+          <div class="dp-section-title">📞 Call Qualification</div>
+          <div class="vibe-badge ${vibeClass}">${vibeLabel}</div>
+        </div>
+
+        ${data.calledAt ? `
+          <div class="call-meta">
+            <span>Called <strong>${calledDate}</strong></span>
+            <span>Score <strong>${getScore(leadId)}</strong></span>
+            <span>Answered <strong>${answered} / ${QUESTIONS.length}</strong></span>
+          </div>
+        ` : ''}
+
+        ${QUESTIONS.map((q, idx) => `
+          <div class="qual-q">
+            <div class="qual-q-head">
+              <span class="qual-q-num">${String(idx+1).padStart(2,'0')}</span>
+              <span class="qual-q-label">${q.label}</span>
+            </div>
+            <div class="qual-q-script">${q.script}</div>
+            <div class="qual-chips">
+              ${q.options.map(opt => {
+                const selected = (data.answers || {})[q.id] === opt.val;
+                const extraClass = selected ? (opt.type || '') : '';
+                return `<div class="qual-chip ${selected?'selected':''} ${extraClass}" onclick="setQualAnswer('${leadId}','${q.id}','${opt.val}')">${opt.text}</div>`;
+              }).join('')}
+            </div>
+          </div>
+        `).join('')}
+
+        <textarea class="qual-notes" id="qualNotes-${leadId}" placeholder="Free-form notes — vibe, slang, references, follow-up needed..." onchange="saveQualNotes('${leadId}')">${data.notes || ''}</textarea>
+
+        <div class="qual-actions">
+          <button class="copy-btn" onclick="copyCallSummary('${leadId}')">📋 Copy Call Summary</button>
+          <button class="copy-btn danger" onclick="resetQual('${leadId}')">✕ Reset Call</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Toggle an answer
+  function setQualAnswer(leadId, qId, optVal) {
+    const data = getQual(leadId);
+    if (!data.calledAt) data.calledAt = new Date().toISOString();
+    if (!data.answers) data.answers = {};
+
+    if (data.answers[qId] === optVal) {
+      delete data.answers[qId];
+    } else {
+      data.answers[qId] = optVal;
+    }
+
+    saveQual(leadId, data);
+    refreshDetailQual(leadId);
+    renderTable();
+  }
+
+  // Save notes
+  function saveQualNotes(leadId) {
+    const el = document.getElementById('qualNotes-' + leadId);
+    if (!el) return;
+    const data = getQual(leadId);
+    if (!data.calledAt) data.calledAt = new Date().toISOString();
+    data.notes = el.value;
+    saveQual(leadId, data);
+  }
+
+  // Reset
+  function resetQual(leadId) {
+    if (!confirm('Wipe this call\'s qualification data?')) return;
+    const all = loadAllQual();
+    delete all[leadId];
+    localStorage.setItem(QUAL_KEY, JSON.stringify(all));
+    refreshDetailQual(leadId);
+    renderTable();
+  }
+
+  // Re-render only the qual section (preserves textarea focus pattern)
+  function refreshDetailQual(leadId) {
+    const panel = document.getElementById('detailPanel');
+    if (!panel) return;
+    const existing = panel.querySelector('.dp-qual');
+    if (existing) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = renderQualSection(leadId);
+      existing.replaceWith(tmp.firstElementChild);
+    }
+  }
+
+  // Copy call summary to clipboard
+  function copyCallSummary(leadId) {
+    const row = allData.find(r => r.id === leadId);
+    if (!row) return;
+    const data = getQual(leadId);
+    const score = getScore(leadId);
+    const vibe = getVibe(leadId) || 'NOT CALLED';
+
+    let txt = `═══ ${(row.name || '').toUpperCase()} ═══\n`;
+    txt += `Artist: ${row.artist_name || '—'}\n`;
+    txt += `IG: ${row.instagram || '—'} | Phone: ${row.phone || '—'}\n`;
+    txt += `Vibe: ${vibe} | Score: ${score}\n\n`;
+    txt += `── ANSWERS ──\n`;
+
+    QUESTIONS.forEach(q => {
+      const ans = (data.answers || {})[q.id];
+      if (ans) {
+        const opt = q.options.find(o => o.val === ans);
+        txt += `${q.label}: ${opt ? opt.text : ans}\n`;
+      }
+    });
+
+    if (data.notes) txt += `\nNotes: ${data.notes}`;
+
+    navigator.clipboard.writeText(txt).then(() => alert('Call summary copied!'));
+  }
+
+  // Vibe dot helper for table rows
+  function vibeDotHTML(leadId) {
+    const vibe = getVibe(leadId);
+    if (!vibe) return '';
+    return `<span class="vibe-dot ${vibe.toLowerCase()}" title="${vibe}"></span>`;
+  }
+</script>
+</body>
+</html>
