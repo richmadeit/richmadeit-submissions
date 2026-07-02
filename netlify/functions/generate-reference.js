@@ -52,14 +52,15 @@ exports.handler = async (event) => {
     if (!Array.isArray(images) || images.length < 1) {
       return { statusCode: 400, body: JSON.stringify({ error: "Upload at least one photo." }) };
     }
-    const refs = images.slice(0, 3);
+    const refs = images.slice(0, 1); // ONE reference image = much faster
 
-    // ---- generate the reference sheet (gpt-image-2, low quality) ----
+    // ---- generate the reference sheet (gpt-image-1-mini = fastest) ----
     const form = new FormData();
-    form.append("model", "gpt-image-2");
+    form.append("model", "gpt-image-1-mini");
     form.append("prompt", REFERENCE_PROMPT);   // HARDCODED
     form.append("quality", "low");
-    form.append("size", "1024x1536");
+    form.append("size", "1024x1024");          // square = faster than tall
+    form.append("moderation", "low");
     form.append("n", "1");
     for (let i = 0; i < refs.length; i++) {
       const m = /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.*)$/.exec(refs[i] || "");
@@ -68,19 +69,36 @@ exports.handler = async (event) => {
       form.append("image[]", blob, `ref${i}.png`);
     }
 
-    const resp = await fetch("https://api.openai.com/v1/images/edits", {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${process.env.OPENAI_API_KEY}` },
-      body: form,
-    });
-    const data = await resp.json();
+    // hard timeout so we NEVER hit the 60s function ceiling silently —
+    // if OpenAI hangs, we abort at 45s and surface a real error.
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 45000);
+    let resp, data;
+    try {
+      resp = await fetch("https://api.openai.com/v1/images/edits", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${process.env.OPENAI_API_KEY}` },
+        body: form,
+        signal: controller.signal,
+      });
+      data = await resp.json();
+    } catch (err) {
+      clearTimeout(timer);
+      const reason = err && err.name === "AbortError"
+        ? "The image took too long to generate. Please try again with one clear photo."
+        : "Image service is unavailable right now — try again in a minute.";
+      logLead(email, null);
+      return { statusCode: 200, body: JSON.stringify({ error: reason }) };
+    }
+    clearTimeout(timer);
 
     if (!resp.ok) {
       const msg = (data && data.error && data.error.message) ? data.error.message : "";
-      const friendly = /safety|policy|content|person|face/i.test(msg)
+      // surface the REAL OpenAI error so we can diagnose (verification, billing, etc.)
+      console.log("OpenAI error:", resp.status, JSON.stringify(data));
+      const friendly = /safety|policy|content|person|face|moderation/i.test(msg)
         ? "That photo couldn't be used — try a clear, well-lit photo of yourself."
-        : "Couldn't generate that one — try a different photo.";
-      // still log the attempt as a lead (email captured)
+        : ("Couldn't generate that one — " + (msg || "try a different photo."));
       logLead(email, null);
       return { statusCode: 200, body: JSON.stringify({ error: friendly }) };
     }
