@@ -274,6 +274,10 @@
     .char-result-body { font-family:var(--fb); color:var(--text,#efefef); font-size:1rem; line-height:1.6; white-space:pre-wrap; }
     .char-result-body strong { color:var(--gold); }
     .char-director-note { margin-top:16px; padding:14px 16px; background:rgba(255,179,0,.08); border-left:3px solid var(--gold); border-radius:8px; font-family:var(--fb); font-size:.92rem; line-height:1.5; color:var(--text,#efefef); }
+    .scene-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .scene-btn { font-family:var(--fb); font-size:.98rem; font-weight:600; padding:14px 12px; border-radius:12px; border:2px solid rgba(255,255,255,.14); background:rgba(255,255,255,.04); color:var(--text,#efefef); cursor:pointer; transition:all .15s ease; text-align:center; }
+    .scene-btn:hover { border-color:rgba(255,85,0,.5); background:rgba(255,85,0,.08); }
+    .scene-btn.active { border-color:var(--red,#FF5500); background:rgba(255,85,0,.18); box-shadow:0 0 0 2px rgba(255,85,0,.25); }
     .ref-consent { display:flex; align-items:flex-start; gap:9px; font-size:.85rem; color:var(--muted,#888); line-height:1.4; margin:6px 0 4px; cursor:pointer; }
     .ref-consent input { margin-top:2px; accent-color:var(--accent); flex-shrink:0; }
     .ref-counter { text-align:center; font-family:var(--fs); letter-spacing:1px; text-transform:uppercase; font-size:.78rem; color:var(--gold); margin-top:10px; }
@@ -619,9 +623,9 @@
 <!-- ═════════════ CHARACTER REFERENCE SHEET GENERATOR ═════════════ -->
 <section class="signup-section" id="signup">
   <div class="signup-inner">
-    <span class="signup-eyebrow">★ See Your Character — Free</span>
-    <h1 class="signup-title">Build Your <span class="red">Character</span></h1>
-    <p class="signup-sub">Upload up to 3 photos of yourself and we'll generate your <strong>character reference sheet</strong> — free. Love it? Turn it into a 30-sec cinematic video for <strong>$50</strong>, back in 1–24 hours.</p>
+    <span class="signup-eyebrow">★ See Yourself In The Scene — Free</span>
+    <h1 class="signup-title">Put Yourself In The <span class="red">Video</span></h1>
+    <p class="signup-sub">Upload your photo, pick a scene, and see yourself in a <strong>cinematic music-video shot</strong> — free. Love it? Turn it into a full 30-sec video for <strong>$50</strong>, back in 1–24 hours.</p>
 
     <div class="char-flow">
       <!-- email (required) -->
@@ -642,10 +646,29 @@
         </div>
       </div>
 
+      <!-- SCENE picker: one tap = a tuned pro prompt behind each vibe -->
+      <div class="signup-field">
+        <label>Pick Your Scene <span class="req">*</span> <span class="opt">tap one</span></label>
+        <div class="scene-grid" id="sceneGrid">
+          <button type="button" class="scene-btn" data-scene="rooftop">🌆 Rooftop Night</button>
+          <button type="button" class="scene-btn" data-scene="luxury">💎 Luxury Flex</button>
+          <button type="button" class="scene-btn" data-scene="stage">🎤 On Stage</button>
+          <button type="button" class="scene-btn" data-scene="street">🕶️ Street / Grit</button>
+          <button type="button" class="scene-btn" data-scene="miami">🌴 Miami Vibes</button>
+          <button type="button" class="scene-btn" data-scene="boss">👑 Boss Mode</button>
+        </div>
+      </div>
+
+      <!-- optional detail -->
+      <div class="signup-field">
+        <label>Add a Detail <span class="opt">optional — outfit, color, mood</span></label>
+        <input type="text" class="inp" id="refDetail" placeholder="e.g. red suit, gold chain, rainy night" maxlength="120">
+      </div>
+
       <!-- consent -->
       <label class="ref-consent"><input type="checkbox" id="refConsent"> These are my own photos and I have the right to use them.</label>
 
-      <button type="button" class="signup-submit" id="refBtn">Generate My Character Sheet 🎬</button>
+      <button type="button" class="signup-submit" id="refBtn">Put Me In The Scene 🎬</button>
       <div class="ref-counter" id="refCounter" style="display:none"></div>
       <div class="char-err" id="refErr"></div>
 
@@ -658,8 +681,8 @@
       <!-- RESULT: show the generated sheet right here on the page -->
       <div class="char-result" id="refResult">
         <div class="char-result-badge">★ Your Preview</div>
-        <img id="refImage" alt="Your character reference sheet" style="display:block;width:100%;max-width:520px;margin:0 auto 14px;border-radius:14px;" />
-        <div class="char-result-body" style="text-align:center;">Here's your character preview! 🔥<br>This is just a <strong>first look</strong> — save it (long-press or right-click). When I turn it into your video, the detail, lighting, and likeness get taken to a whole other level. 🎬</div>
+        <img id="refImage" alt="Your cinematic scene preview" style="display:block;width:100%;max-width:420px;margin:0 auto 14px;border-radius:14px;" />
+        <div class="char-result-body" style="text-align:center;">There you are — in the scene! 🔥<br>This is just a <strong>first look</strong> — save it (long-press or right-click). When I turn it into your video, the detail, motion, and likeness get taken to a whole other level. 🎬</div>
         <div class="char-director-note">🔥 This preview is just the start. Your finished video is fully directed by me — sharper detail, cinematic quality, and true-to-life likeness, back in 1–24 hours.</div>
         <div class="char-buy-wrap">
           <a href="https://buy.stripe.com/cNicN52fz7c2b6Q3MxbMQ08" class="char-buy-btn" id="charBuyBtn">Get My 30-Sec Video — $50 →</a>
@@ -1369,6 +1392,20 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
   const resultEl  = document.getElementById('refResult');
   const imgEl     = document.getElementById('refImage');
   const buyBtn    = document.getElementById('charBuyBtn');
+  const detailEl  = document.getElementById('refDetail');
+  const sceneGrid = document.getElementById('sceneGrid');
+
+  // scene selection: tap a vibe button -> highlight it, remember the choice
+  let selectedScene = null;
+  if (sceneGrid){
+    sceneGrid.querySelectorAll('.scene-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        sceneGrid.querySelectorAll('.scene-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        selectedScene = b.dataset.scene;
+      });
+    });
+  }
 
   const MAX_FREE = 3;
   const showErr = m => { errEl.textContent = m; errEl.style.display = 'block'; };
@@ -1413,6 +1450,7 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
     const files = Array.from(photosEl.files).slice(0,3);
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr('Enter a valid email so we can send it to you.');
     if (!files.length) return showErr('Upload at least one photo.');
+    if (!selectedScene) return showErr('Pick a scene first — tap one of the vibes above.');
     if (!consentEl.checked) return showErr('Please confirm these are your own photos.');
 
     btn.disabled = true;
@@ -1426,14 +1464,14 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
       // SYNCHRONOUS function: generates the sheet and returns the image.
       const resp = await fetch('/.netlify/functions/generate-reference', {
         method:'POST', headers:{'content-type':'application/json'},
-        body: JSON.stringify({ email, images, consent: true })
+        body: JSON.stringify({ email, images, consent: true, scene: selectedScene, detail: (detailEl ? detailEl.value : '') })
       });
 
       const data = await resp.json().catch(()=>({}));
       if (!resp.ok || !data.image){
         loadEl.style.display = 'none';
         btn.disabled=false;
-        btn.textContent='Generate My Character Sheet 🎬';
+        btn.textContent='Put Me In The Scene 🎬';
         return showErr(data.error || 'The generator hiccuped — try again.');
       }
 
@@ -1444,7 +1482,7 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
       // count it, fire the LEAD event, reveal the result
       bump();
       refreshCounter();
-      if (typeof fbq !== 'undefined') fbq('track','Lead',{content_name:'Reference Sheet'});
+      if (typeof fbq !== 'undefined') fbq('track','Lead',{content_name:'Scene Preview'});
 
       resultEl.classList.add('show');
       resultEl.scrollIntoView({behavior:'smooth', block:'center'});
@@ -1453,7 +1491,7 @@ document.querySelectorAll('[data-pkgpick]').forEach(a => {
     } catch(e){
       loadEl.style.display = 'none';
       btn.disabled=false;
-      btn.textContent='Generate My Character Sheet 🎬';
+      btn.textContent='Put Me In The Scene 🎬';
       showErr('Something glitched — try again.');
     }
   });
