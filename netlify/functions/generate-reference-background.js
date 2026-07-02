@@ -69,17 +69,20 @@ exports.handler = async (event) => {
 
     if (!resp.ok) {
       console.log("OpenAI error:", resp.status, JSON.stringify(data));
+      const omsg = (data && data.error && data.error.message) ? data.error.message : ("status " + resp.status);
       await emailFail(email, "that photo couldn't be used");
+      await debugPing("OPENAI FAILED: " + omsg);
       await logLead(email, null);
       return { statusCode: 200, body: "openai error" };
     }
 
     const b64 = data && data.data && data.data[0] && data.data[0].b64_json;
-    if (!b64) { await emailFail(email, "no image came back"); await logLead(email, null); return { statusCode: 200, body: "no b64" }; }
+    if (!b64) { await emailFail(email, "no image came back"); await debugPing("NO B64 RETURNED"); await logLead(email, null); return { statusCode: 200, body: "no b64" }; }
     const pngBuffer = Buffer.from(b64, "base64");
 
     // ---- upload sheet to Supabase storage (so dashboard can show it) ----
     let publicImageUrl = null;
+    let supaMsg = "skipped (no env)";
     try {
       if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
         const path = `sheets/${Date.now()}_${Math.random().toString(36).slice(2,8)}.png`;
@@ -88,23 +91,45 @@ exports.handler = async (event) => {
           headers: { "Authorization": `Bearer ${process.env.SUPABASE_SERVICE_KEY}`, "Content-Type": "image/png" },
           body: pngBuffer,
         });
-        if (up.ok) publicImageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/orders/${path}`;
+        if (up.ok) { publicImageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/orders/${path}`; supaMsg = "uploaded OK"; }
+        else { supaMsg = "upload failed: " + up.status + " " + (await up.text()).slice(0,120); }
       }
-    } catch (e) { console.log("supabase upload err", e.message); }
+    } catch (e) { supaMsg = "upload threw: " + e.message; }
 
     // ---- email the sheet + offer via Gmail ----
-    await emailSheet(email, pngBuffer, publicImageUrl);
+    let emailMsg = "ok";
+    try {
+      await emailSheet(email, pngBuffer, publicImageUrl);
+    } catch (e) {
+      emailMsg = "SEND FAILED: " + e.message;
+      await debugPing("EMAIL SEND FAILED: " + e.message + " | supabase: " + supaMsg);
+    }
 
     // ---- log the lead ----
     await logLead(email, publicImageUrl);
 
+    await debugPing("DONE. supabase=[" + supaMsg + "] email=[" + emailMsg + "] to=" + email);
     return { statusCode: 200, body: "ok" };
   } catch (e) {
     console.log("fatal:", e.message);
+    await debugPing("FATAL: " + e.message);
     if (email) { try { await emailFail(email, "something glitched"); } catch(_) {} }
     return { statusCode: 200, body: "error" };
   }
 };
+
+// ---- debug ping: emails Rich a status line so we can see what happened ----
+async function debugPing(msg) {
+  try {
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return;
+    await transport().sendMail({
+      from: `RichMadeIt Debug <${process.env.GMAIL_USER}>`,
+      to: process.env.GMAIL_USER,
+      subject: "🔧 RichMadeIt debug",
+      text: msg,
+    });
+  } catch (e) {}
+}
 
 // ---- Gmail transporter ----
 function transport() {
@@ -117,7 +142,7 @@ function transport() {
 // ---- success email: sheet attached/inline + offer + all contacts ----
 async function emailSheet(to, pngBuffer, publicUrl) {
   if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) { console.log("no gmail creds"); return; }
-  const imgSrc = publicUrl ? publicUrl : "cid:sheet@richmadeit";
+  const imgSrc = "cid:sheet@richmadeit";
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;color:#111;">
       <h1 style="font-size:24px;margin-bottom:6px;">Your Character Is Ready 🔥</h1>
@@ -143,7 +168,9 @@ async function emailSheet(to, pngBuffer, publicUrl) {
     from: `RichMadeIt <${process.env.GMAIL_USER}>`,
     to, subject: "Your Character Is Ready 🔥 — RichMadeIt",
     html,
-    attachments: publicUrl ? [] : [{ filename: "character-sheet.png", content: pngBuffer, cid: "sheet@richmadeit" }],
+    attachments: [
+      { filename: "character-sheet.png", content: pngBuffer, cid: "sheet@richmadeit" }
+    ],
   };
   await transport().sendMail(mail);
 }
