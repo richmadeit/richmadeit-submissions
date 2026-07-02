@@ -1346,15 +1346,32 @@ document.querySelectorAll('a[href="#signup"]').forEach(a => {
       loadEl.style.display = 'none';
       window._rmiLastEmail = email; // remember for song attach
 
-      // Save the lead directly from the page (anon key) so it ALWAYS lands in
-      // the dashboard, independent of the serverless function's env vars.
+      // Upload their actual photos to storage + save the lead with real photo
+      // URLs, so you have the customer's face to build the paid video from.
       try {
         if (typeof supabase !== 'undefined' && typeof CONFIG !== 'undefined' && CONFIG.SUPABASE_URL){
           const _db = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+          const emailSafe = (email.replace(/[^a-z0-9]/gi,'_') || 'anon');
+          const stamp = Date.now();
+          const photoUrls = [];
+          for (let idx=0; idx<files.length; idx++){
+            const f = files[idx];
+            const clean = f.name.replace(/[^a-z0-9._-]/gi,'_');
+            const path = 'photos/' + emailSafe + '_' + stamp + '_' + idx + '_' + clean;
+            try {
+              const { error: upErr } = await _db.storage.from('client-files').upload(path, f, { upsert: true });
+              if (!upErr){
+                const { data: pub } = _db.storage.from('client-files').getPublicUrl(path);
+                if (pub && pub.publicUrl) photoUrls.push(pub.publicUrl);
+              }
+            } catch(_pe){}
+          }
+          window._rmiPhotoUrls = photoUrls; // for reference
           _db.from('reference_generations').insert([{
             email: email,
             image_url: 'on-page-generated',
             scene: (selectedScene || ''),
+            photo_urls: photoUrls.length ? photoUrls.join(' , ') : null,
             purchased: false
           }]).then(()=>{}).catch(()=>{});
         }
