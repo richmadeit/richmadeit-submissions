@@ -67,14 +67,14 @@ const TOON_LOCK =
 
 const STYLES = {
   familyguy:
-    "Adult-animation cartoon style, like Family Guy or American Dad — thick " +
-    "clean black linework, flat cel-shaded coloring, slightly exaggerated " +
-    "facial features and proportions, simple flat shading, unmistakably a " +
-    "TV cartoon character.",
+    "Bold prime-time adult-animation TV cartoon style — thick clean black " +
+    "linework, flat cel-shaded coloring, simplified rounded character " +
+    "proportions with a slightly exaggerated head shape, matte flat color " +
+    "fills, sitcom-cartoon look.",
   cutout:
-    "South Park–style construction-paper cutout animation — flat simple " +
-    "geometric shapes, thick bold outlines, minimal flat shading, blocky " +
-    "proportions, deadpan cutout-puppet look.",
+    "Flat construction-paper cutout animation style — simple flat geometric " +
+    "shapes, thick bold black outlines, minimal flat shading, blocky " +
+    "low-detail proportions, deadpan cutout-puppet look.",
   sketchy:
     "Loose hand-drawn sketchy toon style — visible rough ink linework, " +
     "scribbly cross-hatched shading, wobbly imperfect lines, indie-comic " +
@@ -84,9 +84,9 @@ const STYLES = {
     "cel-shaded coloring, stylized anime hair rendering with sharp " +
     "highlights, crisp linework, vibrant anime color palette.",
   pixar:
-    "3D-animated character style, like Pixar or DreamWorks — soft rounded " +
-    "3D-rendered features, smooth subsurface-scattered skin shading, big " +
-    "expressive eyes, cinematic 3D lighting, animated-movie still quality.",
+    "Modern 3D-animated character style — soft rounded 3D-rendered " +
+    "features, smooth subsurface-scattered skin shading, big expressive " +
+    "eyes, cinematic 3D lighting, high-budget animated-movie still quality.",
 };
 
 function buildPrompt(scene, style, detail) {
