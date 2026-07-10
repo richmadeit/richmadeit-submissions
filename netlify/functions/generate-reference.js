@@ -52,9 +52,50 @@ const SCENES = {
     "chair or executive setting, cinematic rim lighting, commanding presence.",
 };
 
-function buildPrompt(scene, detail) {
-  const base = SCENES[scene] || SCENES.rooftop;
-  let p = FACE_LOCK + base;
+// ---------------------------------------------------------------------------
+//  TOON STYLES — used by the ToonClipz free-preview tool. Unlike SCENES
+//  above (which stay photorealistic), these fully redraw the person as an
+//  animated cartoon character while locking their identity.
+// ---------------------------------------------------------------------------
+const TOON_LOCK =
+  "Using the person in the provided photo(s), keep their exact face shape, " +
+  "hairstyle, skin tone, and identity clearly recognizable — but fully " +
+  "redrawn as an animated cartoon character, NOT photorealistic. Preserve " +
+  "their pose, expression, and framing from the original photo, and keep " +
+  "their original background setting, redrawn in the same cartoon style. " +
+  "Vertical 9:16 composition. No text, no watermark, no logos. ";
+
+const STYLES = {
+  familyguy:
+    "Adult-animation cartoon style, like Family Guy or American Dad — thick " +
+    "clean black linework, flat cel-shaded coloring, slightly exaggerated " +
+    "facial features and proportions, simple flat shading, unmistakably a " +
+    "TV cartoon character.",
+  cutout:
+    "South Park–style construction-paper cutout animation — flat simple " +
+    "geometric shapes, thick bold outlines, minimal flat shading, blocky " +
+    "proportions, deadpan cutout-puppet look.",
+  sketchy:
+    "Loose hand-drawn sketchy toon style — visible rough ink linework, " +
+    "scribbly cross-hatched shading, wobbly imperfect lines, indie-comic " +
+    "energy, muted flat color fills, sketchbook feel.",
+  anime:
+    "Modern anime character style — large expressive anime eyes, clean " +
+    "cel-shaded coloring, stylized anime hair rendering with sharp " +
+    "highlights, crisp linework, vibrant anime color palette.",
+  pixar:
+    "3D-animated character style, like Pixar or DreamWorks — soft rounded " +
+    "3D-rendered features, smooth subsurface-scattered skin shading, big " +
+    "expressive eyes, cinematic 3D lighting, animated-movie still quality.",
+};
+
+function buildPrompt(scene, style, detail) {
+  let p;
+  if (style && STYLES[style]) {
+    p = TOON_LOCK + STYLES[style];
+  } else {
+    p = FACE_LOCK + (SCENES[scene] || SCENES.rooftop);
+  }
   if (detail && detail.trim()) {
     p += " Additional details requested: " + detail.trim().slice(0, 200) + ".";
   }
@@ -71,6 +112,7 @@ exports.handler = async (event) => {
     const images = body.images; // array of data URLs
     const consent = body.consent;
     const scene = (body.scene || "rooftop").trim();
+    const style = (body.style || "").trim();
     const detail = (body.detail || "").trim();
 
     if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
@@ -83,7 +125,7 @@ exports.handler = async (event) => {
       return json(500, { error: "Image service not configured." });
 
     // ---- build the parts: scene prompt + each uploaded photo as inlineData ----
-    const parts = [{ text: buildPrompt(scene, detail) }];
+    const parts = [{ text: buildPrompt(scene, style, detail) }];
     for (const dataUrl of images.slice(0, 3)) {
       const m = /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/.exec(dataUrl || "");
       if (!m) continue;
