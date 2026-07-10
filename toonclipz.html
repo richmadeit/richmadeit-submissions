@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>ToonClipz — Turn Your Video Into A Cartoon | by RichMadeIt</title>
+<meta name="description" content="Send us your clip, get it back animated in 1–24 hours. Shaq posted one to his own page. See yourself animated free, then order.">
+
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '993108543300382');
+fbq('track', 'PageView');
+fbq('track', 'ViewContent', {content_name: 'ToonClipz Landing', content_category: 'Animated Clips'});
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=993108543300382&ev=PageView&noscript=1"/></noscript>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bangers&family=Barlow+Condensed:wght@300;400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  :root {
+    /* Core RichMadeIt brand — unchanged, this page is a family member not a spin-off */
+    --bg: #070707; --bg2: #0d0d0d; --bg3: #161616;
+    --accent: #FF5500; --gold: #FFB300;
+    --text: #EFEFEF; --muted: #8d8a84;
+    --border: rgba(255,85,0,0.18);
+    --fd: 'Bebas Neue', sans-serif;
+    --fs: 'Barlow Condensed', sans-serif;
+    --fb: 'DM Sans', sans-serif;
+    --fc: 'Bangers', cursive;
+    /* Signature accent for THIS product line only — the "toon" blue, used sparingly */
+    --toon: #00C2FF;
+    --toon-dim: rgba(0,194,255,.14);
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--text); font-family:var(--fb); overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+  img,video { max-width:100%; display:block; }
+  a { color:inherit; }
+
+  /* ---- halftone texture, the one recurring signature device ---- */
+  .halftone {
+    position:relative;
+  }
+  .halftone::before {
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+    background-image:radial-gradient(var(--toon-dim) 1.4px, transparent 1.4px);
+    background-size:14px 14px;
+    -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 60%,transparent 100%);
+    mask-image:linear-gradient(180deg,#000 0%,#000 60%,transparent 100%);
+  }
+
+  /* ---- comic-panel border, used only on the proof block + pricing cards ---- */
+  .panel {
+    border:3px solid #111; outline:2px solid rgba(0,194,255,.55); outline-offset:-6px;
+    border-radius:4px; background:var(--bg3); position:relative;
+  }
+
+  header { display:flex; align-items:center; justify-content:space-between; padding:20px 5vw; max-width:1280px; margin:0 auto; }
+  .logo { font-family:'Bangers',cursive; font-style:italic; font-size:1.7rem; letter-spacing:2px; color:#D93500; text-decoration:none; }
+  .back-link { font-family:var(--fs); font-weight:700; font-size:.8rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); text-decoration:none; }
+  .back-link:hover { color:var(--gold); }
+
+  .wrap { max-width:1100px; margin:0 auto; padding:0 5vw; }
+  section { padding:70px 0; }
+
+  /* ---- HERO ---- */
+  .hero { padding:40px 0 60px; text-align:center; }
+  .eyebrow { display:inline-block; font-family:var(--fs); font-weight:700; font-size:.82rem; letter-spacing:3px; text-transform:uppercase; color:var(--toon); border:1px solid rgba(0,194,255,.4); border-radius:30px; padding:7px 18px; margin-bottom:22px; }
+  .hero h1 { font-family:var(--fd); font-size:clamp(2.6rem,6.5vw,5rem); line-height:.95; letter-spacing:2px; }
+  .hero h1 span { color:var(--accent); }
+  .hero-sub { font-family:var(--fb); font-size:1.08rem; color:var(--muted); max-width:600px; margin:20px auto 36px; line-height:1.6; }
+
+  .video-frame { max-width:420px; margin:0 auto; border-radius:18px; overflow:hidden; border:3px solid #1c1c1c; background:#000; position:relative; aspect-ratio:9/16; }
+  .video-frame video { width:100%; height:100%; object-fit:cover; }
+  .video-frame .play-badge { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.25); cursor:pointer; }
+  .play-badge .circle { width:64px; height:64px; border-radius:50%; background:rgba(255,85,0,.92); display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:0 6px 24px rgba(255,85,0,.5); }
+  .video-caption { font-family:var(--fs); font-size:.8rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-top:14px; }
+
+  .hero-cta { margin-top:34px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+  .btn { font-family:var(--fs); font-weight:700; font-size:.9rem; letter-spacing:1.5px; text-transform:uppercase; padding:15px 30px; border-radius:8px; text-decoration:none; display:inline-block; transition:transform .15s ease, box-shadow .15s ease; border:none; cursor:pointer; }
+  .btn-primary { background:var(--accent); color:#fff; box-shadow:0 6px 22px rgba(255,85,0,.35); }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(255,85,0,.5); }
+  .btn-ghost { background:transparent; border:1.5px solid rgba(255,255,255,.2); color:var(--text); }
+  .btn-ghost:hover { border-color:var(--toon); color:var(--toon); }
+
+  /* ---- SHAQ PROOF ---- */
+  .proof { padding:14px; }
+  .proof-inner { padding:44px 34px; text-align:center; }
+  .proof-tag { font-family:var(--fc); font-size:1.5rem; color:var(--toon); letter-spacing:1px; transform:rotate(-2deg); display:inline-block; margin-bottom:6px; }
+  .proof h2 { font-family:var(--fd); font-size:clamp(1.9rem,4.5vw,3rem); line-height:1.05; letter-spacing:1px; margin:8px 0 16px; }
+  .proof p { font-family:var(--fb); color:var(--muted); max-width:520px; margin:0 auto 26px; line-height:1.6; }
+  .proof-clip { max-width:340px; margin:0 auto; border-radius:14px; overflow:hidden; border:3px solid #1c1c1c; aspect-ratio:9/16; background:#000; }
+  .proof-clip video, .proof-clip img { width:100%; height:100%; object-fit:cover; }
+  /* before → after transformation */
+  .transform { display:flex; align-items:center; justify-content:center; gap:16px; margin:6px auto 0; max-width:560px; flex-wrap:nowrap; }
+  .transform-col { flex:1; min-width:0; }
+  .transform-media { border-radius:12px; overflow:hidden; border:2px solid #1c1c1c; aspect-ratio:9/16; background:#000; }
+  .transform-media video, .transform-media img { width:100%; height:100%; object-fit:cover; }
+  .transform-label { font-family:var(--fs); font-weight:700; font-size:.72rem; letter-spacing:2px; text-transform:uppercase; margin-top:8px; }
+  .transform-label.before { color:var(--muted); }
+  .transform-label.after { color:var(--toon); }
+  .transform-arrow { font-family:var(--fc); font-size:2rem; color:var(--accent); flex:0 0 auto; }
+  @media (max-width:520px){ .transform-arrow{ font-size:1.4rem; } .transform{ gap:8px; } }
+  .proof-stats { display:flex; gap:28px; justify-content:center; margin-top:28px; flex-wrap:wrap; }
+  .stat { text-align:center; }
+  .stat b { display:block; font-family:var(--fd); font-size:2.1rem; color:var(--gold); letter-spacing:1px; }
+  .stat span { font-family:var(--fs); font-size:.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+
+  /* ---- HOW IT WORKS ---- */
+  .sec-tag { font-family:var(--fs); font-weight:700; font-size:.78rem; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+  .sec-h { font-family:var(--fd); font-size:clamp(2rem,4.5vw,3.2rem); letter-spacing:1px; margin-bottom:36px; }
+  .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .step { background:var(--bg3); border:1px solid var(--border); border-radius:14px; padding:28px 24px; }
+  .step-num { font-family:var(--fd); font-size:2.6rem; color:var(--toon); line-height:1; opacity:.85; }
+  .step h3 { font-family:var(--fs); font-weight:700; font-size:1.15rem; letter-spacing:.5px; margin:12px 0 8px; }
+  .step p { font-family:var(--fb); font-size:.92rem; color:var(--muted); line-height:1.55; }
+  @media (max-width:760px){ .steps{ grid-template-columns:1fr; } }
+
+  /* ---- FREE PREVIEW ---- */
+  .preview-sub { color:var(--muted); font-family:var(--fb); font-size:.98rem; line-height:1.6; max-width:600px; margin-bottom:30px; }
+  .field { margin-bottom:20px; }
+  .field label { display:block; font-family:var(--fs); font-weight:700; font-size:.82rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--text); margin-bottom:9px; }
+  .field label .req{ color:var(--accent); } .field label .opt{ color:var(--muted); font-weight:400; text-transform:none; letter-spacing:0; }
+  .inp { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:13px 15px; color:var(--text); font-family:var(--fb); font-size:.95rem; outline:none; }
+  .inp:focus { border-color:var(--toon); }
+
+  .up-zone { border:2px dashed rgba(255,255,255,.18); border-radius:14px; padding:26px; text-align:center; cursor:pointer; position:relative; transition:border-color .15s ease; }
+  .up-zone:hover { border-color:var(--toon); }
+  .up-zone input[type=file]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .up-icon { font-size:1.9rem; margin-bottom:8px; }
+  .up-title { font-family:var(--fb); font-weight:600; font-size:.92rem; }
+  .up-picked { margin-top:8px; font-family:var(--fb); font-size:.85rem; color:var(--gold); }
+
+  .vibe-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+  .vibe-btn { font-family:var(--fb); font-size:.9rem; font-weight:600; padding:13px 10px; border-radius:10px; border:2px solid rgba(255,255,255,.14); background:rgba(255,255,255,.04); color:var(--text); cursor:pointer; text-align:center; transition:all .15s ease; }
+  .vibe-btn:hover { border-color:rgba(0,194,255,.5); background:var(--toon-dim); }
+  .vibe-btn.active { border-color:var(--toon); background:var(--toon-dim); box-shadow:0 0 0 2px rgba(0,194,255,.25); }
+  @media (max-width:640px){ .vibe-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (min-width:641px) and (max-width:860px){ .vibe-grid{ grid-template-columns:repeat(3,1fr); } }
+
+  .consent { display:flex; align-items:flex-start; gap:9px; font-family:var(--fb); font-size:.85rem; color:var(--muted); margin:22px 0; cursor:pointer; }
+  .consent input { margin-top:3px; }
+
+  .gen-btn { width:100%; padding:16px; border-radius:10px; border:none; background:var(--toon); color:#03222c; font-family:var(--fs); font-weight:800; font-size:1rem; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:opacity .15s ease; }
+  .gen-btn:hover { opacity:.9; } .gen-btn:disabled { opacity:.5; cursor:default; }
+  .err { display:none; margin-top:12px; padding:12px 14px; background:rgba(255,60,60,.1); border:1px solid rgba(255,60,60,.35); border-radius:8px; color:#ff9d9d; font-family:var(--fb); font-size:.88rem; }
+  .loading { display:none; text-align:center; padding:30px 0; font-family:var(--fs); letter-spacing:1px; color:var(--toon); }
+
+  .result { display:none; margin-top:28px; padding:26px; background:var(--bg3); border:1px solid rgba(0,194,255,.3); border-radius:16px; text-align:center; }
+  .result.show { display:block; }
+  .result img { width:100%; max-width:340px; margin:0 auto 16px; border-radius:14px; }
+  .result-note { font-family:var(--fb); font-size:.95rem; color:var(--text); line-height:1.6; margin-bottom:20px; }
+
+  /* ---- PRICING ---- */
+  .pricing-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; max-width:720px; margin:0 auto; }
+  @media (max-width:640px){ .pricing-grid{ grid-template-columns:1fr; max-width:420px; } }
+  .price-card { padding:30px 26px; text-align:left; }
+  .price-card.bundle { outline-color:var(--gold); }
+  .price-card.music { outline-color:var(--accent); }
+  .price-badge { font-family:var(--fs); font-weight:700; font-size:.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--toon); }
+  .price-card.bundle .price-badge { color:var(--gold); }
+  .price-card.music .price-badge { color:var(--accent); }
+  .price-amt { font-family:var(--fd); font-size:3.2rem; letter-spacing:1px; margin:10px 0 4px; }
+  .price-per { font-family:var(--fb); font-size:.85rem; color:var(--muted); margin-bottom:18px; }
+  .price-list { list-style:none; margin-bottom:26px; }
+  .price-list li { font-family:var(--fb); font-size:.92rem; color:var(--text); padding:7px 0 7px 24px; position:relative; }
+  .price-list li::before { content:"✓"; position:absolute; left:0; color:var(--toon); font-weight:700; }
+  .price-card.bundle .price-list li::before { color:var(--gold); }
+  .price-card.music .price-list li::before { color:var(--accent); }
+  .buy-btn { display:block; text-align:center; width:100%; padding:15px; border-radius:9px; font-family:var(--fs); font-weight:800; letter-spacing:1.5px; text-transform:uppercase; text-decoration:none; background:var(--accent); color:#fff; }
+  .buy-btn:hover { opacity:.92; }
+
+  .trust-line { text-align:center; font-family:var(--fb); color:var(--muted); font-size:.88rem; margin-top:26px; }
+
+  footer { text-align:center; padding:50px 5vw 70px; color:var(--muted); font-family:var(--fb); font-size:.85rem; }
+  footer a { color:var(--gold); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/">ToonClipz~</a>
+  <a class="back-link" href="/">← RichMadeIt</a>
+</header>
+
+<!-- ═══ HERO — avatar explainer video does the pitching ═══ -->
+<section class="hero wrap">
+  <span class="eyebrow">★ ToonClipz — by RichMadeIt</span>
+  <h1>Turn Your Video Into A <span>Cartoon</span></h1>
+  <p class="hero-sub">Send us your clip, we animate it — exact same camera moves, exact same energy, just cartoon. For rappers, artists, podcasters &amp; streamers. 15 seconds, ready to post in 1–24 hours.</p>
+
+  <div class="hero-cta">
+    <a href="#preview" class="btn btn-primary">See Yourself As A Cartoon — Free →</a>
+  </div>
+</section>
+
+<!-- ═══ SHAQ PROOF — the signature comic/halftone moment ═══ -->
+<div class="wrap">
+<div class="panel halftone proof">
+  <div class="proof-inner">
+    <span class="proof-tag">No cap —</span>
+    <h2>His real clip →<br>a cartoon he posted himself.</h2>
+    <p>See the actual transformation. I took a real moment from Shaq's podcast and animated it — same camera movement, same everything — and he put the finished clip up on his own page for his own audience. This is exactly what you're paying for.</p>
+
+    <!-- BEFORE / AFTER — swap both src's for the real files once you have them.
+         BEFORE = the original podcast clip. AFTER = your finished cartoon. -->
+    <div class="transform">
+      <div class="transform-col">
+        <div class="transform-media">
+          <video controls playsinline poster="posters/poster_new_girlfriend.jpg">
+            <source src="videos/shaq_original.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="transform-label before">The Original</div>
+      </div>
+      <div class="transform-arrow">→</div>
+      <div class="transform-col">
+        <div class="transform-media">
+          <video controls playsinline poster="posters/poster_new_girlfriend.jpg">
+            <source src="videos/shaq_podcast_clip.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="transform-label after">The Cartoon I Made</div>
+      </div>
+    </div>
+    <p style="font-family:var(--fb); font-size:.82rem; color:var(--muted); max-width:400px; margin:16px auto 0; line-height:1.5;">Shaq's ran 45 sec — 3 clips stitched into one story (that's the 4-pack bundle). A single order is one 15-sec moment.</p>
+
+    <div style="font-family:var(--fc); font-size:1.15rem; color:var(--gold); letter-spacing:.5px; transform:rotate(-1deg); margin:32px 0 4px;">Another one —</div>
+    <div class="transform" style="margin-top:6px;">
+      <div class="transform-col">
+        <div class="transform-media">
+          <video controls playsinline poster="posters/poster_new_girlfriend.jpg">
+            <source src="videos/example2_original.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="transform-label before">The Original</div>
+      </div>
+      <div class="transform-arrow">→</div>
+      <div class="transform-col">
+        <div class="transform-media">
+          <video controls playsinline poster="posters/poster_new_girlfriend.jpg">
+            <source src="videos/example2_cartoon.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="transform-label after">The Cartoon I Made</div>
+      </div>
+    </div>
+
+    <div class="proof-stats">
+      <div class="stat"><b>Shaq</b><span>Posted It Himself</span></div>
+      <div class="stat"><b id="proofViews">—</b><span>Views &amp; Counting</span></div>
+      <div class="stat"><b>1 → 🎬</b><span>Real Transformation</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section class="wrap" id="how">
+  <div class="sec-tag">The Process</div>
+  <div class="sec-h">Three Steps. Zero Editing On Your End.</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>See yourself free</h3>
+      <p>Upload a photo, pick a style, and see yourself as a cartoon in seconds. Free — no card, no signup. Just see the quality first.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>Send us your clip</h3>
+      <p>Like what you see? Order right here on the page — single clip or a bundle. Then send me the video you already have recorded — that's it.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>I animate &amp; you post</h3>
+      <p>I direct every frame myself and deliver ready to share in 1–24 hours. Drop it on TikTok, Reels, Shorts — wherever your people are.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FREE PREVIEW — see yourself as a cartoon, reuses the working generator ═══ -->
+<section class="wrap" id="preview">
+  <div class="sec-tag">Try It Free</div>
+  <div class="sec-h">See Yourself As A Cartoon First</div>
+  <p class="preview-sub">Upload a photo and I'll show you a free animated preview — the exact style your clip will be made in. No payment, no signup fee, just a taste of the quality.</p>
+
+  <div class="field">
+    <label>Your Email <span class="req">*</span></label>
+    <input type="email" class="inp" id="pcEmail" placeholder="you@email.com">
+  </div>
+
+  <div class="field">
+    <label>Upload A Photo <span class="req">*</span></label>
+    <div class="up-zone" id="pcZone">
+      <input type="file" id="pcPhoto" accept="image/*">
+      <div class="up-icon">📸</div>
+      <div class="up-title" id="pcUpTitle">Tap to upload your photo</div>
+      <div class="up-picked" id="pcUpPicked"></div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Pick Your Style <span class="opt">tap one — see how you look</span></label>
+    <div class="vibe-grid" id="pcStyleGrid">
+      <button type="button" class="vibe-btn" data-style="familyguy">🎭 Adult Cartoon</button>
+      <button type="button" class="vibe-btn" data-style="cutout">✂️ Cutout Style</button>
+      <button type="button" class="vibe-btn" data-style="sketchy">🌀 Sketchy Toon</button>
+      <button type="button" class="vibe-btn" data-style="anime">🌸 Anime</button>
+      <button type="button" class="vibe-btn" data-style="pixar">🎬 3D Animated</button>
+    </div>
+  </div>
+
+  <label class="consent"><input type="checkbox" id="pcConsent"> This is my own photo and I have the right to use it.</label>
+
+  <button type="button" class="gen-btn" id="pcGenBtn">Cartoon Me — Free 🎬</button>
+  <div class="err" id="pcErr"></div>
+  <div class="loading" id="pcLoading">Drawing you up… ~10 sec 🎨</div>
+
+  <div class="result" id="pcResult">
+    <img id="pcResultImg" alt="Your cartoon preview">
+    <div class="result-note">That's the style your clip gets made in. 🔥<br>This is just a preview — your real clip is fully animated, directed, and built around your actual podcast moment.</div>
+    <a href="#pricing" class="gen-btn" style="display:inline-block; text-decoration:none; width:auto; padding:15px 32px;">Get My Clip Now →</a>
+  </div>
+</section>
+
+
+
+<!-- ═══ PRICING — direct checkout, no DM required ═══ -->
+<section class="wrap" id="pricing">
+  <div class="sec-tag">Step 1: Get Your Clip</div>
+  <div class="sec-h">Order Here — Pay In Seconds</div>
+  <p class="preview-sub">Pick single or bundle, pay right on the page, then send me your moment below. No DMs, no waiting on a quote.</p>
+
+  <div class="pricing-grid">
+    <div class="panel price-card">
+      <span class="price-badge">Single Clip</span>
+      <div class="price-amt">$50</div>
+      <div class="price-per">15 sec · built to be watched to the end</div>
+      <ul class="price-list">
+        <li>Send us your own 15-sec clip, animated</li>
+        <li>Exact camera movement, exact energy</li>
+        <li>Delivered ready to post, 1–24 hrs</li>
+        <li>Directed personally by me</li>
+      </ul>
+      <a href="https://buy.stripe.com/6oU3cv9I13ZQ8YI96RbMQ0a" class="buy-btn" id="buySingle">Get My Clip — $50 →</a>
+    </div>
+
+    <div class="panel price-card bundle">
+      <span class="price-badge">★ Best Value — Bundle</span>
+      <div class="price-amt">$160</div>
+      <div class="price-per">4 clips · save $40</div>
+      <ul class="price-list">
+        <li>4 animated clips, 15 sec each ($40/clip)</li>
+        <li>Perfect for weekly episode content</li>
+        <li>Same 1–24 hr turnaround, per clip</li>
+        <li>Priority delivery order</li>
+      </ul>
+      <a href="https://buy.stripe.com/8x2bJ107r3ZQfn6cj3bMQ0b" class="buy-btn" id="buyBundle">Get The Bundle — $160 →</a>
+    </div>
+
+  </div>
+
+  <p class="trust-line">Pay on the site, send your clip moment after — no back and forth, no waiting on a quote.</p>
+</section>
+
+<!-- ═══ SEND YOUR MOMENT — after ordering, send the clip to animate ═══ -->
+<section class="wrap" id="moment">
+  <div class="sec-tag">After You Order</div>
+  <div class="sec-h">Step 2: Send Me Your Moment</div>
+  <p class="preview-sub">Once you've ordered above, send me what you want animated — a podcast/stream moment, or your song if you grabbed the music video clip. Upload the file or paste a link. I'll match it to your order by email and get to work.</p>
+
+  <div class="field">
+    <label>Upload Your Clip Or Song <span class="opt">video or audio file</span></label>
+    <div class="up-zone" id="momentZone">
+      <input type="file" id="momentFile" accept="video/*,audio/*,.mp4,.mov,.mp3,.wav,.m4a">
+      <div class="up-icon">🎬</div>
+      <div class="up-title" id="momentTitle">Tap to upload your clip</div>
+      <div class="up-picked" id="momentPicked"></div>
+    </div>
+  </div>
+
+  <div style="text-align:center; font-family:var(--fb); font-size:.82rem; color:var(--muted); margin:14px 0;">— or —</div>
+
+  <div class="field">
+    <label>Paste A Link <span class="opt">YouTube, Descript, Riverside, Drive, Dropbox…</span></label>
+    <input type="url" class="inp" id="momentLink" placeholder="https://youtube.com/watch?v=… (include the timestamp)">
+  </div>
+
+  <button type="button" class="gen-btn" id="momentSaveBtn" style="background:var(--gold); color:#1a1300;">Attach My Moment ✓</button>
+  <div class="err" id="momentStatus" style="display:none;"></div>
+
+  <p style="font-family:var(--fb); font-size:.85rem; color:var(--muted); text-align:center; margin-top:16px; line-height:1.6;">
+    Upload not working? Email it to <a href="mailto:rich.madeit3@gmail.com" style="color:var(--gold);">rich.madeit3@gmail.com</a>
+    or <a href="https://wa.me/13464981235" target="_blank" rel="noopener" style="color:var(--gold);">message me on WhatsApp</a> —
+    include the email you used above so I can match it to your order.
+  </p>
+</section>
+
+<footer>
+  ToonClipz by RichMadeIt · Questions? <a href="https://instagram.com/rich_madeit_" target="_blank" rel="noopener">@rich_madeit_</a> on Instagram &nbsp;·&nbsp; <a href="/">richmadeit.netlify.app</a>
+</footer>
+
+<script>
+// ---- free cartoon preview: reuses the SAME working endpoint as the main
+//      site's scene tool, style locked to familyguy ----
+(function(){
+  const emailEl   = document.getElementById('pcEmail');
+  const photoEl   = document.getElementById('pcPhoto');
+  const zoneTitle = document.getElementById('pcUpTitle');
+  const zonePicked= document.getElementById('pcUpPicked');
+  const styleGrid = document.getElementById('pcStyleGrid');
+  const consentEl = document.getElementById('pcConsent');
+  const btn       = document.getElementById('pcGenBtn');
+  const errEl     = document.getElementById('pcErr');
+  const loadEl    = document.getElementById('pcLoading');
+  const resultEl  = document.getElementById('pcResult');
+  const imgEl     = document.getElementById('pcResultImg');
+
+  let selectedStyle = null;
+  if (styleGrid){
+    styleGrid.querySelectorAll('.vibe-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        styleGrid.querySelectorAll('.vibe-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        selectedStyle = b.dataset.style;
+      });
+    });
+  }
+  if (photoEl){
+    photoEl.addEventListener('change', () => {
+      const f = photoEl.files[0];
+      if (f){ zonePicked.textContent = '✓ ' + f.name; zoneTitle.textContent = 'Tap to change photo'; }
+    });
+  }
+
+  const showErr = m => { errEl.textContent = m; errEl.style.display = 'block'; };
+
+  function fileToDataURL(file, maxDim){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = e => {
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim){
+            if (w > h){ h = Math.round(h * maxDim / w); w = maxDim; }
+            else { w = Math.round(w * maxDim / h); h = maxDim; }
+          }
+          const c = document.createElement('canvas');
+          c.width = w; c.height = h;
+          c.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(c.toDataURL('image/jpeg', 0.88));
+        };
+        img.onerror = reject; img.src = e.target.result;
+      };
+      reader.onerror = reject; reader.readAsDataURL(file);
+    });
+  }
+
+  btn.addEventListener('click', async () => {
+    errEl.style.display = 'none';
+    const email = (emailEl.value||'').trim();
+    const file = photoEl.files[0];
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr('Enter a valid email so we can send it to you.');
+    if (!file) return showErr('Upload a photo first.');
+    if (!selectedStyle) return showErr('Pick a cartoon style first — tap one above.');
+    if (!consentEl.checked) return showErr('Please confirm this is your own photo.');
+
+    btn.disabled = true;
+    btn.textContent = 'Drawing you up… 🎨';
+    loadEl.style.display = 'block';
+
+    try {
+      const image = await fileToDataURL(file, 1024);
+      const resp = await fetch('/.netlify/functions/generate-reference', {
+        method:'POST', headers:{'content-type':'application/json'},
+        body: JSON.stringify({ email, images:[image], consent:true, style: selectedStyle, scene:'stage' })
+      });
+      const data = await resp.json().catch(()=>({}));
+      if (!resp.ok || !data.image){
+        loadEl.style.display = 'none'; btn.disabled = false; btn.textContent = 'Cartoon Me — Free 🎬';
+        return showErr(data.error || 'The generator hiccuped — try again.');
+      }
+      imgEl.src = data.image;
+      loadEl.style.display = 'none';
+      resultEl.classList.add('show');
+      resultEl.scrollIntoView({behavior:'smooth', block:'center'});
+      if (typeof fbq !== 'undefined') fbq('track','Lead',{content_name:'Cartoon Clip Preview'});
+      btn.disabled = false; btn.textContent = 'Make Another 🎬';
+    } catch(e){
+      loadEl.style.display = 'none'; btn.disabled = false; btn.textContent = 'Cartoon Me — Free 🎬';
+      showErr('Something glitched — try again.');
+    }
+  });
+})();
+
+// ---- MOMENT ATTACH: upload the actual clip/audio to Supabase storage OR
+//      save a pasted link, then attach it to the lead by email ----
+(function(){
+  const momentFile   = document.getElementById('momentFile');
+  const momentLink    = document.getElementById('momentLink');
+  const momentSave    = document.getElementById('momentSaveBtn');
+  const momentStatus  = document.getElementById('momentStatus');
+  const momentTitle   = document.getElementById('momentTitle');
+  const momentPicked  = document.getElementById('momentPicked');
+  const emailEl       = document.getElementById('pcEmail');
+  if (!momentSave) return;
+
+  const setStatus = (msg, ok) => {
+    momentStatus.textContent = msg;
+    momentStatus.style.display = 'block';
+    momentStatus.style.color = ok ? '#4ade80' : '#ff9d9d';
+    momentStatus.style.background = ok ? 'rgba(74,222,128,.1)' : 'rgba(255,60,60,.1)';
+    momentStatus.style.border = '1px solid ' + (ok ? 'rgba(74,222,128,.35)' : 'rgba(255,60,60,.35)');
+  };
+
+  if (momentFile){
+    momentFile.addEventListener('change', () => {
+      const f = momentFile.files[0];
+      if (f){ momentPicked.textContent = '✓ ' + f.name; momentTitle.textContent = 'Tap to change clip'; }
+    });
+  }
+
+  let db = null;
+  try {
+    if (typeof supabase !== 'undefined' && typeof CONFIG !== 'undefined' && CONFIG.SUPABASE_URL){
+      db = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    }
+  } catch(e){}
+
+  momentSave.addEventListener('click', async () => {
+    const email = (emailEl && emailEl.value || '').trim();
+    const file  = momentFile && momentFile.files[0];
+    const link  = (momentLink && momentLink.value || '').trim();
+
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+      return setStatus('Enter your email above first, so I can match this to your order.', false);
+    }
+    if (!file && !link){
+      return setStatus('Upload a clip or paste a link first.', false);
+    }
+
+    momentSave.disabled = true;
+    setStatus('Saving your moment…', true);
+
+    try {
+      let momentUrl = link;
+
+      if (file && db){
+        const safe = email.replace(/[^a-z0-9]/gi,'_') + '_' + Date.now() + '_' + file.name.replace(/[^a-z0-9._-]/gi,'_');
+        const { error: upErr } = await db.storage.from('client-files').upload('moments/' + safe, file, { upsert:true });
+        if (upErr) throw upErr;
+        const { data: pub } = db.storage.from('client-files').getPublicUrl('moments/' + safe);
+        momentUrl = (pub && pub.publicUrl) ? pub.publicUrl : ('moments/' + safe);
+      } else if (file && !db){
+        throw new Error('storage-unavailable');
+      }
+
+      if (db){
+        await db.from('reference_generations').update({ moment_url: momentUrl }).eq('email', email);
+      }
+
+      setStatus('✓ Moment attached! You\'re all set — grab your clip below. 🎬', true);
+      momentSave.textContent = 'Moment Attached ✓';
+    } catch (err){
+      console.error(err);
+      setStatus("Couldn't save it here — email it to rich.madeit3@gmail.com or WhatsApp instead, no stress.", false);
+      momentSave.disabled = false;
+    }
+  });
+})();
+
+// ---- fire InitiateCheckout when either buy button is tapped ----
+(function(){
+  const single = document.getElementById('buySingle');
+  const bundle = document.getElementById('buyBundle');
+  const music  = document.getElementById('buyMusic');
+  if (single) single.addEventListener('click', () => {
+    if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Clip Single', value:50, currency:'USD'});
+  });
+  if (bundle) bundle.addEventListener('click', () => {
+    if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Clip Bundle', value:160, currency:'USD'});
+  });
+  if (music) music.addEventListener('click', () => {
+    if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Music Video Clip', value:99, currency:'USD'});
+  });
+})();
+</script>
+
+</body>
+</html>
