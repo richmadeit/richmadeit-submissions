@@ -484,7 +484,7 @@ fbq('track', 'ViewContent', {content_name: 'ToonClipz Landing', content_category
       const image = await fileToDataURL(file, 1024);
       const resp = await fetch('/.netlify/functions/generate-reference', {
         method:'POST', headers:{'content-type':'application/json'},
-        body: JSON.stringify({ email, images:[image], consent:true, style: selectedStyle, scene:'stage' })
+        body: JSON.stringify({ email, images:[image], consent:true, style: selectedStyle })
       });
       const data = await resp.json().catch(()=>({}));
       if (!resp.ok || !data.image){
