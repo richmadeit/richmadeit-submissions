@@ -26,7 +26,7 @@ fbq('track', 'ViewContent', {content_name: 'ToonClipz Landing', content_category
 
   ttq.load('D98UMHBC77U7PB56O2D0');
   ttq.page();
-  ttq.track('ViewContent', {content_name: 'ToonClipz Landing', content_type: 'product'});
+  ttq.track('ViewContent', {content_id: 'toonclipz_landing', content_name: 'ToonClipz Landing', content_type: 'product'});
 }(window, document, 'ttq');
 </script>
 
@@ -599,11 +599,11 @@ fbq('track', 'ViewContent', {content_name: 'ToonClipz Landing', content_category
   const music  = document.getElementById('buyMusic');
   if (single) single.addEventListener('click', () => {
     if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Clip Single', value:50, currency:'USD'});
-    if (typeof ttq !== 'undefined') ttq.track('InitiateCheckout',{content_name:'Cartoon Clip Single', value:50, currency:'USD'});
+    if (typeof ttq !== 'undefined') ttq.track('InitiateCheckout',{content_id:'toonclipz_single', content_name:'Cartoon Clip Single', value:50, currency:'USD'});
   });
   if (bundle) bundle.addEventListener('click', () => {
     if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Clip Bundle', value:160, currency:'USD'});
-    if (typeof ttq !== 'undefined') ttq.track('InitiateCheckout',{content_name:'Cartoon Clip Bundle', value:160, currency:'USD'});
+    if (typeof ttq !== 'undefined') ttq.track('InitiateCheckout',{content_id:'toonclipz_bundle', content_name:'Cartoon Clip Bundle', value:160, currency:'USD'});
   });
   if (music) music.addEventListener('click', () => {
     if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Music Video Clip', value:99, currency:'USD'});
