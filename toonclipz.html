@@ -19,6 +19,17 @@ fbq('track', 'ViewContent', {content_name: 'ToonClipz Landing', content_category
 </script>
 <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=993108543300382&ev=PageView&noscript=1"/></noscript>
 
+<!-- TikTok Pixel -->
+<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<e.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=i+"?sdkid="+e+"&lib="+t;var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(a,s)};
+
+  ttq.load('D98UMHBC77U7PB56O2D0');
+  ttq.page();
+  ttq.track('ViewContent', {content_name: 'ToonClipz Landing', content_type: 'product'});
+}(window, document, 'ttq');
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bangers&family=Barlow+Condensed:wght@300;400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <script src="config.js"></script>
@@ -496,6 +507,7 @@ fbq('track', 'ViewContent', {content_name: 'ToonClipz Landing', content_category
       resultEl.classList.add('show');
       resultEl.scrollIntoView({behavior:'smooth', block:'center'});
       if (typeof fbq !== 'undefined') fbq('track','Lead',{content_name:'Cartoon Clip Preview'});
+      if (typeof ttq !== 'undefined') ttq.track('SubmitForm',{content_name:'Cartoon Clip Preview'});
       btn.disabled = false; btn.textContent = 'Make Another 🎬';
     } catch(e){
       loadEl.style.display = 'none'; btn.disabled = false; btn.textContent = 'Cartoon Me — Free 🎬';
@@ -587,9 +599,11 @@ fbq('track', 'ViewContent', {content_name: 'ToonClipz Landing', content_category
   const music  = document.getElementById('buyMusic');
   if (single) single.addEventListener('click', () => {
     if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Clip Single', value:50, currency:'USD'});
+    if (typeof ttq !== 'undefined') ttq.track('InitiateCheckout',{content_name:'Cartoon Clip Single', value:50, currency:'USD'});
   });
   if (bundle) bundle.addEventListener('click', () => {
     if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Clip Bundle', value:160, currency:'USD'});
+    if (typeof ttq !== 'undefined') ttq.track('InitiateCheckout',{content_name:'Cartoon Clip Bundle', value:160, currency:'USD'});
   });
   if (music) music.addEventListener('click', () => {
     if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Music Video Clip', value:99, currency:'USD'});
