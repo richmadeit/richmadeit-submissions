@@ -355,7 +355,7 @@ fbq('track', 'ViewContent', {content_name: 'ToonClipz Landing', content_category
   <div class="pricing-grid">
     <div class="panel price-card">
       <span class="price-badge">Single Clip</span>
-      <div class="price-amt">$50</div>
+      <div class="price-amt">$25</div>
       <div class="price-per">15 sec · built to be watched to the end</div>
       <ul class="price-list">
         <li>Send us your own 15-sec clip, animated</li>
@@ -363,20 +363,20 @@ fbq('track', 'ViewContent', {content_name: 'ToonClipz Landing', content_category
         <li>Delivered ready to post, 1–24 hrs</li>
         <li>Directed personally by me</li>
       </ul>
-      <a href="https://buy.stripe.com/6oU3cv9I13ZQ8YI96RbMQ0a" class="buy-btn" id="buySingle">Get My Clip — $50 →</a>
+      <a href="https://buy.stripe.com/6oU3cv9I13ZQ8YI96RbMQ0a" class="buy-btn" id="buySingle">Get My Clip — $25 →</a>
     </div>
 
     <div class="panel price-card bundle">
       <span class="price-badge">★ Best Value — Bundle</span>
-      <div class="price-amt">$160</div>
-      <div class="price-per">4 clips · save $40</div>
+      <div class="price-amt">$90</div>
+      <div class="price-per">4 clips · save $10</div>
       <ul class="price-list">
-        <li>4 animated clips, 15 sec each ($40/clip)</li>
+        <li>4 animated clips, 15 sec each ($22.50/clip)</li>
         <li>Perfect for weekly episode content</li>
         <li>Same 1–24 hr turnaround, per clip</li>
         <li>Priority delivery order</li>
       </ul>
-      <a href="https://buy.stripe.com/8x2bJ107r3ZQfn6cj3bMQ0b" class="buy-btn" id="buyBundle">Get The Bundle — $160 →</a>
+      <a href="https://buy.stripe.com/8x2bJ107r3ZQfn6cj3bMQ0b" class="buy-btn" id="buyBundle">Get The Bundle — $90 →</a>
     </div>
 
   </div>
@@ -598,12 +598,12 @@ fbq('track', 'ViewContent', {content_name: 'ToonClipz Landing', content_category
   const bundle = document.getElementById('buyBundle');
   const music  = document.getElementById('buyMusic');
   if (single) single.addEventListener('click', () => {
-    if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Clip Single', value:50, currency:'USD'});
-    if (typeof ttq !== 'undefined') ttq.track('InitiateCheckout',{content_id:'toonclipz_single', content_name:'Cartoon Clip Single', value:50, currency:'USD'});
+    if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Clip Single', value:25, currency:'USD'});
+    if (typeof ttq !== 'undefined') ttq.track('InitiateCheckout',{content_id:'toonclipz_single', content_name:'Cartoon Clip Single', value:25, currency:'USD'});
   });
   if (bundle) bundle.addEventListener('click', () => {
-    if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Clip Bundle', value:160, currency:'USD'});
-    if (typeof ttq !== 'undefined') ttq.track('InitiateCheckout',{content_id:'toonclipz_bundle', content_name:'Cartoon Clip Bundle', value:160, currency:'USD'});
+    if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Clip Bundle', value:90, currency:'USD'});
+    if (typeof ttq !== 'undefined') ttq.track('InitiateCheckout',{content_id:'toonclipz_bundle', content_name:'Cartoon Clip Bundle', value:90, currency:'USD'});
   });
   if (music) music.addEventListener('click', () => {
     if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'Cartoon Music Video Clip', value:99, currency:'USD'});
