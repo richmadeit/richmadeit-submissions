@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Get Your Video Started — RichMadeIt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#0a0000;
+    --panel:#160707;
+    --panel-border:#2b1212;
+    --red:#e8433f;
+    --red-bright:#ff6b5c;
+    --white:#f7f5ef;
+    --muted:#b89f9c;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  html,body{
+    background:var(--black);
+    color:var(--white);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  body{
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+
+  /* Header */
+  .hero{
+    position:relative;
+    padding:56px 24px 40px;
+    text-align:center;
+    background:
+      radial-gradient(ellipse at 50% 0%, #3a0a0a 0%, var(--black) 65%);
+    border-bottom:1px solid var(--panel-border);
+  }
+  .eyebrow{
+    font-weight:800;
+    font-size:13px;
+    letter-spacing:0.32em;
+    color:var(--red);
+    text-transform:uppercase;
+  }
+  .hero h1{
+    font-family:'Anton',sans-serif;
+    font-weight:400;
+    font-size:clamp(34px, 9vw, 44px);
+    line-height:1.05;
+    text-transform:uppercase;
+    margin-top:14px;
+    letter-spacing:0.01em;
+  }
+  .hero h1 span{
+    color:var(--red-bright);
+  }
+  .hero p{
+    margin-top:14px;
+    color:var(--muted);
+    font-size:15px;
+    line-height:1.5;
+    max-width:420px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+  /* Progress steps */
+  .steps{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-top:26px;
+  }
+  .step-dot{
+    width:26px; height:4px;
+    border-radius:4px;
+    background:var(--panel-border);
+  }
+  .step-dot.active{ background:var(--red); }
+
+  form{
+    max-width:520px;
+    margin:0 auto;
+    padding:32px 20px 0;
+  }
+
+  .field-group{
+    margin-bottom:36px;
+  }
+  .field-label{
+    font-weight:700;
+    font-size:17px;
+    color:var(--white);
+    margin-bottom:6px;
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+  }
+  .field-number{
+    font-family:'Anton',sans-serif;
+    color:var(--red);
+    font-size:20px;
+  }
+  .field-hint{
+    font-size:14px;
+    color:var(--muted);
+    margin-bottom:14px;
+    line-height:1.4;
+  }
+
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"]{
+    width:100%;
+    background:var(--panel);
+    border:1.5px solid var(--panel-border);
+    border-radius:12px;
+    padding:16px 16px;
+    font-size:16px;
+    color:var(--white);
+    font-family:'Inter',sans-serif;
+    outline:none;
+    transition:border-color 0.15s ease;
+  }
+  input::placeholder{ color:#6b5654; }
+  input:focus{ border-color:var(--red); }
+
+  /* Logo upload */
+  .upload-box{
+    position:relative;
+    border:2px dashed var(--panel-border);
+    border-radius:16px;
+    padding:36px 20px;
+    text-align:center;
+    background:var(--panel);
+    transition:border-color 0.15s ease, background 0.15s ease;
+  }
+  .upload-box.has-file{
+    border-color:var(--red);
+    border-style:solid;
+  }
+  .upload-box input[type="file"]{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    cursor:pointer;
+    width:100%;
+    height:100%;
+  }
+  .upload-icon{
+    width:44px; height:44px;
+    margin:0 auto 12px;
+    border-radius:50%;
+    background:rgba(232,67,63,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--red-bright);
+    font-size:22px;
+  }
+  .upload-text{
+    font-weight:700;
+    font-size:15px;
+    color:var(--white);
+  }
+  .upload-subtext{
+    font-size:13px;
+    color:var(--muted);
+    margin-top:4px;
+  }
+  #logo-preview{
+    max-width:120px;
+    max-height:120px;
+    border-radius:10px;
+    margin:0 auto 14px;
+    display:none;
+    object-fit:contain;
+    background:#fff;
+    padding:6px;
+  }
+
+  .vehicle-preview-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .vehicle-preview-grid:empty{
+    display:none;
+  }
+  .vehicle-preview-grid img{
+    width:100%;
+    aspect-ratio:1/1;
+    object-fit:cover;
+    border-radius:8px;
+    border:1.5px solid var(--panel-border);
+  }
+
+  /* Option cards (radio-style) */
+  .option-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .option-grid.single-col{
+    grid-template-columns:1fr;
+  }
+  .option-card{
+    position:relative;
+    background:var(--panel);
+    border:1.5px solid var(--panel-border);
+    border-radius:14px;
+    padding:16px 14px;
+    cursor:pointer;
+    transition:border-color 0.15s ease, background 0.15s ease;
+  }
+  .option-card input{
+    position:absolute;
+    opacity:0;
+    inset:0;
+    cursor:pointer;
+  }
+  .option-card:has(input:checked){
+    border-color:var(--red);
+    background:rgba(232,67,63,0.08);
+  }
+  .option-emoji{
+    font-size:24px;
+    margin-bottom:8px;
+    display:block;
+  }
+  .option-title{
+    font-weight:700;
+    font-size:15px;
+    color:var(--white);
+  }
+  .option-desc{
+    font-size:12.5px;
+    color:var(--muted);
+    margin-top:3px;
+    line-height:1.35;
+  }
+  .check-mark{
+    position:absolute;
+    top:12px; right:12px;
+    width:18px; height:18px;
+    border-radius:50%;
+    border:1.5px solid var(--panel-border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .option-card:has(input:checked) .check-mark{
+    background:var(--red);
+    border-color:var(--red);
+  }
+  .check-mark::after{
+    content:"";
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--white);
+    opacity:0;
+  }
+  .option-card:has(input:checked) .check-mark::after{
+    opacity:1;
+  }
+
+  textarea{
+    width:100%;
+    background:var(--panel);
+    border:1.5px solid var(--panel-border);
+    border-radius:12px;
+    padding:16px;
+    font-size:16px;
+    color:var(--white);
+    font-family:'Inter',sans-serif;
+    outline:none;
+    resize:vertical;
+    min-height:90px;
+    transition:border-color 0.15s ease;
+  }
+  textarea::placeholder{ color:#6b5654; }
+  textarea:focus{ border-color:var(--red); }
+
+  .submit-btn{
+    width:100%;
+    background:var(--red);
+    color:var(--white);
+    border:none;
+    border-radius:14px;
+    padding:19px;
+    font-family:'Inter',sans-serif;
+    font-weight:800;
+    font-size:17px;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    cursor:pointer;
+    margin-top:8px;
+    transition:background 0.15s ease, transform 0.1s ease;
+    box-shadow:0 8px 24px rgba(232,67,63,0.35);
+  }
+  .submit-btn:active{
+    transform:scale(0.98);
+    background:#c8302c;
+  }
+
+  .footnote{
+    text-align:center;
+    font-size:13px;
+    color:var(--muted);
+    margin-top:18px;
+    padding-bottom:20px;
+    line-height:1.5;
+  }
+
+  .price-confirm{
+    text-align:center;
+    font-size:13.5px;
+    color:var(--muted);
+    line-height:1.5;
+    margin-bottom:14px;
+    padding:12px 14px;
+    background:var(--panel);
+    border:1.5px solid var(--panel-border);
+    border-radius:12px;
+  }
+  .price-confirm strong{
+    color:var(--white);
+  }
+
+  .error-message{
+    display:none;
+    text-align:center;
+    font-size:14px;
+    color:var(--red-bright);
+    line-height:1.5;
+    margin-top:14px;
+    padding:14px;
+    background:rgba(232,67,63,0.1);
+    border:1.5px solid var(--red);
+    border-radius:12px;
+  }
+  .error-message strong{
+    color:var(--white);
+  }
+  .submit-btn.loading{
+    opacity:0.7;
+    pointer-events:none;
+  }
+
+  /* Success state */
+  .success-screen{
+    display:none;
+    max-width:480px;
+    margin:0 auto;
+    padding:80px 24px;
+    text-align:center;
+  }
+  .success-icon{
+    width:72px; height:72px;
+    border-radius:50%;
+    background:rgba(232,67,63,0.12);
+    border:2px solid var(--red);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 24px;
+    font-size:32px;
+    color:var(--red-bright);
+  }
+  .success-screen h2{
+    font-family:'Anton',sans-serif;
+    font-weight:400;
+    font-size:32px;
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  .success-screen p{
+    color:var(--muted);
+    font-size:15px;
+    line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">RichMadeIt · AI Video Intake</div>
+  <h1>Let's Build<br>Your <span>Hype Video</span></h1>
+  <p>Takes about 2 minutes. Fill this out and I'll get your custom video queued up.</p>
+  <div class="steps">
+    <div class="step-dot active"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot active"></div>
+  </div>
+</div>
+
+<form id="intake-form" name="dealership-intake" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data">
+  <input type="hidden" name="form-name" value="dealership-intake">
+  <p style="display:none;">
+    <label>Don't fill this out: <input name="bot-field"></label>
+  </p>
+
+  <div class="field-group">
+    <div class="field-label"><span class="field-number">01</span> Your Company</div>
+    <div class="field-hint">So I know who this is for and where to send the video.</div>
+    <input type="text" name="dealership_name" placeholder="Company name" required style="margin-bottom:10px;">
+    <input type="text" name="contact_name" placeholder="Your name" required style="margin-bottom:10px;">
+    <input type="tel" name="phone" placeholder="Phone number" required style="margin-bottom:10px;">
+    <input type="email" name="email" placeholder="Email (optional)">
+  </div>
+
+  <div class="field-group">
+    <div class="field-label"><span class="field-number">02</span> Your Logo</div>
+    <div class="field-hint">I'll drop this into your video's end card. Any image works — PNG or JPG.</div>
+    <label class="upload-box" id="upload-box">
+      <img id="logo-preview" alt="Logo preview">
+      <div class="upload-icon">⬆</div>
+      <div class="upload-text">Tap to upload your logo</div>
+      <div class="upload-subtext">or take a photo of it</div>
+      <input type="file" name="logo" accept="image/*" id="logo-input">
+    </label>
+  </div>
+
+  <div class="field-group">
+    <div class="field-label"><span class="field-number">03</span> Music Style</div>
+    <div class="field-hint">What should the video feel like?</div>
+    <div class="option-grid">
+      <label class="option-card">
+        <input type="radio" name="music_style" value="Trap / Hip-Hop" required>
+        <span class="check-mark"></span>
+        <span class="option-emoji">🔥</span>
+        <div class="option-title">Trap / Hip-Hop</div>
+        <div class="option-desc">Hard-hitting, high energy</div>
+      </label>
+      <label class="option-card">
+        <input type="radio" name="music_style" value="R&B / Smooth">
+        <span class="check-mark"></span>
+        <span class="option-emoji">🎷</span>
+        <div class="option-title">R&B / Smooth</div>
+        <div class="option-desc">Laid back, premium feel</div>
+      </label>
+      <label class="option-card">
+        <input type="radio" name="music_style" value="Upbeat / Pop">
+        <span class="check-mark"></span>
+        <span class="option-emoji">⚡</span>
+        <div class="option-title">Upbeat / Pop</div>
+        <div class="option-desc">Fun, fast, family-friendly</div>
+      </label>
+      <label class="option-card">
+        <input type="radio" name="music_style" value="Country">
+        <span class="check-mark"></span>
+        <span class="option-emoji">🤠</span>
+        <div class="option-title">Country</div>
+        <div class="option-desc">Texas, small-town vibe</div>
+      </label>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <div class="field-label"><span class="field-number">04</span> Mascot Style</div>
+    <div class="field-hint">Who's hyping up your cars?</div>
+    <div class="option-grid single-col">
+      <label class="option-card">
+        <input type="radio" name="mascot_style" value="The Closer (default)" checked>
+        <span class="check-mark"></span>
+        <div class="option-title">Use "The Closer" 🕶️</div>
+        <div class="option-desc">Our signature slick salesman-rapper mascot — ready to go, no wait time</div>
+      </label>
+      <label class="option-card">
+        <input type="radio" name="mascot_style" value="Custom mascot">
+        <span class="check-mark"></span>
+        <div class="option-title">Design Me My Own</div>
+        <div class="option-desc">A one-of-a-kind character just for your dealership (custom quote)</div>
+      </label>
+      <label class="option-card">
+        <input type="radio" name="mascot_style" value="No mascot">
+        <span class="check-mark"></span>
+        <div class="option-title">No Mascot</div>
+        <div class="option-desc">Just the cars, no character on screen</div>
+      </label>
+    </div>
+  </div>
+
+  <div class="field-group">
+    <div class="field-label"><span class="field-number">05</span> Top 3 Vehicles</div>
+    <div class="field-hint">What are the 3 cars you want featured this week? (Make/model/year is fine)</div>
+    <textarea name="vehicles" placeholder="e.g. 2023 Dodge Charger, 2022 Cadillac Escalade, 2024 Ford F-150" required></textarea>
+  </div>
+
+  <div class="field-group">
+    <div class="field-label"><span class="field-number">06</span> Vehicle Photos</div>
+    <div class="field-hint">Upload a few photos of each of the 3 cars — the more angles, the better the video looks.</div>
+    <label class="upload-box" id="vehicle-upload-box">
+      <div id="vehicle-preview-grid" class="vehicle-preview-grid"></div>
+      <div class="upload-icon" id="vehicle-upload-icon">⬆</div>
+      <div class="upload-text" id="vehicle-upload-text">Tap to upload vehicle photos</div>
+      <div class="upload-subtext" id="vehicle-upload-subtext">Select multiple — front, side, interior all help</div>
+      <input type="file" name="vehicle_photos" accept="image/*" id="vehicle-photos-input" multiple>
+    </label>
+  </div>
+
+  <div class="price-confirm">You're confirming: <strong>$250, no contract, first video</strong> — I'll follow up to lock in payment.</div>
+
+  <button type="submit" class="submit-btn" id="submit-btn">Send It — Let's Build This</button>
+  <div class="footnote">I'll follow up within 24 hours once this is submitted.</div>
+  <div class="error-message" id="error-message">
+    Something went wrong sending this — please text me directly at <strong>(281) 222-9301</strong> so we don't lose your spot.
+  </div>
+</form>
+
+<div class="success-screen" id="success-screen">
+  <div class="success-icon">✓</div>
+  <h2>You're In</h2>
+  <p>Got your info — I'll reach out shortly to confirm everything and get your video moving. Talk soon 🎬</p>
+</div>
+
+<script>
+  const logoInput = document.getElementById('logo-input');
+  const uploadBox = document.getElementById('upload-box');
+  const logoPreview = document.getElementById('logo-preview');
+  const uploadText = document.querySelector('.upload-text');
+  const uploadSubtext = document.querySelector('.upload-subtext');
+
+  logoInput.addEventListener('change', function(){
+    if(this.files && this.files[0]){
+      const reader = new FileReader();
+      reader.onload = function(e){
+        logoPreview.src = e.target.result;
+        logoPreview.style.display = 'block';
+      };
+      reader.readAsDataURL(this.files[0]);
+      uploadBox.classList.add('has-file');
+      uploadText.textContent = 'Logo uploaded ✓';
+      uploadSubtext.textContent = 'Tap to change';
+    }
+  });
+
+  const vehiclePhotosInput = document.getElementById('vehicle-photos-input');
+  const vehicleUploadBox = document.getElementById('vehicle-upload-box');
+  const vehiclePreviewGrid = document.getElementById('vehicle-preview-grid');
+  const vehicleUploadText = document.getElementById('vehicle-upload-text');
+  const vehicleUploadSubtext = document.getElementById('vehicle-upload-subtext');
+
+  vehiclePhotosInput.addEventListener('change', function(){
+    vehiclePreviewGrid.innerHTML = '';
+    if(this.files && this.files.length > 0){
+      Array.from(this.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e){
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          vehiclePreviewGrid.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+      vehicleUploadBox.classList.add('has-file');
+      const count = this.files.length;
+      vehicleUploadText.textContent = count + (count === 1 ? ' photo uploaded ✓' : ' photos uploaded ✓');
+      vehicleUploadSubtext.textContent = 'Tap to add more or change';
+    }
+  });
+
+  const form = document.getElementById('intake-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const errorMessage = document.getElementById('error-message');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    errorMessage.style.display = 'none';
+    submitBtn.classList.add('loading');
+    submitBtn.textContent = 'Sending...';
+
+    const formData = new FormData(form);
+    fetch('/', {
+      method: 'POST',
+      body: formData
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error('Submission failed with status ' + response.status);
+      }
+      form.style.display = 'none';
+      document.querySelector('.hero').style.display = 'none';
+      document.getElementById('success-screen').style.display = 'block';
+    }).catch((err) => {
+      console.error('Form submission error:', err);
+      submitBtn.classList.remove('loading');
+      submitBtn.textContent = "Send It — Let's Build This";
+      errorMessage.style.display = 'block';
+      errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+</script>
+
+</body>
+</html>
