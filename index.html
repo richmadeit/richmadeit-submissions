@@ -18,7 +18,6 @@
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=993108543300382&ev=PageView&noscript=1"/></noscript>
   <!-- End Meta Pixel -->
   <script src="config.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bangers&family=Barlow+Condensed:wght@300;400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
   <style>
@@ -203,10 +202,7 @@
     .cards { display:grid; grid-template-columns:1fr 1fr; gap:2px; margin-top:36px; }
     .cards-two { max-width:760px; margin-left:auto; margin-right:auto; }
     .cards-three { grid-template-columns:1fr 1fr 1fr; max-width:1100px; margin-left:auto; margin-right:auto; }
-    .pkg-options-two { max-width:560px; margin-left:auto; margin-right:auto; }
-    .pkg-options-three { grid-template-columns:1fr 1fr 1fr; max-width:720px; margin-left:auto; margin-right:auto; }
     @media(max-width:900px){ .cards-three{ grid-template-columns:1fr; } }
-    @media(max-width:560px){ .pkg-options-three{ grid-template-columns:1fr; } }
     @media(max-width:600px){ .cards{grid-template-columns:1fr;} }
     .card { padding:36px; background:var(--bg3); position:relative; }
     .card.hot { background:linear-gradient(135deg,rgba(255,85,0,.1),rgba(255,179,0,.06)); border:1px solid rgba(255,85,0,.4); }
@@ -253,83 +249,18 @@
     footer a:hover { color:var(--accent); }
 
     /* ── INLINE SIGNUP FORM ──────────────────────────── */
-    .signup-section { padding:70px 40px; background:linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%); position:relative; }
-    .signup-section::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, var(--accent) 0%, var(--accent) 60%, var(--gold) 60%, var(--gold) 100%); }
-    .signup-inner { max-width:560px; margin:0 auto; }
-    .signup-eyebrow { display:inline-block; font-family:var(--fs); font-size:.7rem; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--gold); padding:6px 12px; border:1px solid var(--gold); margin-bottom:18px; }
-    .signup-title { font-family:var(--fd); font-size:clamp(2.6rem,6vw,4.4rem); letter-spacing:2px; line-height:.95; margin-bottom:16px; text-transform:uppercase; }
-    .signup-title .red { color:var(--accent); }
-    .signup-sub { font-family:var(--fb); color:var(--muted); font-size:.98rem; line-height:1.6; margin-bottom:32px; max-width:480px; }
 
     /* ── character reveal flow ── */
-    .char-flow { max-width:520px; }
-    .char-lyrics { width:100%; min-height:130px; background:var(--bg3,#161616); border:1px solid rgba(255,85,0,.25); border-radius:14px; padding:15px 16px; color:var(--text,#efefef); font-size:1rem; font-family:var(--fb); resize:vertical; outline:none; transition:border .2s; }
-    .char-lyrics:focus { border-color:var(--accent); }
+
     #revealBtn { margin-top:14px; }
-    .char-err { color:#ff6b4a; font-size:.9rem; margin-top:10px; display:none; }
-    .char-result { display:none; margin-top:26px; background:linear-gradient(160deg,#1a0f08,#120c08); border:1px solid rgba(255,85,0,.3); border-radius:18px; padding:22px; animation:charIn .4s ease; }
-    .char-result.show { display:block; }
-    @keyframes charIn { from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:translateY(0);} }
-    .char-result-badge { font-family:var(--fs); font-size:.72rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
-    .char-result-body { font-family:var(--fb); color:var(--text,#efefef); font-size:1rem; line-height:1.6; white-space:pre-wrap; }
-    .char-result-body strong { color:var(--gold); }
-    .char-director-note { margin-top:16px; padding:14px 16px; background:rgba(255,179,0,.08); border-left:3px solid var(--gold); border-radius:8px; font-family:var(--fb); font-size:.92rem; line-height:1.5; color:var(--text,#efefef); }
-    .scene-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .scene-btn { font-family:var(--fb); font-size:.98rem; font-weight:600; padding:14px 12px; border-radius:12px; border:2px solid rgba(255,255,255,.14); background:rgba(255,255,255,.04); color:var(--text,#efefef); cursor:pointer; transition:all .15s ease; text-align:center; }
-    .scene-btn:hover { border-color:rgba(255,85,0,.5); background:rgba(255,85,0,.08); }
-    .scene-btn.active { border-color:var(--red,#FF5500); background:rgba(255,85,0,.18); box-shadow:0 0 0 2px rgba(255,85,0,.25); }
+
     .yt-btn { display:inline-flex; align-items:center; gap:8px; margin:0 0 30px; padding:12px 22px; border-radius:30px; background:#FF0000; color:#fff; font-family:var(--fb); font-weight:700; font-size:1rem; text-decoration:none; transition:transform .15s ease, box-shadow .15s ease; box-shadow:0 4px 18px rgba(255,0,0,.3); }
     .yt-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(255,0,0,.45); }
-    .song-note { margin:14px 0 4px; padding:14px 16px; background:rgba(255,179,0,.10); border:1px solid rgba(255,179,0,.35); border-radius:10px; font-family:var(--fb); font-size:.9rem; line-height:1.55; color:var(--text,#efefef); text-align:left; }
-    .song-note a { color:var(--gold); font-weight:700; text-decoration:none; }
-    .song-note a:hover { text-decoration:underline; }
-    .song-box { margin:4px 0 14px; padding:16px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.12); border-radius:12px; }
-    .up-zone-sm { padding:16px 12px; }
-    .up-zone-sm .up-icon { font-size:1.6rem; }
-    .song-or { text-align:center; color:var(--muted); font-size:.82rem; margin:10px 0; font-family:var(--fb); }
-    .song-save-btn { width:100%; margin-top:12px; padding:12px; border-radius:10px; border:none; background:var(--gold,#FFB300); color:#070707; font-family:var(--fb); font-weight:800; font-size:1rem; cursor:pointer; transition:opacity .15s ease; }
-    .song-save-btn:hover { opacity:.9; }
-    .song-save-btn:disabled { opacity:.6; cursor:default; }
-    .song-status { margin-top:10px; font-family:var(--fb); font-size:.88rem; text-align:center; min-height:1.2em; }
-    .song-status.ok { color:#4ade80; }
-    .song-status.err { color:#f87171; }
-    .ref-consent { display:flex; align-items:flex-start; gap:9px; font-size:.85rem; color:var(--muted,#888); line-height:1.4; margin:6px 0 4px; cursor:pointer; }
-    .ref-consent input { margin-top:2px; accent-color:var(--accent); flex-shrink:0; }
-    .ref-counter { text-align:center; font-family:var(--fs); letter-spacing:1px; text-transform:uppercase; font-size:.78rem; color:var(--gold); margin-top:10px; }
-    .ref-loading { display:none; text-align:center; padding:24px 0; color:var(--muted,#888); font-size:.95rem; }
-    .ref-loading.show { display:block; }
-    .ref-spinner { width:38px; height:38px; margin:0 auto 12px; border:3px solid rgba(255,85,0,.2); border-top-color:var(--accent); border-radius:50%; animation:refspin .8s linear infinite; }
     @keyframes refspin { to { transform:rotate(360deg); } }
-    .ref-image { width:100%; border-radius:14px; margin-bottom:4px; display:block; }
-    .char-buy-wrap { margin-top:22px; }
-    .char-buy-btn { display:block; text-align:center; background:linear-gradient(135deg,var(--accent),var(--gold)); color:#fff; text-decoration:none; font-family:var(--fd); font-size:1.5rem; letter-spacing:2px; padding:17px; border-radius:14px; transition:transform .2s, box-shadow .2s; }
-    .char-buy-btn:hover { transform:translateY(-2px); box-shadow:0 10px 36px rgba(255,85,0,.4); }
-    .char-buy-note { text-align:center; color:var(--muted,#888); font-size:.85rem; margin-top:10px; }
-    .char-buy-note strong { color:var(--gold); }
-    .char-more { max-width:520px; margin-top:28px; padding:16px 18px; background:var(--bg3,#161616); border:1px solid rgba(255,255,255,.08); border-radius:12px; font-size:.92rem; color:var(--muted,#888); line-height:1.5; }
-    .char-more strong { color:var(--text,#efefef); }
-    .char-more a { color:var(--gold); font-weight:700; text-decoration:none; }
-    .char-more a:hover { text-decoration:underline; }
-    .signup-sub strong { color:var(--text); font-weight:600; }
-    .signup-form { background:var(--bg3); border:1px solid var(--border); padding:28px 24px; position:relative; }
+
     .form-heads-up { display:flex; align-items:flex-start; gap:11px; background:linear-gradient(90deg, rgba(255,179,0,.1), rgba(255,85,0,.04)); border:1px solid rgba(255,179,0,.32); border-left:3px solid var(--gold); padding:14px 16px; margin-bottom:22px; font-size:.9rem; line-height:1.5; color:var(--text); }
     .form-heads-up strong { color:var(--gold); font-weight:700; }
     .form-heads-up .fh-icon { font-size:1.1rem; flex-shrink:0; line-height:1.3; }
-    .signup-field { margin-bottom:18px; }
-    .signup-field label { display:block; font-family:var(--fs); font-size:.7rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--text); margin-bottom:8px; }
-    .signup-field label .req { color:var(--accent); margin-left:2px; }
-    .signup-field label .opt { color:var(--muted); font-weight:600; margin-left:6px; letter-spacing:1px; }
-    .signup-field input, .signup-field select, .signup-field textarea {
-      width:100%; background:var(--bg2); border:1px solid var(--border); color:var(--text);
-      font-family:var(--fb); font-size:15px; font-weight:500; padding:14px 16px;
-      transition:all .18s; -webkit-appearance:none; appearance:none; outline:none;
-    }
-    .signup-field input:focus, .signup-field select:focus, .signup-field textarea:focus {
-      border-color:var(--accent); background:rgba(255,85,0,.04); box-shadow:0 0 0 3px rgba(255,85,0,.12);
-    }
-    .signup-field input::placeholder, .signup-field textarea::placeholder { color:rgba(255,255,255,.25); font-weight:400; }
-    .signup-field textarea { resize:vertical; min-height:80px; font-family:var(--fb); }
-    .signup-field select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23FF5500' stroke-width='2'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 16px center; padding-right:42px; cursor:pointer; }
 
     /* Photo upload drop zone */
     .photo-drop {
@@ -359,45 +290,6 @@
     .photo-progress.ok { color:var(--gold); }
 
     /* ─── PACKAGE SELECTOR ─── */
-    .pkg-options { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px; }
-    @media(max-width:560px){ .pkg-options { grid-template-columns:1fr; } }
-    .pkg-opt { cursor:pointer; }
-    .pkg-opt input[type="radio"] { position:absolute; opacity:0; pointer-events:none; }
-    .pkg-card {
-      position:relative; padding:18px 14px 16px; border:2px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.03); transition:all .2s; text-align:center;
-    }
-    .pkg-card:hover { border-color:rgba(255,179,0,.4); background:rgba(255,179,0,.04); }
-    .pkg-opt input[type="radio"]:checked + .pkg-card {
-      border-color:var(--gold); background:linear-gradient(135deg,rgba(255,85,0,.12),rgba(255,179,0,.10));
-      box-shadow:0 0 0 1px var(--gold), 0 8px 24px rgba(255,85,0,.18);
-    }
-    .pkg-badge {
-      position:absolute; top:-10px; left:50%; transform:translateX(-50%);
-      background:linear-gradient(135deg,var(--accent),var(--gold)); color:#fff;
-      font-family:var(--fs); font-size:.62rem; letter-spacing:2px; padding:4px 10px;
-      text-transform:uppercase; white-space:nowrap; font-weight:700;
-    }
-    .pkg-price { font-family:var(--fd); font-size:2rem; color:var(--gold); line-height:1; margin-bottom:6px; }
-    .pkg-name { font-family:var(--fs); font-size:.78rem; letter-spacing:1.5px; text-transform:uppercase; color:#fff; margin-bottom:4px; }
-    .pkg-eta { font-size:.72rem; color:var(--muted); }
-
-    /* ── UPLOAD ZONES (song + photos) ── */
-    .upload-divider { display:flex; align-items:center; gap:14px; margin:26px 0 16px; }
-    .upload-divider::before, .upload-divider::after { content:''; flex:1; height:1px; background:var(--border); }
-    .upload-divider span { font-family:var(--fs); font-size:.72rem; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--gold); }
-    .upload-note { background:rgba(255,179,0,.1); border:1px solid rgba(255,179,0,.35); border-radius:8px; padding:12px 14px; font-size:.85rem; line-height:1.5; color:var(--text); margin-bottom:18px; }
-    .upload-note strong { color:var(--gold); }
-    .up-zone { position:relative; border:2px dashed var(--border); background:var(--bg3); border-radius:10px; padding:24px 16px; text-align:center; cursor:pointer; transition:all .2s; }
-    .up-zone:hover, .up-zone.dragover { border-color:var(--accent); background:rgba(255,85,0,.06); }
-    .up-zone input[type=file] { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
-    .up-icon { font-size:1.8rem; margin-bottom:6px; }
-    .up-title { font-family:var(--fs); font-weight:700; font-size:1rem; letter-spacing:.5px; color:var(--text); }
-    .up-sub { font-size:.74rem; color:var(--muted); margin-top:4px; }
-    .up-picked { margin-top:10px; font-size:.82rem; color:var(--gold); font-weight:600; line-height:1.5; }
-    .up-picked .pick-item { display:inline-block; background:rgba(255,85,0,.14); border:1px solid rgba(255,85,0,.3); border-radius:20px; padding:3px 11px; margin:3px 3px 0 0; font-size:.76rem; }
-
-    /* ── $99 locked price display ── */
     .tryme-lock { display:flex; align-items:center; gap:16px; background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:16px 18px; }
     .tryme-lock-price { font-family:var(--fd); font-size:2.6rem; line-height:1; color:var(--gold); }
     .tryme-lock-name { font-family:var(--fs); font-weight:700; font-size:1.05rem; letter-spacing:.5px; color:var(--text); }
@@ -422,28 +314,9 @@
     .fullvid-note strong { color:var(--accent); }
     @media(max-width:560px){ .fullvid { padding:44px 18px 16px; } .contact-grid{ grid-template-columns:1fr 1fr; } }
 
-    .signup-submit { background:linear-gradient(135deg,var(--accent),var(--gold)); color:#fff;
-      border:none; font-family:var(--fd); font-size:1.3rem; letter-spacing:3px; padding:18px;
-      cursor:pointer; transition:all .25s; text-transform:uppercase; box-shadow:0 8px 24px rgba(255,85,0,.25);
-    }
-    .signup-submit:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 12px 32px rgba(255,85,0,.45); }
-    .signup-submit:disabled { opacity:.6; cursor:not-allowed; }
-    .signup-trust { margin-top:18px; text-align:center; font-size:.78rem; color:var(--muted); line-height:1.55; }
-    .signup-trust strong { color:var(--gold); font-weight:700; }
-    .signup-success { display:none; text-align:center; padding:40px 20px; }
-    .signup-success.show { display:block; }
-    .signup-form.hide { display:none; }
-    .signup-success-icon { font-size:3.5rem; margin-bottom:18px; }
-    .signup-success h3 { font-family:var(--fd); font-size:2.4rem; letter-spacing:3px; margin-bottom:12px; text-transform:uppercase; }
-    .signup-success h3 span { color:var(--gold); }
-    .signup-success p { color:var(--muted); font-size:.95rem; line-height:1.6; max-width:380px; margin:0 auto 18px; }
-    .signup-success p strong { color:var(--text); }
-    .signup-success a.ig-follow { display:inline-block; color:var(--gold); font-family:var(--fs); font-weight:700; letter-spacing:2px; text-transform:uppercase; font-size:.85rem; text-decoration:none; margin-top:8px; }
     .hp-field { display:none; }
     @media(max-width:600px){
-      .signup-section { padding:44px 16px; }
-      .signup-form { padding:22px 18px; }
-      .signup-eyebrow { font-size:.65rem; }
+
     }
 
     /* ── MOBILE STICKY CTA ───────────────────────────── */
@@ -558,7 +431,7 @@
   <div class="logo">RichmadeiT<svg class="logo-flame" width="20" height="16" viewBox="0 0 28 20"><path d="M2 4 C6 1,18 2,24 10 C26 14,22 19,14 18" stroke="#FFD700" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <div class="nav-row">
     <a href="university.html" class="nav-link"><span class="live-dot"></span>University</a>
-    <a href="#signup" class="nav-cta">Submit Your Vision →</a>
+    <a href="#pricing" class="nav-cta">Get Your Video →</a>
   </div>
 </header>
 
@@ -568,14 +441,12 @@
     <span>Rick Ross</span><span class="ticker-dot">◆</span>
     <span>French Montana</span><span class="ticker-dot">◆</span>
     <span>Max B</span><span class="ticker-dot">◆</span>
-    <span>Cinematic AI Production</span><span class="ticker-dot">◆</span>
-    <span>Houston Texas</span><span class="ticker-dot">◆</span>
+    <span>Full Videos Up To 4 Min — $250</span><span class="ticker-dot">◆</span>
     <span>Shaquille O'Neal</span><span class="ticker-dot">◆</span>
     <span>Rick Ross</span><span class="ticker-dot">◆</span>
     <span>French Montana</span><span class="ticker-dot">◆</span>
     <span>Max B</span><span class="ticker-dot">◆</span>
-    <span>Cinematic AI Production</span><span class="ticker-dot">◆</span>
-    <span>Houston Texas</span><span class="ticker-dot">◆</span>
+    <span>Full Videos Up To 4 Min — $250</span><span class="ticker-dot">◆</span>
   </div>
 </div>
 
@@ -593,216 +464,138 @@
 
 <div class="hero">
   <h1><span class="d">Your Song.</span> <span class="d">Your Vision.</span><br><span class="a">Your AI Music Video.</span></h1>
-  <p class="hero-sub">AI-Powered · Directed by Rich · 30-Sec Cinematic Videos $75</p>
+  <p class="hero-sub">Perfect Lip Sync · Directed by Rich · Full Video Up To 4 Min — $250</p>
 </div>
 
 <!-- ═══ HERO VIDEO — click to play, full sound ═══ -->
 <div class="hero-video-wrap">
-  <div class="wc hero-clip" data-clip>
-    <span class="v-tag">Featured</span>
-    <img class="poster-fallback" src="posters/poster_ny_champions_hero.jpg" alt="New York Champions — AI Music Video by RichMadeIt">
-    <video loop playsinline webkit-playsinline preload="none"
-      poster="posters/poster_ny_champions_hero.jpg"
-      data-src="videos/ny_champions.mp4"></video>
-    <button class="wc-play" type="button" aria-label="Play New York Champions">
+  <div class="wc hero-clip" data-yt="2Be9sK_dJy0" data-title="Butter Knife Shawty — Loyalty Cost Me More Than Love Ever Did">
+    <span class="v-tag">Featured · Full Video</span>
+    <img class="poster-fallback" src="https://img.youtube.com/vi/2Be9sK_dJy0/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/2Be9sK_dJy0/hqdefault.jpg'" alt="Butter Knife Shawty — AI Music Video by RichMadeIt">
+    <button class="wc-play" type="button" aria-label="Play Butter Knife Shawty">
       <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
     </button>
   </div>
   <div class="hero-video-meta">
     <span class="v-badge">Featured</span>
     <div>
-      <div class="v-title">Shaq, Corey Guns &amp; Alicia Keys — "New York Champions"</div>
+      <div class="v-title">Butter Knife Shawty — "Loyalty Cost Me More Than Love Ever Did"</div>
       <div class="v-sub">Produced by RichMadeIt · Cinematic AI Direction</div>
     </div>
   </div>
 
-  <!-- NY CHAMPIONS COLLAB — tap to verify on Instagram -->
-  <a href="https://www.instagram.com/p/DZux32PR54Z/" target="_blank" rel="noopener noreferrer" style="text-decoration:none">
-  <div class="stak5-card" style="border-color:rgba(255,179,0,.6);background:linear-gradient(135deg,rgba(255,179,0,.12),rgba(255,85,0,.08));margin-top:14px;cursor:pointer;">
+  <!-- RECENT CUSTOMER RESULT — Butter Knife Shawty -->
+  <div class="stak5-card" style="border-color:rgba(255,179,0,.6);background:linear-gradient(135deg,rgba(255,179,0,.12),rgba(255,85,0,.08));margin-top:14px;">
     <div class="stak5-inner">
-      <div class="stak5-label">🏆 Official Collab With Shaq · Tap to Verify ↗</div>
-      <div class="stak5-name">New York Champions <span class="ig-check">✓</span></div>
-      <div class="stak5-aka">Shaq · Corey Guns · Alicia Keys — Cinematic AI Video</div>
-      <div class="stak5-quote">Collaboration with <strong style="color:var(--accent)">@shaq</strong> · produced by <strong style="color:var(--accent)">@rich_madeit_</strong></div>
+      <div class="stak5-label">🎬 Recent Customer · Real Results</div>
+      <div class="stak5-name">Butter Knife Shawty <span class="ig-check">✓</span></div>
+      <div class="stak5-aka">"Loyalty Cost Me More Than Love Ever Did" — Cinematic AI Video</div>
+      <div class="stak5-quote">Full video delivered by <strong style="color:var(--accent)">@rich_madeit_</strong> · watch it above</div>
       <div class="stak5-stats">
-        <div class="stak5-stat"><span>442K</span>Views</div>
-        <div class="stak5-stat"><span>309K</span>Reached</div>
-        <div class="stak5-stat"><span>8.3K</span>Likes</div>
-        <div class="stak5-stat"><span>480</span>Sends</div>
+        <div class="stak5-stat"><span>274K</span>Views</div>
+        <div class="stak5-stat"><span>9.2K</span>Likes</div>
+        <div class="stak5-stat"><span>86K</span>Subscribers</div>
+        <div class="stak5-stat"><span>2 Wks</span>Since Drop</div>
       </div>
     </div>
   </div>
-  </a>
 </div>
 
 <!-- ═════════════ CHARACTER REFERENCE SHEET GENERATOR ═════════════ -->
-<section class="signup-section" id="signup">
-  <div class="signup-inner">
-    <span class="signup-eyebrow">★ See Yourself In The Scene — Free</span>
-    <h1 class="signup-title">Put Yourself In The <span class="red">Video</span></h1>
-    <p class="signup-sub">Upload your photo, pick a scene, and see yourself in a <strong>cinematic music-video shot</strong> — free. Love it? I'll build a full 30-sec video <strong>around your song</strong> for <strong>$75</strong>, back in 1–24 hours. (You'll send your track right after checkout.)</p>
+<!-- ═══ PORTFOLIO — click-to-play landscape grid ═══ -->
+<div class="featured" id="work">
+  <div class="sec-tag">The Work</div>
+  <div class="sec-h">Watch The Full Videos</div>
+  <p style="color:var(--muted);font-size:.95rem;line-height:1.6;max-width:640px;margin:-16px 0 22px">These aren't teasers — these are the <strong style="color:var(--text)">complete music videos</strong>, start to finish, with perfect lip sync. Tap any one to watch it right here. This is exactly what you get.</p>
+  <a href="https://www.youtube.com/@Rich_Madeit_" target="_blank" rel="noopener" class="yt-btn">▶ More Full Videos on YouTube</a>
 
-    <div class="char-flow">
-      <!-- email (required) -->
-      <div class="signup-field">
-        <label>Your Email <span class="req">*</span> <span class="opt">so we can send it to you</span></label>
-        <input type="email" class="inp" id="refEmail" placeholder="your@email.com" inputmode="email" autocomplete="email">
-      </div>
+  <div class="work-grid">
+    <div class="wc wc-hero" data-yt="qh2a5XLlFuY" data-title="Shaq x Corey Guns">
+      <div class="wc-num">01</div>
+      <img class="poster-fallback" src="https://img.youtube.com/vi/qh2a5XLlFuY/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/qh2a5XLlFuY/hqdefault.jpg'" alt="Shaq x Corey Guns — AI Music Video">
+      <button class="wc-play" type="button" aria-label="Play Shaq x Corey Guns">
+        <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      </button>
+      <div class="wc-label"><div class="wl-name">Shaq x Corey Guns</div><div class="wl-sub">Full AI Music Video</div></div>
+    </div>
+    <div class="wc" data-yt="9_RsR22ODRo" data-title="Minks in Miami Remix">
+      <div class="wc-num">02</div>
+      <img class="poster-fallback" src="posters/poster_minks_miami.jpg" alt="Rick Ross, Shaq, French Montana & Max B — Minks in Miami Remix">
+      <button class="wc-play" type="button" aria-label="Play Minks in Miami Remix">
+        <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      </button>
+      <div class="wc-label"><div class="wl-name">Rick Ross, Shaq, French Montana &amp; Max B</div><div class="wl-sub">"Minks in Miami" Remix · Full Video</div></div>
+    </div>
+    <div class="wc" data-yt="W7vMPcfEFGQ" data-title="Shaq x Stak5 — Still Reigning">
+      <div class="wc-num">03</div>
+      <img class="poster-fallback" src="posters/poster_shaq_stak5.jpg" alt="Shaq × Stak5 — AI Music Video">
+      <button class="wc-play" type="button" aria-label="Play Shaq × Stak5">
+        <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      </button>
+      <div class="wc-label"><div class="wl-name">Shaq × Stak5</div><div class="wl-sub">"Still Reigning" · Full Video</div></div>
+    </div>
+    <div class="wc" data-yt="a2T5HaOE0Y8" data-title="Shaq — Gotta Let Me Know">
+      <div class="wc-num">04</div>
+      <img class="poster-fallback" src="posters/poster_shaq_letmeknow.jpg" alt="Shaquille O'Neal — AI Music Video">
+      <button class="wc-play" type="button" aria-label="Play Shaquille O'Neal">
+        <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      </button>
+      <div class="wc-label"><div class="wl-name">Shaquille O'Neal</div><div class="wl-sub">"Gotta Let Me Know" · Full Official Video</div></div>
+    </div>
+    <div class="wc" data-yt="Q16MFXelnpY" data-title="Owen James ft Shaq — When I Stand">
+      <div class="wc-num">05</div>
+      <img class="poster-fallback" src="posters/poster_owen_james.jpg" alt="Owen James ft. Shaq — AI Music Video">
+      <button class="wc-play" type="button" aria-label="Play Owen James ft. Shaq">
+        <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      </button>
+      <div class="wc-label"><div class="wl-name">Owen James ft. Shaq</div><div class="wl-sub">"When I Stand" · Full Official Video</div></div>
+    </div>
+    <div class="wc" data-yt="Z9Lv3UUggiQ" data-title="Klay Thompson">
+      <div class="wc-num">06</div>
+      <img class="poster-fallback" src="posters/poster_klay.jpg" alt="Klay Thompson — AI Music Video">
+      <button class="wc-play" type="button" aria-label="Play Klay Thompson">
+        <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      </button>
+      <div class="wc-label"><div class="wl-name">Klay Thompson</div><div class="wl-sub">Full AI Music Video</div></div>
+    </div>
+    </div>
+</div>
 
-      <!-- photo upload up to 3 -->
-      <div class="signup-field">
-        <label>Your Photos <span class="req">*</span> <span class="opt">up to 3 — clear, well-lit</span></label>
-        <div class="up-zone" id="refZone">
-          <input type="file" id="refPhotos" accept="image/*,.jpg,.jpeg,.png,.heic,.heif,.webp" multiple>
-          <div class="up-icon">📸</div>
-          <div class="up-title">Tap to upload up to 3 photos</div>
-          <div class="up-sub">Take a photo or pick from your camera roll</div>
-          <div class="up-picked" id="refPicked"></div>
-        </div>
-      </div>
+<!-- ═══ PRICING — ONE OPTION ═══ -->
+<section class="pricing" id="pricing">
+  <div class="pricing-inner">
+    <div class="sec-tag" style="text-align:center">One Price · No Quotes · No Waiting</div>
+    <div class="sec-h" style="text-align:center;margin-bottom:0">Your Full Music Video</div>
 
-      <!-- SCENE picker: one tap = a tuned pro prompt behind each vibe -->
-      <div class="signup-field">
-        <label>Pick Your Scene <span class="req">*</span> <span class="opt">tap one</span></label>
-        <div class="scene-grid" id="sceneGrid">
-          <button type="button" class="scene-btn" data-scene="rooftop">🌆 Rooftop Night</button>
-          <button type="button" class="scene-btn" data-scene="luxury">💎 Luxury Flex</button>
-          <button type="button" class="scene-btn" data-scene="stage">🎤 On Stage</button>
-          <button type="button" class="scene-btn" data-scene="street">🕶️ Street / Grit</button>
-          <button type="button" class="scene-btn" data-scene="miami">🌴 Miami Vibes</button>
-          <button type="button" class="scene-btn" data-scene="boss">👑 Boss Mode</button>
-        </div>
-      </div>
-
-      <!-- optional detail -->
-      <div class="signup-field">
-        <label>Add a Detail <span class="opt">optional — outfit, color, mood</span></label>
-        <input type="text" class="inp" id="refDetail" placeholder="e.g. red suit, gold chain, rainy night" maxlength="120">
-      </div>
-
-      <!-- consent -->
-      <label class="ref-consent"><input type="checkbox" id="refConsent"> These are my own photos and I have the right to use them.</label>
-
-      <button type="button" class="signup-submit" id="refBtn">Put Me In The Scene 🎬</button>
-      <div class="ref-counter" id="refCounter" style="display:none"></div>
-      <div class="char-err" id="refErr"></div>
-
-      <!-- loading -->
-      <div class="ref-loading" id="refLoading">
-        <div class="ref-spinner"></div>
-        <div>Building your character… this takes ~30 seconds 🔥</div>
-      </div>
-
-      <!-- RESULT: show the generated sheet right here on the page -->
-      <div class="char-result" id="refResult">
-        <div class="char-result-badge">★ Your Preview</div>
-        <img id="refImage" alt="Your cinematic scene preview" style="display:block;width:100%;max-width:420px;margin:0 auto 14px;border-radius:14px;" />
-        <div class="char-result-body" style="text-align:center;">There you are — in the scene! 🔥<br>This is just a <strong>first look</strong> — save it (long-press or right-click). When I turn it into your video, the detail, motion, and likeness get taken to a whole other level. 🎬</div>
-        <div class="char-director-note">🔥 This preview is just the start. Your finished video is fully directed by me — sharper detail, cinematic quality, and true-to-life likeness, back in 1–24 hours.</div>
-        <div class="song-note">
-          🎵 <strong>Add your song now</strong> so I have everything ready when you order. Upload the file or paste a link (Suno, Google Drive, Dropbox, etc.).
-        </div>
-        <div class="song-box" id="songBox">
-          <div class="signup-field" style="margin-bottom:10px;">
-            <label>Upload Your Song <span class="opt">MP3 or WAV</span></label>
-            <div class="up-zone up-zone-sm" id="songZone">
-              <input type="file" id="songFile" accept="audio/*,.mp3,.wav,.m4a,.aac">
-              <div class="up-icon">🎵</div>
-              <div class="up-title" id="songTitle">Tap to upload your track</div>
-              <div class="up-picked" id="songPicked"></div>
-            </div>
-          </div>
-          <div class="song-or">— or —</div>
-          <div class="signup-field">
-            <label>Paste a Song Link <span class="opt">Suno, Drive, Dropbox…</span></label>
-            <input type="url" class="inp" id="songLink" placeholder="https://suno.com/song/…">
-          </div>
-          <button type="button" class="song-save-btn" id="songSaveBtn">Attach My Song ✓</button>
-          <div class="song-status" id="songStatus"></div>
-        </div>
-        <div class="char-buy-wrap">
-          <a href="https://buy.stripe.com/9B6bJ1bQ90NEfn62ItbMQ09" class="char-buy-btn" id="charBuyBtn">Get My 30-Sec Video — $75 →</a>
-          <div class="char-buy-note">Song not ready? You can also email it to <a href="mailto:rich.madeit3@gmail.com" style="color:var(--gold)">rich.madeit3@gmail.com</a> or WhatsApp <a href="https://wa.me/13464981235" target="_blank" rel="noopener" style="color:var(--gold)">346-498-1235</a> after checkout. 🎬</div>
-        </div>
+    <div class="cards" style="grid-template-columns:1fr;max-width:520px;margin-left:auto;margin-right:auto;">
+      <div class="card hot">
+        <span class="hot-badge">Everything Included</span>
+        <div class="card-tag">The Full Experience</div>
+        <h3 style="font-family:var(--fd);font-size:3.4rem;letter-spacing:2px;margin:4px 0 2px">$250</h3>
+        <div style="font-family:var(--fs);font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px">Full Video · Up To 4 Minutes</div>
+        <ul class="features">
+          <li>Your ENTIRE song — start to finish, up to 4 minutes</li>
+          <li>Perfect lip sync on every single bar</li>
+          <li>Built from just 2–3 photos + your track</li>
+          <li>Same quality as the celeb videos above</li>
+          <li>YouTube, Instagram &amp; TikTok ready · own it forever</li>
+          <li>Delivered to your inbox in 1–7 business days</li>
+        </ul>
+        <a href="https://buy.stripe.com/14A3cv7zTdAqej23MxbMQ0c" class="card-cta c199" data-checkout="250" data-name="Full Video $250">Get My Full Video — $250 →</a>
+        <p style="margin-top:14px;font-size:.82rem;color:var(--muted);line-height:1.5;text-align:center">After checkout, just email your <strong style="color:var(--gold)">song + 2–3 photos</strong> to rich.madeit3@gmail.com — takes 2 minutes, then I get to work.</p>
       </div>
     </div>
 
-    <!-- everything else → DM -->
-    <div class="char-more">
-      Want <strong>60 seconds</strong>, a <strong>full-length video</strong>, or <strong>custom work</strong>? That's custom —
-      <a href="#fullvideo">message me and I'll lock it in personally →</a>
+    <div class="selective-banner">
+      <span class="sel-star">★</span>
+      <div>Not sure yet? <strong>Get a free 15-second watermarked preview of YOUR video first.</strong> <a href="#preview15" style="color:var(--gold);font-weight:700">Here's how →</a></div>
     </div>
   </div>
 </section>
 
-<!-- ═══ PORTFOLIO — click-to-play landscape grid ═══ -->
-<div class="featured" id="work">
-  <div class="sec-tag">The Work</div>
-  <div class="sec-h">The Portfolio</div>
-  <p style="color:var(--muted);font-size:.95rem;line-height:1.6;max-width:640px;margin:-16px 0 22px">Real AI music videos, fully directed. Tap any one to preview with sound — this is exactly the quality you get. Want the full versions? Watch them on YouTube.</p>
-  <a href="https://www.youtube.com/watch?v=qh2a5XLlFuY" target="_blank" rel="noopener" class="yt-btn">▶ Watch Full Videos on YouTube</a>
-
-  <div class="work-grid">
-    <div class="wc wc-hero" data-clip>
-      <div class="wc-num">01</div>
-      <img class="poster-fallback" src="posters/poster_new_girlfriend.jpg" alt="New Girl Friend Know — AI Music Video">
-      <video loop playsinline webkit-playsinline preload="none" poster="posters/poster_new_girlfriend.jpg" data-src="videos/new_girlfriend.mp4"></video>
-      <button class="wc-play" type="button" aria-label="Play New Girl Friend Know">
-        <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
-      </button>
-      <div class="wc-label"><div class="wl-name">Destiny Blanca — "New Girlfriend"</div><div class="wl-sub">Cinematic AI Music Video</div></div>
-    </div>
-    <div class="wc" data-clip>
-      <div class="wc-num">02</div>
-      <img class="poster-fallback" src="posters/poster_minks_miami.jpg" alt="Rick Ross, Shaq, French Montana & Max B — Minks in Miami Remix">
-      <video loop playsinline webkit-playsinline preload="none" poster="posters/poster_minks_miami.jpg" data-src="videos/minks_miami.mp4"></video>
-      <button class="wc-play" type="button" aria-label="Play Minks in Miami Remix">
-        <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
-      </button>
-      <div class="wc-label"><div class="wl-name">Rick Ross, Shaq, French Montana &amp; Max B</div><div class="wl-sub">"Minks in Miami" Remix · Cinematic AI</div></div>
-    </div>
-    <div class="wc" data-clip>
-      <div class="wc-num">03</div>
-      <img class="poster-fallback" src="posters/poster_shaq_stak5.jpg" alt="Shaq × Stak5 — AI Music Video">
-      <video loop playsinline webkit-playsinline preload="none" poster="posters/poster_shaq_stak5.jpg" data-src="videos/shaq_stak5.mp4"></video>
-      <button class="wc-play" type="button" aria-label="Play Shaq × Stak5">
-        <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
-      </button>
-      <div class="wc-label"><div class="wl-name">Shaq × Stak5</div><div class="wl-sub">"Still Reigning" · Cinematic AI</div></div>
-    </div>
-    <div class="wc" data-clip>
-      <div class="wc-num">04</div>
-      <img class="poster-fallback" src="posters/poster_shaq_letmeknow.jpg" alt="Shaquille O'Neal — AI Music Video">
-      <video loop playsinline webkit-playsinline preload="none" poster="posters/poster_shaq_letmeknow.jpg" data-src="videos/shaq_letmeknow.mp4"></video>
-      <button class="wc-play" type="button" aria-label="Play Shaquille O'Neal">
-        <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
-      </button>
-      <div class="wc-label"><div class="wl-name">Shaquille O'Neal</div><div class="wl-sub">"Gotta Let Me Know" · Official AI Video</div></div>
-    </div>
-    <div class="wc" data-clip>
-      <div class="wc-num">05</div>
-      <img class="poster-fallback" src="posters/poster_owen_james.jpg" alt="Owen James ft. Shaq — AI Music Video">
-      <video loop playsinline webkit-playsinline preload="none" poster="posters/poster_owen_james.jpg" data-src="videos/owen_james.mp4"></video>
-      <button class="wc-play" type="button" aria-label="Play Owen James ft. Shaq">
-        <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
-      </button>
-      <div class="wc-label"><div class="wl-name">Owen James ft. Shaq</div><div class="wl-sub">"When I Stand" · Official AI Video</div></div>
-    </div>
-    <div class="wc" data-clip>
-      <div class="wc-num">06</div>
-      <img class="poster-fallback" src="posters/poster_klay.jpg" alt="Klay Thompson — AI Music Video">
-      <video loop playsinline webkit-playsinline preload="none" poster="posters/poster_klay.jpg" data-src="videos/klay.mp4"></video>
-      <button class="wc-play" type="button" aria-label="Play Klay Thompson">
-        <span class="wc-play-btn"><svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
-      </button>
-      <div class="wc-label"><div class="wl-name">Klay Thompson</div><div class="wl-sub">Cinematic AI Music Video</div></div>
-    </div>
-    </div>
-</div>
-
 <div class="process">
   <div class="sec-tag">How It Works</div>
-  <div class="sec-h">Four Steps to Cinema</div>
+  <div class="sec-h">Three Steps to Cinema</div>
   <div class="steps">
     <div class="step">
       <div class="step-n">01</div>
@@ -811,13 +604,13 @@
     </div>
     <div class="step">
       <div class="step-n">02</div>
-      <h3>Lock In Your $75 Video</h3>
-      <p>Check out in seconds, then upload your song on the next step. Want 60 sec, a full video, or your own face in it? That's custom — just message me.</p>
+      <h3>Pick Your Video</h3>
+      <p>One option, no menus: your <strong>entire song</strong>, up to 4 minutes, perfect lip sync on every bar — <strong>$250 flat</strong>. Check out in seconds, upload your song and photos right after.</p>
     </div>
     <div class="step">
       <div class="step-n">03</div>
       <h3>Your Video Drops</h3>
-      <p>Your 30-second cinematic AI music video is delivered straight to your inbox — <strong>guaranteed in 1–24 hours.</strong> Fully directed, no back-and-forth.</p>
+      <p>Your cinematic AI music video is delivered straight to your inbox in <strong>1–7 business days</strong> — most drop way sooner. Fully directed, no back-and-forth.</p>
     </div>
   </div>
 </div>
@@ -949,10 +742,10 @@
 
 
 <!-- ═══ FULL VIDEO — CONTACT DIRECTLY ═══ -->
-<section class="fullvid" id="fullvideo">
-  <div class="fullvid-tag">Want The Full Video?</div>
-  <h2 class="fullvid-h">Full 720p &amp; 1080p Videos</h2>
-  <p class="fullvid-sub">Ready for a full-length cinematic music video? Pricing depends on <strong>length and resolution</strong> — message me directly and I'll quote you and lock in your spot personally.</p>
+<section class="fullvid" id="preview15">
+  <div class="fullvid-tag">Skeptical? Smart. Here's The Proof.</div>
+  <h2 class="fullvid-h">Free 15-Sec Preview First</h2>
+  <p class="fullvid-sub">Message me your <strong>song + 2–3 photos</strong> on Instagram, Facebook, or email — I'll send you a <strong>15-second watermarked preview of YOUR actual video</strong> before you pay a single dollar. You see the lip sync. You see your face. Then you decide.</p>
 
   <div class="contact-grid">
     <a href="https://instagram.com/rich_madeit_" target="_blank" rel="noopener noreferrer" class="contact-btn ig">
@@ -963,22 +756,14 @@
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12a12 12 0 1 0-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.6 4.5-4.6 1.3 0 2.7.2 2.7.2v2.9h-1.5c-1.5 0-1.9.9-1.9 1.8V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0 0 24 12z"/></svg>
       Facebook
     </a>
-    <a href="https://wa.me/13464981235" target="_blank" rel="noopener noreferrer" class="contact-btn wa">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.6-.6a9.8 9.8 0 0 1-3.8-3.3c-.3-.4-.9-1.3-.9-2.5s.6-1.8.9-2c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.7 1.7c.1.1.1.3 0 .5l-.3.5-.3.3c-.1.1-.3.3-.1.5.1.3.6 1 1.3 1.6.9.8 1.6 1 1.9 1.2.2.1.4.1.5-.1l.6-.7c.2-.2.3-.2.5-.1l1.7.8c.2.1.4.2.4.3.1.1.1.6 0 1.1z"/></svg>
-      WhatsApp
-    </a>
-    <a href="https://www.tiktok.com/@clipzbyrich" target="_blank" rel="noopener noreferrer" class="contact-btn tt">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.6 6.7a4.8 4.8 0 0 1-3.3-1.3 4.8 4.8 0 0 1-1.4-3.1h-3.3v13.2a2.7 2.7 0 1 1-2.7-2.7c.3 0 .5 0 .8.1V9.5a6 6 0 0 0-.8-.1 6 6 0 1 0 6 6V8.9a8 8 0 0 0 4.7 1.5z"/></svg>
-      TikTok
-    </a>
-    <a href="mailto:rich.madeit3@gmail.com" class="contact-btn em">
+    <a href="mailto:rich.madeit3@gmail.com?subject=15-Sec%20Preview%20Request&body=Hey%20Rich!%20I%20want%20a%20free%2015-sec%20preview.%20My%20song%20link%3A%20%0APhotos%20attached." class="contact-btn em">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
       Email
     </a>
   </div>
 
   <div class="fullvid-note">
-    ⚡ <strong>Real talk:</strong> I prioritize paying customers, so messages without a <strong>$75 order</strong> aren't guaranteed a reply — I stay focused on the people already locked in. The fastest way to get me working on your video is to grab the $75 video above first.
+    ⚡ <strong>To get your preview fast:</strong> send your <strong>song link</strong> (Suno, YouTube, Drive, anything) + <strong>2–3 clear photos</strong> in the first message. Previews are watermarked. Love it? Grab your <a href="#pricing" style="color:var(--gold);font-weight:700">full video for $250</a> and it drops in 1–7 business days.
   </div>
 </section>
 
@@ -1017,8 +802,8 @@
 
 <!-- STICKY MOBILE CTA -->
 <div class="mobile-cta-bar">
-  <div class="mcta-text"><strong>30-Sec Video $75</strong>Full videos · message me</div>
-  <a href="#signup">Lock In My Spot →</a>
+  <div class="mcta-text"><strong>Full Video — $250</strong>Up to 4 min · perfect lip sync</div>
+  <a href="#pricing">Get My Video →</a>
 </div>
 
 <script>
@@ -1151,329 +936,76 @@
 })();
 
 // ════════════════════════════════════════════════════════
-// PORTFOLIO — click-to-play, full sound, one at a time
+// FULL VIDEOS — YouTube lazy embeds, one at a time
+// Tap a poster → the FULL YouTube video plays right on the page.
+// Fires a ViewContent pixel event per video for ad optimization.
 // ════════════════════════════════════════════════════════
 (function () {
-  const clips = Array.from(document.querySelectorAll('[data-clip]'));
-  if (!clips.length) return;
+  const cards = Array.from(document.querySelectorAll('[data-yt]'));
+  if (!cards.length) return;
   let current = null;
 
   function stop(card) {
-    const v = card.querySelector('video');
-    if (v) { v.pause(); }
+    const f = card.querySelector('iframe');
+    if (f) f.remove();
     card.classList.remove('playing');
+    const pf = card.querySelector('.poster-fallback');
+    if (pf) pf.style.display = '';
   }
 
   function play(card) {
-    // stop whatever else is playing
-    if (current && current !== card) stop(current);
-    const v = card.querySelector('video');
-    if (!v) return;
-    // lazy-load on first click
-    if (!v.dataset.loaded) {
-      v.src = v.getAttribute('data-src');
-      v.dataset.loaded = '1';
-      v.load();
-      v.addEventListener('playing', () => {
-        const pf = card.querySelector('.poster-fallback');
-        if (pf) pf.style.display = 'none';
-      }, { once: true });
+    const id = (card.getAttribute('data-yt') || '').trim();
+    // Placeholder ID not swapped yet? Send them to the channel instead of breaking.
+    if (!id || id.indexOf('YOUTUBE_ID') === 0) {
+      window.open('https://www.youtube.com/@Rich_Madeit_', '_blank', 'noopener');
+      return;
     }
-    v.muted = false;
-    v.currentTime = v.currentTime || 0;
-    const p = v.play();
-    if (p && p.catch) p.catch(() => {});
+    if (current && current !== card) stop(current);
+    let frame = card.querySelector('iframe');
+    if (!frame) {
+      frame = document.createElement('iframe');
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&playsinline=1&modestbranding=1';
+      frame.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen');
+      frame.setAttribute('allowfullscreen', '');
+      frame.setAttribute('title', card.getAttribute('data-title') || 'RichMadeIt Full Video');
+      frame.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;z-index:6;background:#000;';
+      card.appendChild(frame);
+    }
     card.classList.add('playing');
     current = card;
-  }
-
-  clips.forEach(card => {
-    const v = card.querySelector('video');
-
-    card.addEventListener('click', () => {
-      if (card.classList.contains('playing')) {
-        // tap again while playing = pause
-        stop(card);
-        if (current === card) current = null;
-      } else {
-        play(card);
-      }
-    });
-
-    // when a clip ends, reset it so the poster + play button come back
-    if (v) {
-      v.addEventListener('ended', () => {
-        v.pause();
-        card.classList.remove('playing');
-        const pf = card.querySelector('.poster-fallback');
-        if (pf) pf.style.display = '';
-        v.currentTime = 0;
-        if (current === card) current = null;
+    if (typeof fbq !== 'undefined') {
+      fbq('track', 'ViewContent', {
+        content_name: card.getAttribute('data-title') || 'Full Music Video',
+        content_category: 'Full AI Music Video'
       });
     }
-  });
+  }
 
-  // pause portfolio video if tab hidden
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden && current) stop(current);
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      if (card.classList.contains('playing')) return; // controls belong to YouTube now
+      play(card);
+    });
   });
 })();
 
 // ════════════════════════════════════════════════════════
-// Smooth-scroll any link that points to the signup/scene tool
+// CHECKOUT TRACKING — every Stripe CTA fires InitiateCheckout
+// with the $250 value for purchase-optimized ads
 // ════════════════════════════════════════════════════════
-document.querySelectorAll('a[href="#signup"]').forEach(a => {
-  a.addEventListener('click', (e) => {
-    e.preventDefault();
-    const el = document.getElementById('signup');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+document.querySelectorAll('[data-checkout]').forEach(a => {
+  a.addEventListener('click', () => {
+    const val = parseInt(a.getAttribute('data-checkout'), 10) || 0;
+    if (typeof fbq !== 'undefined') {
+      fbq('track', 'InitiateCheckout', {
+        content_name: a.getAttribute('data-name') || 'AI Music Video',
+        value: val,
+        currency: 'USD'
+      });
+    }
   });
 });
 
-// ════════════════════════════════════════════════════════
-//  SCENE PREVIEW  →  photos + email + scene → Nano Banana → $75 video upsell
-//  3 free generations per browser. Email required each time.
-// ════════════════════════════════════════════════════════
-(function(){
-  const btn = document.getElementById('refBtn');
-  if (!btn) return;
-  const emailEl   = document.getElementById('refEmail');
-  const photosEl  = document.getElementById('refPhotos');
-  const pickedEl  = document.getElementById('refPicked');
-  const consentEl = document.getElementById('refConsent');
-  const counterEl = document.getElementById('refCounter');
-  const errEl     = document.getElementById('refErr');
-  const loadEl    = document.getElementById('refLoading');
-  const resultEl  = document.getElementById('refResult');
-  const imgEl     = document.getElementById('refImage');
-  const buyBtn    = document.getElementById('charBuyBtn');
-  const detailEl  = document.getElementById('refDetail');
-  const sceneGrid = document.getElementById('sceneGrid');
-
-  // scene selection: tap a vibe button -> highlight it, remember the choice
-  let selectedScene = null;
-  if (sceneGrid){
-    sceneGrid.querySelectorAll('.scene-btn').forEach(b => {
-      b.addEventListener('click', () => {
-        sceneGrid.querySelectorAll('.scene-btn').forEach(x => x.classList.remove('active'));
-        b.classList.add('active');
-        selectedScene = b.dataset.scene;
-      });
-    });
-  }
-
-  const showErr = m => { errEl.textContent = m; errEl.style.display = 'block'; };
-
-  // Daily soft cap: prevents bots/abuse running up API cost, but resets every
-  // day so real repeat customers are never permanently locked out.
-  const DAILY_CAP = 10;
-  const today = () => new Date().toISOString().slice(0,10); // YYYY-MM-DD
-  const used = () => {
-    try {
-      const raw = JSON.parse(localStorage.getItem('rmi_daily')||'{}');
-      return (raw.date === today()) ? (raw.count||0) : 0;
-    } catch(e){ return 0; }
-  };
-  const bump = () => {
-    try { localStorage.setItem('rmi_daily', JSON.stringify({ date: today(), count: used()+1 })); } catch(e){}
-  };
-  function refreshCounter(){
-    if (counterEl){ counterEl.textContent = ''; counterEl.style.display = 'none'; }
-  }
-  refreshCounter();
-
-  // show picked filenames (cap 3)
-  photosEl.addEventListener('change', () => {
-    const files = Array.from(photosEl.files).slice(0,3);
-    pickedEl.textContent = files.length ? ('✓ ' + files.map(f=>f.name).join(', ')) : '';
-  });
-
-  // read a File -> resized base64 data URL (keeps payload small/cheap)
-  function fileToDataURL(file, maxDim){
-    return new Promise((resolve,reject)=>{
-      const img = new Image();
-      const rd = new FileReader();
-      rd.onload = e => { img.onload = () => {
-        let {width:w,height:h} = img;
-        if (Math.max(w,h) > maxDim){ const s = maxDim/Math.max(w,h); w=Math.round(w*s); h=Math.round(h*s); }
-        const c = document.createElement('canvas'); c.width=w; c.height=h;
-        c.getContext('2d').drawImage(img,0,0,w,h);
-        resolve(c.toDataURL('image/png'));
-      }; img.onerror = reject; img.src = e.target.result; };
-      rd.onerror = reject; rd.readAsDataURL(file);
-    });
-  }
-
-  btn.addEventListener('click', async () => {
-    errEl.style.display = 'none';
-
-    // daily soft cap — friendly, not a hard lockout
-    if (used() >= DAILY_CAP){
-      return showErr("You've made a lot of previews today! 🔥 Come back tomorrow for more — or grab your full video now below. 👇");
-    }
-
-    const email = (emailEl.value||'').trim();
-    const files = Array.from(photosEl.files).slice(0,3);
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr('Enter a valid email so we can send it to you.');
-    if (!files.length) return showErr('Upload at least one photo.');
-    if (!selectedScene) return showErr('Pick a scene first — tap one of the vibes above.');
-    if (!consentEl.checked) return showErr('Please confirm these are your own photos.');
-
-    btn.disabled = true;
-    btn.textContent = 'Dropping you into the scene… ~10 sec 🔥';
-    loadEl.style.display = 'block';
-
-    try {
-      const images = [];
-      for (const f of files){ images.push(await fileToDataURL(f, 1024)); }
-
-      // SYNCHRONOUS function: generates the sheet and returns the image.
-      const resp = await fetch('/.netlify/functions/generate-reference', {
-        method:'POST', headers:{'content-type':'application/json'},
-        body: JSON.stringify({ email, images, consent: true, scene: selectedScene, detail: (detailEl ? detailEl.value : '') })
-      });
-
-      const data = await resp.json().catch(()=>({}));
-      if (!resp.ok || !data.image){
-        loadEl.style.display = 'none';
-        btn.disabled=false;
-        btn.textContent='Put Me In The Scene 🎬';
-        return showErr(data.error || 'The generator hiccuped — try again.');
-      }
-
-      // show the finished sheet right here on the page
-      imgEl.src = data.image;
-      loadEl.style.display = 'none';
-      window._rmiLastEmail = email; // remember for song attach
-
-      // Upload their actual photos to storage + save the lead with real photo
-      // URLs, so you have the customer's face to build the paid video from.
-      try {
-        if (typeof supabase !== 'undefined' && typeof CONFIG !== 'undefined' && CONFIG.SUPABASE_URL){
-          const _db = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
-          const emailSafe = (email.replace(/[^a-z0-9]/gi,'_') || 'anon');
-          const stamp = Date.now();
-          const photoUrls = [];
-          for (let idx=0; idx<files.length; idx++){
-            const f = files[idx];
-            const clean = f.name.replace(/[^a-z0-9._-]/gi,'_');
-            const path = 'photos/' + emailSafe + '_' + stamp + '_' + idx + '_' + clean;
-            try {
-              const { error: upErr } = await _db.storage.from('client-files').upload(path, f, { upsert: true });
-              if (!upErr){
-                const { data: pub } = _db.storage.from('client-files').getPublicUrl(path);
-                if (pub && pub.publicUrl) photoUrls.push(pub.publicUrl);
-              }
-            } catch(_pe){}
-          }
-          window._rmiPhotoUrls = photoUrls; // for reference
-          _db.from('reference_generations').insert([{
-            email: email,
-            image_url: 'on-page-generated',
-            scene: (selectedScene || ''),
-            photo_urls: photoUrls.length ? photoUrls.join(' , ') : null,
-            purchased: false
-          }]).then(()=>{}).catch(()=>{});
-        }
-      } catch(_e){}
-
-      // count it, fire the LEAD event, reveal the result
-      bump();
-      refreshCounter();
-      if (typeof fbq !== 'undefined') fbq('track','Lead',{content_name:'Scene Preview'});
-
-      resultEl.classList.add('show');
-      resultEl.scrollIntoView({behavior:'smooth', block:'center'});
-
-      btn.disabled=false; btn.textContent='Build Another Scene 🎬';
-    } catch(e){
-      loadEl.style.display = 'none';
-      btn.disabled=false;
-      btn.textContent='Put Me In The Scene 🎬';
-      showErr('Something glitched — try again.');
-    }
-  });
-
-  if (buyBtn) buyBtn.addEventListener('click', () => {
-    if (typeof fbq !== 'undefined') fbq('track','InitiateCheckout',{content_name:'30-Sec Video $75', value:75, currency:'USD'});
-  });
-
-  // ── SONG ATTACH: upload file to Supabase storage OR save a pasted link,
-  //    then record it against the customer's lead so it shows in the dashboard ──
-  (function(){
-    const songFile   = document.getElementById('songFile');
-    const songLink   = document.getElementById('songLink');
-    const songSave   = document.getElementById('songSaveBtn');
-    const songStatus = document.getElementById('songStatus');
-    const songPicked = document.getElementById('songPicked');
-    const songTitle  = document.getElementById('songTitle');
-    if (!songSave) return;
-
-    const setStatus = (msg, kind) => {
-      songStatus.textContent = msg;
-      songStatus.className = 'song-status' + (kind ? ' ' + kind : '');
-    };
-
-    // show picked filename
-    if (songFile){
-      songFile.addEventListener('change', () => {
-        const f = songFile.files[0];
-        if (f){ songPicked.textContent = '✓ ' + f.name; songTitle.textContent = 'Tap to change track'; }
-        else { songPicked.textContent = ''; }
-      });
-    }
-
-    let db = null;
-    try {
-      if (typeof supabase !== 'undefined' && typeof CONFIG !== 'undefined' && CONFIG.SUPABASE_URL){
-        db = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
-      }
-    } catch(e){}
-
-    songSave.addEventListener('click', async () => {
-      const email = (window._rmiLastEmail || '').trim();
-      const file  = songFile && songFile.files[0];
-      const link  = (songLink && songLink.value || '').trim();
-
-      if (!file && !link){
-        return setStatus('Upload a file or paste a link first.', 'err');
-      }
-
-      songSave.disabled = true;
-      setStatus('Saving your song…', '');
-
-      try {
-        let songUrl = link;
-
-        // If a file was chosen, upload it to Supabase storage
-        if (file && db){
-          const safe = (email.replace(/[^a-z0-9]/gi,'_') || 'anon') + '_' + Date.now() + '_' + file.name.replace(/[^a-z0-9._-]/gi,'_');
-          const { error: upErr } = await db.storage.from('client-files').upload('songs/' + safe, file, { upsert: true });
-          if (upErr) throw upErr;
-          const { data: pub } = db.storage.from('client-files').getPublicUrl('songs/' + safe);
-          songUrl = (pub && pub.publicUrl) ? pub.publicUrl : ('songs/' + safe);
-        } else if (file && !db){
-          throw new Error('storage-unavailable');
-        }
-
-        // Attach the song to their lead row (best-effort)
-        if (db && email){
-          // update the most recent lead for this email with the song link
-          await db.from('reference_generations')
-            .update({ song_url: songUrl })
-            .eq('email', email);
-        }
-
-        setStatus('✓ Song attached! Now grab your video below. 🎬', 'ok');
-        songSave.textContent = 'Song Attached ✓';
-      } catch(err){
-        console.error(err);
-        setStatus("Couldn't save it here — no stress, email it to rich.madeit3@gmail.com after checkout.", 'err');
-        songSave.disabled = false;
-      }
-    });
-  })();
-})();
 
 
 </script>
