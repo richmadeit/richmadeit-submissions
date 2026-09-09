@@ -75,7 +75,7 @@ input:focus,textarea:focus,button:focus-visible,.drop:focus-visible{
 .drop:hover,.drop.over{border-color:var(--gold);background:var(--panel-2)}
 .drop .big{font-family:'Oswald',sans-serif;font-weight:500;font-size:17px}
 .drop .sub{color:var(--muted);font-size:14px;margin-top:4px}
-input[type=file]{display:none}
+input[type=file]{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;opacity:0}
 
 .thumbs{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}
 .thumb{position:relative;width:76px;height:76px;border-radius:3px;overflow:hidden;border:1px solid var(--line)}
@@ -152,10 +152,10 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
     <section class="block">
       <h2>Photos <span class="req">3 to 5</span></h2>
       <p class="why">Face clear and well lit. No sunglasses, no heavy filters. Different angles if you have them — front, side, three-quarter.</p>
-      <div class="drop" id="pdrop" tabindex="0" role="button" aria-label="Add photos">
+      <label class="drop" id="pdrop" for="pin">
         <div class="big">Add photos</div>
         <div class="sub">JPG or PNG</div>
-      </div>
+      </label>
       <input type="file" id="pin" accept="image/*" multiple>
       <div class="thumbs" id="pthumbs"></div>
     </section>
@@ -170,10 +170,10 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
       </div>
 
       <div class="tab" id="paneFile">
-        <div class="drop" id="adrop" tabindex="0" role="button" aria-label="Add song file">
+        <label class="drop" id="adrop" for="ain">
           <div class="big">Add song file</div>
           <div class="sub">MP3, WAV or M4A, up to 50 MB</div>
-        </div>
+        </label>
         <input type="file" id="ain" accept="audio/*">
         <div id="arow"></div>
         <div class="loading" id="wload"></div>
@@ -232,8 +232,8 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
    SETUP — paste your two Supabase values here.
    Project settings > API > Project URL and anon public key.
    ============================================================ */
-const SUPABASE_URL = "PASTE_YOUR_PROJECT_URL_HERE";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";
+const SUPABASE_URL = "https://molqlfdjlmnlkscecngz.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vbHFsZmRqbG1ubGtzY2Vjbmd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODEzNjMsImV4cCI6MjA5MzE1NzM2M30._CR9A4H7-E7CYzIWdEO4PgRcCgBcORP2wAZqXrXE4Ec";
 const BUCKET = "submissions";
 /* ========================================================== */
 
@@ -431,8 +431,6 @@ function tally(){
 /* ---------- wiring ---------- */
 function zone(dropId,inputId,handler){
   const dz=$(dropId), inp=$(inputId);
-  dz.onclick=()=>inp.click();
-  dz.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); inp.click(); } };
   dz.ondragover=e=>{ e.preventDefault(); dz.classList.add("over"); };
   dz.ondragleave=()=>dz.classList.remove("over");
   dz.ondrop=e=>{ e.preventDefault(); dz.classList.remove("over"); handler(e.dataTransfer.files); };
