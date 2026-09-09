@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Submissions — RichMadeIt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#000; --panel:#141216; --panel-2:#1c1920; --line:#2e2932;
+  --gold:#d4af5a; --paper:#f2efe8; --muted:#8f8a94;
+  --alert:#e2574c; --ok:#5ec27a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--black);color:var(--paper);
+  font-family:'Barlow',system-ui,sans-serif;font-size:16px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;padding:0 20px 70px}
+.wrap{max-width:760px;margin:0 auto}
+
+/* login */
+.login{max-width:360px;margin:0 auto;padding:90px 0}
+.login h1{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;
+  font-size:32px;margin:0 0 4px;line-height:1}
+.login .rule{height:4px;background:var(--gold);margin:16px 0 26px}
+label{display:block;font-size:14px;color:var(--muted);margin:0 0 6px}
+input[type=email],input[type=password]{width:100%;background:var(--panel);color:var(--paper);
+  border:1px solid var(--line);border-radius:3px;padding:13px 14px;font-family:inherit;font-size:16.5px}
+input:focus,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-color:transparent}
+button.go{width:100%;background:var(--gold);color:#0d0b07;border:0;border-radius:3px;
+  font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:17px;
+  letter-spacing:.05em;padding:16px;cursor:pointer;margin-top:20px}
+button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
+.err{color:var(--alert);font-size:14.5px;margin-top:14px;min-height:1.3em}
+
+/* header */
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:40px 0 0}
+.top h1{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:28px;margin:0}
+.top button{background:none;border:0;color:var(--muted);cursor:pointer;font-family:inherit;font-size:14.5px;padding:4px}
+.top button:hover{color:var(--paper)}
+.rulebar{height:4px;background:var(--gold);margin:14px 0 22px}
+
+.filters{display:flex;gap:8px;margin-bottom:24px}
+.filters button{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+  border-radius:3px;padding:9px 16px;font-family:inherit;font-size:14.5px;cursor:pointer}
+.filters button[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:#0d0b07;font-weight:600}
+
+.state{color:var(--muted);padding:30px 0}
+
+/* card */
+.card{border:1px solid var(--line);border-left:4px solid var(--gold);background:var(--panel);
+  margin-bottom:18px;padding:18px}
+.card.done{border-left-color:var(--line);opacity:.62}
+.chead{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.ref{font-family:ui-monospace,Menlo,monospace;font-size:17px;color:var(--gold);letter-spacing:.07em}
+.when{color:var(--muted);font-size:13.5px}
+.who{font-family:'Oswald',sans-serif;font-weight:500;font-size:21px;margin:8px 0 2px}
+.who span{color:var(--muted);font-family:'Barlow',sans-serif;font-weight:400;font-size:15px}
+.contact{color:var(--muted);font-size:15px;word-break:break-all}
+
+.window{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:15px;
+  background:var(--panel-2);border:1px solid var(--line);padding:7px 12px;margin:13px 0 4px;letter-spacing:.04em}
+.window b{color:var(--gold);font-weight:400}
+
+.shots{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.shots a{display:block;width:82px;height:82px;border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.shots img{width:100%;height:100%;object-fit:cover;display:block}
+audio{width:100%;margin-top:14px;display:block}
+.songlink{display:inline-block;margin-top:13px;color:var(--gold);font-size:15px;word-break:break-all}
+
+.acts{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.acts button,.acts a{background:var(--panel-2);border:1px solid var(--line);color:var(--paper);
+  border-radius:3px;padding:10px 16px;font-family:inherit;font-size:14.5px;cursor:pointer;
+  text-decoration:none;display:inline-block}
+.acts button:hover,.acts a:hover{border-color:var(--gold)}
+.acts button.mark{border-color:var(--ok);color:var(--ok)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <section class="login" id="login">
+    <h1>Submissions</h1>
+    <div class="rule"></div>
+    <label for="em">Email</label>
+    <input type="email" id="em" autocomplete="username">
+    <div style="height:14px"></div>
+    <label for="pw">Password</label>
+    <input type="password" id="pw" autocomplete="current-password">
+    <button class="go" id="signin">Sign in</button>
+    <div class="err" id="lerr"></div>
+  </section>
+
+  <main id="app" hidden>
+    <div class="top">
+      <h1>Submissions</h1>
+      <button id="out">Sign out</button>
+    </div>
+    <div class="rulebar"></div>
+    <div class="filters">
+      <button id="fNew" aria-pressed="true">New</button>
+      <button id="fAll" aria-pressed="false">Everything</button>
+    </div>
+    <div class="state" id="state">Loading…</div>
+    <div id="list"></div>
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://molqlfdjlmnlkscecngz.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vbHFsZmRqbG1ubGtzY2Vjbmd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODEzNjMsImV4cCI6MjA5MzE1NzM2M30._CR9A4H7-E7CYzIWdEO4PgRcCgBcORP2wAZqXrXE4Ec";
+const BUCKET = "submissions";
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const $ = id => document.getElementById(id);
+let filter = "new";
+
+/* ---------- auth ---------- */
+$("signin").onclick = async () => {
+  const b = $("signin"); b.disabled = true; b.textContent = "Signing in";
+  $("lerr").textContent = "";
+  const { error } = await sb.auth.signInWithPassword({
+    email: $("em").value.trim(), password: $("pw").value
+  });
+  b.disabled = false; b.textContent = "Sign in";
+  if (error) { $("lerr").textContent = "That didn't work. Check the email and password."; return; }
+  show();
+};
+$("pw").addEventListener("keydown", e => { if (e.key === "Enter") $("signin").click(); });
+$("out").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+async function show() {
+  $("login").hidden = true;
+  $("app").hidden = false;
+  load();
+}
+
+/* ---------- filters ---------- */
+$("fNew").onclick = () => { filter = "new"; flip(); };
+$("fAll").onclick = () => { filter = "all"; flip(); };
+function flip() {
+  $("fNew").setAttribute("aria-pressed", filter === "new");
+  $("fAll").setAttribute("aria-pressed", filter === "all");
+  load();
+}
+
+/* ---------- helpers ---------- */
+const esc = s => (s || "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const ago = iso => {
+  const m = Math.floor((Date.now() - new Date(iso)) / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return m + " min ago";
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + (h === 1 ? " hour ago" : " hours ago");
+  const d = Math.floor(h / 24);
+  return d + (d === 1 ? " day ago" : " days ago");
+};
+const toSec = v => { const m = (v || "").match(/^(\d{1,2}):([0-5]\d)$/); return m ? +m[1] * 60 + +m[2] : null; };
+const signed = async path => {
+  const { data } = await sb.storage.from(BUCKET).createSignedUrl(path, 3600);
+  return data ? data.signedUrl : null;
+};
+
+/* ---------- load ---------- */
+async function load() {
+  $("list").innerHTML = "";
+  $("state").textContent = "Loading…";
+  let q = sb.from("submissions").select("*").order("created_at", { ascending: false }).limit(60);
+  if (filter === "new") q = q.eq("status", "new");
+  const { data, error } = await q;
+
+  if (error) {
+    $("state").textContent = "Couldn't load. Check that the admin policies are in place.";
+    console.error(error); return;
+  }
+  if (!data.length) {
+    $("state").textContent = filter === "new" ? "Nothing new right now." : "Nothing here yet.";
+    return;
+  }
+  $("state").textContent = "";
+  for (const row of data) $("list").append(await card(row));
+}
+
+/* ---------- one submission ---------- */
+async function card(r) {
+  const el = document.createElement("article");
+  el.className = "card" + (r.status === "done" ? " done" : "");
+
+  const a = toSec(r.start_time), b = toSec(r.end_time);
+  const len = (a !== null && b !== null) ? (b - a) + " seconds" : "";
+
+  el.innerHTML = `
+    <div class="chead">
+      <span class="ref">${esc(r.ref)}</span>
+      <span class="when">${ago(r.created_at)}</span>
+    </div>
+    <div class="who">${esc(r.artist_name) || "<span>No name given</span>"}</div>
+    <div class="contact">${esc(r.contact) || "No contact given"}</div>
+    <div class="window"><b>${esc(r.start_time)}</b> to <b>${esc(r.end_time)}</b>${len ? " · " + len : ""}</div>
+    <div class="shots"></div>
+    <div class="audio"></div>
+    <div class="acts"></div>`;
+
+  // photos
+  const shots = el.querySelector(".shots");
+  for (const p of (r.photo_paths || [])) {
+    const url = await signed(p);
+    if (!url) continue;
+    const link = document.createElement("a");
+    link.href = url; link.target = "_blank"; link.rel = "noopener";
+    const img = document.createElement("img"); img.src = url; img.alt = "";
+    link.append(img); shots.append(link);
+  }
+
+  // song
+  const au = el.querySelector(".audio");
+  if (r.song_path) {
+    const url = await signed(r.song_path);
+    if (url) {
+      const p = document.createElement("audio");
+      p.controls = true; p.preload = "none"; p.src = url;
+      au.append(p);
+      const dl = document.createElement("a");
+      dl.href = url; dl.download = ""; dl.textContent = "Download the song";
+      el.querySelector(".acts").append(dl);
+    }
+  } else if (r.song_url) {
+    const link = document.createElement("a");
+    link.className = "songlink"; link.href = r.song_url;
+    link.target = "_blank"; link.rel = "noopener";
+    link.textContent = r.song_url;
+    au.append(link);
+  }
+
+  // mark done / reopen
+  const acts = el.querySelector(".acts");
+  const mark = document.createElement("button");
+  const setLabel = () => {
+    mark.textContent = r.status === "done" ? "Put it back" : "Mark it done";
+    mark.className = r.status === "done" ? "" : "mark";
+  };
+  setLabel();
+  mark.onclick = async () => {
+    const next = r.status === "done" ? "new" : "done";
+    mark.disabled = true;
+    const { error } = await sb.from("submissions").update({ status: next }).eq("id", r.id);
+    mark.disabled = false;
+    if (error) { mark.textContent = "Didn't save"; console.error(error); return; }
+    r.status = next; setLabel();
+    el.classList.toggle("done", next === "done");
+    if (filter === "new" && next === "done") el.remove();
+  };
+  acts.append(mark);
+
+  return el;
+}
+
+/* ---------- boot ---------- */
+sb.auth.getSession().then(({ data }) => { if (data.session) show(); });
+</script>
+</body>
+</html>
