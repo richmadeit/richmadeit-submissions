@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Start your preview — RichMadeIt</title>
+<meta name="description" content="Send your photos, your song, and the fifteen seconds you want. That starts your preview.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#000000; --panel:#141216; --panel-2:#1c1920; --line:#2e2932;
+  --gold:#d4af5a; --paper:#f2efe8; --muted:#8f8a94;
+  --alert:#e2574c; --ok:#5ec27a; --pad:22px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--black);color:var(--paper);
+  font-family:'Barlow',system-ui,sans-serif;font-size:16.5px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;padding:0 var(--pad) 70px;
+}
+.wrap{max-width:620px;margin:0 auto}
+
+.hero{padding:56px 0 34px}
+.hero h1{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;
+  font-size:clamp(34px,9vw,54px);line-height:.96;margin:0}
+.hero h1 em{font-style:normal;color:var(--gold);display:block}
+.rule{height:4px;background:var(--gold);margin:20px 0 18px;width:100%;
+  transform-origin:left center;animation:draw .85s cubic-bezier(.22,1,.36,1) both}
+@keyframes draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hero p{margin:0;color:var(--muted);max-width:46ch}
+.hero p b{color:var(--paper);font-weight:600}
+
+.tally{display:flex;align-items:center;gap:10px;border:1px solid var(--line);
+  border-left:4px solid var(--gold);background:var(--panel);padding:12px 16px;
+  margin:30px 0 8px;font-size:15px}
+.tally .n{font-family:'Oswald',sans-serif;font-weight:600;color:var(--gold);font-size:19px}
+.tally.done{border-left-color:var(--ok)}
+.tally.done .n{color:var(--ok)}
+
+.block{border-top:1px solid var(--line);padding:30px 0 6px}
+.block h2{font-family:'Oswald',sans-serif;font-weight:500;font-size:21px;margin:0 0 4px}
+.block .why{color:var(--muted);font-size:14.5px;margin:0 0 16px;max-width:52ch}
+.req{color:var(--gold);font-weight:600}
+
+label{display:block;font-size:14.5px;color:var(--muted);margin:0 0 6px}
+input[type=text],input[type=url],textarea{
+  width:100%;background:var(--panel);color:var(--paper);border:1px solid var(--line);
+  border-radius:3px;padding:13px 14px;font-family:inherit;font-size:16.5px}
+textarea{min-height:132px;resize:vertical;line-height:1.7}
+input:focus,textarea:focus,button:focus-visible,.drop:focus-visible{
+  outline:2px solid var(--gold);outline-offset:2px;border-color:transparent}
+.pair{display:flex;gap:12px}
+.pair>div{flex:1}
+
+/* toggle */
+.toggle{display:flex;border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.toggle button{flex:1;background:var(--panel);color:var(--muted);border:0;cursor:pointer;
+  font-family:'Barlow',sans-serif;font-size:15px;padding:12px 8px}
+.toggle button[aria-selected=true]{background:var(--gold);color:#0d0b07;font-weight:600}
+.tab[hidden]{display:none}
+
+/* timecode */
+.tc input{font-family:ui-monospace,Menlo,monospace;font-size:21px;letter-spacing:.06em;
+  text-align:center;padding:14px 8px}
+.tcnote{margin-top:11px;font-size:14.5px;min-height:1.4em}
+.tcnote.good{color:var(--ok)}
+.tcnote.bad{color:var(--alert)}
+
+/* dropzones */
+.drop{border:1px dashed var(--line);background:var(--panel);border-radius:3px;
+  padding:26px 18px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--gold);background:var(--panel-2)}
+.drop .big{font-family:'Oswald',sans-serif;font-weight:500;font-size:17px}
+.drop .sub{color:var(--muted);font-size:14px;margin-top:4px}
+input[type=file]{display:none}
+
+.thumbs{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}
+.thumb{position:relative;width:76px;height:76px;border-radius:3px;overflow:hidden;border:1px solid var(--line)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb button{position:absolute;top:0;right:0;width:23px;height:23px;background:rgba(0,0,0,.82);
+  color:var(--paper);border:0;cursor:pointer;font-size:14px;line-height:23px;padding:0}
+.filerow{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--gold);
+  padding:12px 14px;margin-top:13px;font-size:15px}
+.filerow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filerow button{background:none;border:0;color:var(--muted);cursor:pointer;font-size:15px;padding:4px}
+
+/* clipper */
+.clip{margin-top:18px;display:none}
+.clip.on{display:block}
+.wavebox{position:relative;background:var(--panel);border:1px solid var(--line);
+  border-radius:3px;height:104px;touch-action:none;cursor:grab;overflow:hidden}
+.wavebox.drag{cursor:grabbing}
+.wavebox canvas{display:block;width:100%;height:104px}
+.sel{position:absolute;top:0;bottom:0;border-left:2px solid var(--gold);
+  border-right:2px solid var(--gold);background:rgba(212,175,90,.17);pointer-events:none}
+.play{position:absolute;top:0;bottom:0;width:1px;background:var(--paper);
+  pointer-events:none;opacity:0;transition:opacity .15s}
+.play.on{opacity:.85}
+.cliprow{display:flex;align-items:center;gap:12px;margin-top:12px}
+.cliprow button{background:var(--panel-2);color:var(--paper);border:1px solid var(--line);
+  border-radius:3px;padding:11px 18px;font-family:'Barlow',sans-serif;font-size:15px;cursor:pointer}
+.cliprow button:hover{border-color:var(--gold)}
+.cliprow .read{font-family:ui-monospace,Menlo,monospace;font-size:15px;color:var(--gold);letter-spacing:.04em}
+.hint{color:var(--muted);font-size:14px;margin-top:9px}
+.loading{color:var(--muted);font-size:14.5px;margin-top:12px}
+
+.send{margin-top:38px}
+button.go{width:100%;background:var(--gold);color:#0d0b07;border:0;border-radius:3px;
+  font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:19px;
+  letter-spacing:.05em;padding:19px;cursor:pointer}
+button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
+.bar{height:3px;background:var(--panel-2);margin-top:14px;display:none}
+.bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .25s}
+.msg{margin-top:14px;font-size:15px;color:var(--alert);min-height:1.3em}
+
+.receipt{display:none;padding:60px 0 40px;text-align:center}
+.receipt h2{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:31px;margin:0 0 6px}
+.receipt .id{font-family:ui-monospace,Menlo,monospace;font-size:29px;color:var(--gold);
+  letter-spacing:.1em;margin:26px 0 6px}
+.receipt .idl{color:var(--muted);font-size:14px;margin:0 0 30px}
+.receipt p{color:var(--muted);max-width:40ch;margin:0 auto 12px}
+
+@media(prefers-reduced-motion:reduce){.rule{animation:none}*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <form id="f" novalidate>
+    <header class="hero">
+      <h1>Start your<em>preview</em></h1>
+      <div class="rule"></div>
+      <p>Fifteen seconds, built from your photos and your song. Send the three things below and I'll get to work. <b>Nothing to pay yet.</b></p>
+    </header>
+
+    <div class="tally" id="tally"><span class="n" id="tallyn">0 of 3</span><span>ready to send</span></div>
+
+    <section class="block">
+      <h2>Who is this for</h2>
+      <p class="why">So I know who I'm talking to when it's done.</p>
+      <label for="name">Artist name</label>
+      <input type="text" id="name" autocomplete="off">
+      <div style="height:14px"></div>
+      <label for="contact">Instagram handle or email</label>
+      <input type="text" id="contact" autocomplete="off">
+    </section>
+
+    <section class="block">
+      <h2>Photos <span class="req">3 to 5</span></h2>
+      <p class="why">Face clear and well lit. No sunglasses, no heavy filters. Different angles if you have them — front, side, three-quarter.</p>
+      <div class="drop" id="pdrop" tabindex="0" role="button" aria-label="Add photos">
+        <div class="big">Add photos</div>
+        <div class="sub">JPG or PNG</div>
+      </div>
+      <input type="file" id="pin" accept="image/*" multiple>
+      <div class="thumbs" id="pthumbs"></div>
+    </section>
+
+    <section class="block">
+      <h2>The song <span class="req">required</span></h2>
+      <p class="why">Upload the file if you have it — you'll be able to drag out your fifteen seconds and hear them. If it's only online, paste the link instead.</p>
+
+      <div class="toggle" role="tablist">
+        <button type="button" id="tabFile" role="tab" aria-selected="true">Upload the file</button>
+        <button type="button" id="tabLink" role="tab" aria-selected="false">Paste a link</button>
+      </div>
+
+      <div class="tab" id="paneFile">
+        <div class="drop" id="adrop" tabindex="0" role="button" aria-label="Add song file">
+          <div class="big">Add song file</div>
+          <div class="sub">MP3, WAV or M4A, up to 50 MB</div>
+        </div>
+        <input type="file" id="ain" accept="audio/*">
+        <div id="arow"></div>
+        <div class="loading" id="wload"></div>
+
+        <div class="clip" id="clip">
+          <div class="wavebox" id="wavebox">
+            <canvas id="wave"></canvas>
+            <div class="sel" id="sel"></div>
+            <div class="play" id="ph"></div>
+          </div>
+          <div class="cliprow">
+            <button type="button" id="pbtn">Play the clip</button>
+            <span class="read" id="read">0:00 – 0:15</span>
+          </div>
+          <p class="hint">Drag the gold window to move it. Fine-tune the numbers below if you need to.</p>
+        </div>
+      </div>
+
+      <div class="tab" id="paneLink" hidden>
+        <label for="link">Link to the song</label>
+        <input type="url" id="link" placeholder="YouTube, SoundCloud, Spotify, Dropbox" autocomplete="off">
+        <p class="hint">Make sure it's public, not private or unlisted-with-password.</p>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>The fifteen seconds <span class="req">required</span></h2>
+      <p class="why">Play the song above and pick the part you want people to hear first. This is the only part that gets made, so choose the strongest fifteen seconds you have.</p>
+      <div class="pair tc">
+        <div><label for="ts">Starts at</label><input type="text" id="ts" inputmode="numeric" placeholder="0:00"></div>
+        <div><label for="te">Ends at</label><input type="text" id="te" inputmode="numeric" placeholder="0:15"></div>
+      </div>
+      <div class="tcnote" id="tcnote"></div>
+    </section>
+
+    <div class="send">
+      <button type="submit" class="go" id="go" disabled>Send it</button>
+      <div class="bar" id="bar"><i></i></div>
+      <div class="msg" id="msg"></div>
+    </div>
+  </form>
+
+  <section class="receipt" id="receipt">
+    <h2>Got it</h2>
+    <p>Everything came through. I'll send your preview back to the handle you gave me.</p>
+    <div class="id" id="rid"></div>
+    <p class="idl">Your reference — screenshot this</p>
+    <p>When the preview lands it'll be watermarked and blurred at the end. Ten dollars unlocks the clean file, and it comes off your total if you book the full video.</p>
+  </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================================================
+   SETUP — paste your two Supabase values here.
+   Project settings > API > Project URL and anon public key.
+   ============================================================ */
+const SUPABASE_URL = "PASTE_YOUR_PROJECT_URL_HERE";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";
+const BUCKET = "submissions";
+/* ========================================================== */
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const $ = id => document.getElementById(id);
+
+let photos = [], song = null, mode = "file";
+let dur = 0, winStart = 0, WIN = 15;
+let audioEl = null, peaks = null, raf = null;
+
+/* ---------- time helpers ---------- */
+const toSec = v => { const m = v.trim().match(/^(\d{1,2}):([0-5]\d)$/); return m ? +m[1]*60 + +m[2] : null; };
+const mmss = s => Math.floor(s/60) + ":" + String(Math.floor(s%60)).padStart(2,"0");
+const fmtTC = el => { let d = el.value.replace(/\D/g,"").slice(0,4);
+  el.value = d.length <= 2 ? d : d.slice(0,d.length-2) + ":" + d.slice(-2); };
+
+function checkWindow(){
+  const a = toSec($("ts").value), b = toSec($("te").value), n = $("tcnote");
+  if(a===null||b===null){ n.textContent=""; n.className="tcnote"; return false; }
+  const d = b - a;
+  if(d<=0){ n.textContent="The end has to come after the start."; n.className="tcnote bad"; return false; }
+  if(d<8){ n.textContent=d+" seconds — too short for a preview. Give me at least eight."; n.className="tcnote bad"; return false; }
+  if(d>20){ n.textContent=d+" seconds. The preview is fifteen, so pick a tighter window."; n.className="tcnote bad"; return false; }
+  if(dur && b > dur + 1){ n.textContent="That's past the end of the song."; n.className="tcnote bad"; return false; }
+  n.textContent = d+" seconds"; n.className="tcnote good"; return true;
+}
+
+/* ---------- photos ---------- */
+function drawThumbs(){
+  const w = $("pthumbs"); w.innerHTML="";
+  photos.forEach((f,i)=>{
+    const d=document.createElement("div"); d.className="thumb";
+    const img=document.createElement("img"); img.src=URL.createObjectURL(f); img.alt="";
+    const b=document.createElement("button"); b.type="button"; b.textContent="\u00d7";
+    b.setAttribute("aria-label","Remove photo "+(i+1));
+    b.onclick=()=>{ photos.splice(i,1); drawThumbs(); tally(); };
+    d.append(img,b); w.append(d);
+  });
+}
+function addPhotos(list){
+  for(const f of list){ if(photos.length>=5) break; if(f.type.startsWith("image/")) photos.push(f); }
+  drawThumbs(); tally();
+}
+
+/* ---------- waveform clipper ---------- */
+function drawWave(){
+  const c = $("wave"), box = $("wavebox");
+  const w = box.clientWidth, h = 104, dpr = window.devicePixelRatio || 1;
+  c.width = w*dpr; c.height = h*dpr;
+  const x = c.getContext("2d"); x.scale(dpr,dpr);
+  x.clearRect(0,0,w,h);
+  if(!peaks) return;
+  const step = peaks.length / w, mid = h/2;
+  x.fillStyle = "#4a4450";
+  for(let i=0;i<w;i++){
+    const p = peaks[Math.floor(i*step)] || 0;
+    const bh = Math.max(1.5, p*(h*0.82));
+    x.fillRect(i, mid-bh/2, 1, bh);
+  }
+}
+function placeSel(){
+  const box = $("wavebox"), w = box.clientWidth;
+  if(!dur) return;
+  const l = winStart/dur*w, wd = Math.min(WIN,dur)/dur*w;
+  const s = $("sel"); s.style.left = l+"px"; s.style.width = wd+"px";
+  $("read").textContent = mmss(winStart)+" \u2013 "+mmss(Math.min(winStart+WIN,dur));
+}
+function syncFields(){
+  $("ts").value = mmss(winStart);
+  $("te").value = mmss(Math.min(winStart+WIN,dur));
+  tally();
+}
+function setWin(sec){
+  winStart = Math.max(0, Math.min(sec, Math.max(0,dur-WIN)));
+  placeSel(); syncFields();
+}
+
+async function loadWave(file){
+  $("wload").textContent = "Reading the song…";
+  $("clip").classList.remove("on");
+  try{
+    const buf = await file.arrayBuffer();
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const ab = await ctx.decodeAudioData(buf);
+    dur = ab.duration;
+    const ch = ab.getChannelData(0);
+    const BINS = 900, block = Math.floor(ch.length/BINS);
+    const p = new Float32Array(BINS);
+    let max = 0;
+    for(let i=0;i<BINS;i++){
+      let s = 0;
+      for(let j=0;j<block;j+=8) s = Math.max(s, Math.abs(ch[i*block+j]||0));
+      p[i]=s; if(s>max) max=s;
+    }
+    if(max>0) for(let i=0;i<BINS;i++) p[i]/=max;
+    peaks = p;
+    ctx.close();
+
+    if(audioEl) URL.revokeObjectURL(audioEl.src);
+    audioEl = new Audio(URL.createObjectURL(file));
+    audioEl.preload = "metadata";
+
+    $("wload").textContent = "";
+    $("clip").classList.add("on");
+    drawWave();
+    setWin(Math.max(0, Math.min(dur*0.28, Math.max(0,dur-WIN))));
+  }catch(err){
+    console.error(err);
+    $("wload").textContent = "Couldn't read that file for the clipper — type the times in below instead.";
+    peaks = null; dur = 0;
+  }
+}
+
+/* drag the window */
+(function(){
+  const box = $("wavebox");
+  let dragging = false, grabOff = 0;
+  const xOf = e => (e.touches ? e.touches[0].clientX : e.clientX) - box.getBoundingClientRect().left;
+  const secOf = px => px / box.clientWidth * dur;
+
+  const down = e => {
+    if(!dur) return;
+    const px = xOf(e), s = secOf(px);
+    if(s >= winStart && s <= winStart+WIN) grabOff = s - winStart;
+    else { grabOff = WIN/2; setWin(s - WIN/2); }
+    dragging = true; box.classList.add("drag");
+  };
+  const move = e => { if(!dragging) return; e.preventDefault(); setWin(secOf(xOf(e)) - grabOff); };
+  const up = () => { dragging = false; box.classList.remove("drag"); };
+
+  box.addEventListener("mousedown", down);
+  box.addEventListener("touchstart", down, {passive:true});
+  window.addEventListener("mousemove", move);
+  window.addEventListener("touchmove", move, {passive:false});
+  window.addEventListener("mouseup", up);
+  window.addEventListener("touchend", up);
+  window.addEventListener("resize", () => { drawWave(); placeSel(); });
+})();
+
+/* play the selection on loop */
+$("pbtn").onclick = () => {
+  if(!audioEl) return;
+  const b = $("pbtn"), head = $("ph");
+  if(!audioEl.paused){ audioEl.pause(); b.textContent="Play the clip"; head.classList.remove("on"); cancelAnimationFrame(raf); return; }
+  audioEl.currentTime = winStart;
+  audioEl.play();
+  b.textContent = "Stop";
+  head.classList.add("on");
+  const tick = () => {
+    if(audioEl.paused) return;
+    if(audioEl.currentTime >= winStart+WIN) audioEl.currentTime = winStart;
+    head.style.left = (audioEl.currentTime/dur*$("wavebox").clientWidth)+"px";
+    raf = requestAnimationFrame(tick);
+  };
+  tick();
+};
+
+/* ---------- song file / link ---------- */
+function drawSong(){
+  const w = $("arow"); w.innerHTML="";
+  if(!song) return;
+  const d=document.createElement("div"); d.className="filerow";
+  const s=document.createElement("span");
+  s.textContent = song.name+"  \u2014  "+(song.size/1048576).toFixed(1)+" MB";
+  const b=document.createElement("button"); b.type="button"; b.textContent="Remove";
+  b.onclick=()=>{ song=null; peaks=null; dur=0;
+    if(audioEl){ audioEl.pause(); audioEl=null; }
+    $("clip").classList.remove("on"); $("wload").textContent=""; drawSong(); tally(); };
+  d.append(s,b); w.append(d);
+}
+
+$("tabFile").onclick = () => setMode("file");
+$("tabLink").onclick = () => setMode("link");
+function setMode(m){
+  mode = m;
+  $("tabFile").setAttribute("aria-selected", m==="file");
+  $("tabLink").setAttribute("aria-selected", m==="link");
+  $("paneFile").hidden = m!=="file";
+  $("paneLink").hidden = m!=="link";
+  if(m==="file" && peaks){ requestAnimationFrame(()=>{ drawWave(); placeSel(); }); }
+  tally();
+}
+
+/* ---------- tally ---------- */
+function tally(){
+  const songOK = mode==="file" ? !!song : /^https?:\/\/.+\..+/.test($("link").value.trim());
+  const ok = [ photos.length>=3, songOK, checkWindow() ];
+  const n = ok.filter(Boolean).length;
+  $("tallyn").textContent = n+" of 3";
+  $("tally").classList.toggle("done", n===3);
+  $("go").disabled = n!==3;
+  return n===3;
+}
+
+/* ---------- wiring ---------- */
+function zone(dropId,inputId,handler){
+  const dz=$(dropId), inp=$(inputId);
+  dz.onclick=()=>inp.click();
+  dz.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); inp.click(); } };
+  dz.ondragover=e=>{ e.preventDefault(); dz.classList.add("over"); };
+  dz.ondragleave=()=>dz.classList.remove("over");
+  dz.ondrop=e=>{ e.preventDefault(); dz.classList.remove("over"); handler(e.dataTransfer.files); };
+  inp.onchange=()=>{ handler(inp.files); inp.value=""; };
+}
+zone("pdrop","pin",addPhotos);
+zone("adrop","ain",files=>{
+  const f=files[0]; if(!f) return;
+  if(f.size>50*1048576){ $("msg").textContent="That file is over 50 MB. Paste a link instead, or export a smaller one."; return; }
+  song=f; $("msg").textContent=""; drawSong(); tally(); loadWave(f);
+});
+["ts","te"].forEach(id=>$(id).addEventListener("input",e=>{ fmtTC(e.target); tally(); }));
+$("link").addEventListener("input",tally);
+
+/* ---------- submit ---------- */
+const code=()=>{ const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s="";
+  for(let i=0;i<5;i++) s+=c[Math.floor(Math.random()*c.length)]; return "RMI-"+s; };
+const clean=n=>n.replace(/[^a-zA-Z0-9._-]/g,"_");
+
+$("f").addEventListener("submit", async e=>{
+  e.preventDefault();
+  if(!tally()) return;
+  const go=$("go"), bar=$("bar"), fill=bar.querySelector("i"), msg=$("msg");
+  go.disabled=true; go.textContent="Sending";
+  bar.style.display="block"; msg.textContent="";
+  if(audioEl && !audioEl.paused) audioEl.pause();
+
+  const id=code();
+  const total=photos.length+(mode==="file"?1:0);
+  let done=0;
+  const step=()=>{ done++; fill.style.width=Math.round(done/total*92)+"%"; };
+
+  try{
+    const photoPaths=[];
+    for(let i=0;i<photos.length;i++){
+      const p=`${id}/photo_${i+1}_${clean(photos[i].name)}`;
+      const {error}=await sb.storage.from(BUCKET).upload(p,photos[i]);
+      if(error) throw error;
+      photoPaths.push(p); step();
+    }
+    let songPath=null;
+    if(mode==="file"){
+      songPath=`${id}/song_${clean(song.name)}`;
+      const {error}=await sb.storage.from(BUCKET).upload(songPath,song);
+      if(error) throw error;
+      step();
+    }
+    const {error:ie}=await sb.from("submissions").insert({
+      ref:id,
+      artist_name:$("name").value.trim(),
+      contact:$("contact").value.trim(),
+      photo_paths:photoPaths,
+      song_path:songPath,
+      song_url: mode==="link" ? $("link").value.trim() : null,
+      start_time:$("ts").value.trim(),
+      end_time:$("te").value.trim()
+    });
+    if(ie) throw ie;
+
+    fill.style.width="100%";
+    $("f").style.display="none";
+    $("rid").textContent=id;
+    $("receipt").style.display="block";
+    window.scrollTo({top:0,behavior:"smooth"});
+  }catch(err){
+    msg.textContent="That didn't go through. Check your connection and hit send again — nothing was lost.";
+    console.error(err);
+    go.disabled=false; go.textContent="Send it";
+    bar.style.display="none"; fill.style.width="0";
+  }
+});
+
+tally();
+</script>
+</body>
+</html>
