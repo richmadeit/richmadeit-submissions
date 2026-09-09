@@ -156,7 +156,7 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
         <div class="big">Add photos</div>
         <div class="sub">JPG or PNG</div>
       </label>
-      <input type="file" id="pin" accept="image/*" multiple>
+      <input type="file" id="pin" accept=".jpg,.jpeg,.png,.heic,.heif,.webp,image/*" multiple>
       <div class="thumbs" id="pthumbs"></div>
     </section>
 
@@ -174,7 +174,7 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
           <div class="big">Add song file</div>
           <div class="sub">MP3, WAV or M4A, up to 50 MB</div>
         </label>
-        <input type="file" id="ain" accept="audio/*">
+        <input type="file" id="ain" accept=".mp3,.m4a,.wav,.aac,.aiff,.flac,.mp4,audio/*">
         <div id="arow"></div>
         <div class="loading" id="wload"></div>
 
@@ -316,8 +316,13 @@ async function loadWave(file){
   $("clip").classList.remove("on");
   try{
     const buf = await file.arrayBuffer();
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    const ab = await ctx.decodeAudioData(buf);
+    // decode into a low-rate offline context: same shape, a fraction of the memory
+    const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    const ctx = new OAC(1, 1, 8000);
+    const ab = await new Promise((res, rej) => {
+      const p = ctx.decodeAudioData(buf, res, rej);
+      if (p && p.then) p.then(res, rej);
+    });
     dur = ab.duration;
     const ch = ab.getChannelData(0);
     const BINS = 900, block = Math.floor(ch.length/BINS);
@@ -325,12 +330,11 @@ async function loadWave(file){
     let max = 0;
     for(let i=0;i<BINS;i++){
       let s = 0;
-      for(let j=0;j<block;j+=8) s = Math.max(s, Math.abs(ch[i*block+j]||0));
+      for(let j=0;j<block;j+=2) s = Math.max(s, Math.abs(ch[i*block+j]||0));
       p[i]=s; if(s>max) max=s;
     }
     if(max>0) for(let i=0;i<BINS;i++) p[i]/=max;
     peaks = p;
-    ctx.close();
 
     if(audioEl) URL.revokeObjectURL(audioEl.src);
     audioEl = new Audio(URL.createObjectURL(file));
