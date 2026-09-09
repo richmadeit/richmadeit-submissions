@@ -30,6 +30,7 @@ label{display:block;font-size:14px;color:var(--muted);margin:0 0 6px}
 input[type=email],input[type=password]{width:100%;background:var(--panel);color:var(--paper);
   border:1px solid var(--line);border-radius:3px;padding:13px 14px;font-family:inherit;font-size:16.5px}
 input:focus,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-color:transparent}
+input.pin{font-family:ui-monospace,Menlo,monospace;font-size:26px;text-align:center;letter-spacing:.35em;padding:16px 8px}
 button.go{width:100%;background:var(--gold);color:#0d0b07;border:0;border-radius:3px;
   font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:17px;
   letter-spacing:.05em;padding:16px;cursor:pointer;margin-top:20px}
@@ -86,12 +87,10 @@ audio{width:100%;margin-top:14px;display:block}
   <section class="login" id="login">
     <h1>Submissions</h1>
     <div class="rule"></div>
-    <label for="em">Email</label>
-    <input type="email" id="em" autocomplete="username">
-    <div style="height:14px"></div>
-    <label for="pw">Password</label>
-    <input type="password" id="pw" autocomplete="current-password">
-    <button class="go" id="signin">Sign in</button>
+    <label for="pw">Enter your code</label>
+    <input type="password" id="pw" inputmode="numeric" autocomplete="current-password"
+           maxlength="12" class="pin">
+    <button class="go" id="signin">Open</button>
     <div class="err" id="lerr"></div>
   </section>
 
@@ -117,19 +116,22 @@ const SUPABASE_URL = "https://molqlfdjlmnlkscecngz.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vbHFsZmRqbG1ubGtzY2Vjbmd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODEzNjMsImV4cCI6MjA5MzE1NzM2M30._CR9A4H7-E7CYzIWdEO4PgRcCgBcORP2wAZqXrXE4Ec";
 const BUCKET = "submissions";
 
+/* your Supabase login email — the code below is its password */
+const ADMIN_EMAIL = "rich.madeit3@gmail.com";
+
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const $ = id => document.getElementById(id);
 let filter = "new";
 
 /* ---------- auth ---------- */
 $("signin").onclick = async () => {
-  const b = $("signin"); b.disabled = true; b.textContent = "Signing in";
+  const b = $("signin"); b.disabled = true; b.textContent = "Opening";
   $("lerr").textContent = "";
   const { error } = await sb.auth.signInWithPassword({
-    email: $("em").value.trim(), password: $("pw").value
+    email: ADMIN_EMAIL, password: $("pw").value.trim()
   });
-  b.disabled = false; b.textContent = "Sign in";
-  if (error) { $("lerr").textContent = "That didn't work. Check the email and password."; return; }
+  b.disabled = false; b.textContent = "Open";
+  if (error) { $("lerr").textContent = "Wrong code."; $("pw").value = ""; $("pw").focus(); return; }
   show();
 };
 $("pw").addEventListener("keydown", e => { if (e.key === "Enter") $("signin").click(); });
