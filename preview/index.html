@@ -108,6 +108,19 @@ input[type=file]{position:absolute;width:1px;height:1px;padding:0;margin:-1px;ov
 .hint{color:var(--muted);font-size:14px;margin-top:9px}
 .loading{color:var(--muted);font-size:14.5px;margin-top:12px}
 
+/* style picker */
+.styles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.styles input{position:absolute;width:1px;height:1px;opacity:0;margin:-1px}
+.styles label{display:block;cursor:pointer;border:2px solid var(--line);border-radius:3px;
+  overflow:hidden;background:var(--panel);transition:border-color .15s;margin:0}
+.styles label:hover{border-color:var(--gold-soft,#7d6634)}
+.styles img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.styles .nm{font-family:'Oswald',sans-serif;font-weight:500;font-size:14px;
+  text-align:center;padding:9px 4px;color:var(--muted);letter-spacing:.02em}
+.styles input:checked+label{border-color:var(--gold)}
+.styles input:checked+label .nm{color:var(--gold);background:rgba(212,175,90,.09)}
+.styles input:focus-visible+label{outline:2px solid var(--gold);outline-offset:2px}
+
 .send{margin-top:38px}
 button.go{width:100%;background:var(--gold);color:#0d0b07;border:0;border-radius:3px;
   font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;font-size:19px;
@@ -134,10 +147,10 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
     <header class="hero">
       <h1>Start your<em>preview</em></h1>
       <div class="rule"></div>
-      <p>Fifteen seconds, built from your photos and your song. Send the three things below and I'll get to work. <b>Nothing to pay yet.</b></p>
+      <p>Fifteen seconds, built from your photos and your song. Send the four things below and I'll get to work. <b>Nothing to pay yet.</b></p>
     </header>
 
-    <div class="tally" id="tally"><span class="n" id="tallyn">0 of 3</span><span>ready to send</span></div>
+    <div class="tally" id="tally"><span class="n" id="tallyn">0 of 4</span><span>ready to send</span></div>
 
     <section class="block">
       <h2>Who is this for</h2>
@@ -147,6 +160,21 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
       <div style="height:14px"></div>
       <label for="contact">Instagram handle or email</label>
       <input type="text" id="contact" autocomplete="off">
+    </section>
+
+    <section class="block">
+      <h2>The look <span class="req">required</span></h2>
+      <p class="why">Pick the style your video gets built in. Tap one.</p>
+      <div class="styles">
+        <input type="radio" name="style" id="stReal" value="realistic">
+        <label for="stReal"><img src="styles/realistic.jpg" alt="Realistic style"><div class="nm">Realistic</div></label>
+
+        <input type="radio" name="style" id="stAnime" value="anime">
+        <label for="stAnime"><img src="styles/anime.jpg" alt="Anime style"><div class="nm">Anime</div></label>
+
+        <input type="radio" name="style" id="stGta" value="gta">
+        <label for="stGta"><img src="styles/gta.jpg" alt="Open-world game style"><div class="nm">Game</div></label>
+      </div>
     </section>
 
     <section class="block">
@@ -424,12 +452,13 @@ function setMode(m){
 /* ---------- tally ---------- */
 function tally(){
   const songOK = mode==="file" ? !!song : /^https?:\/\/.+\..+/.test($("link").value.trim());
-  const ok = [ photos.length>=3, songOK, checkWindow() ];
+  const styleEl = document.querySelector('input[name="style"]:checked');
+  const ok = [ !!styleEl, photos.length>=3, songOK, checkWindow() ];
   const n = ok.filter(Boolean).length;
-  $("tallyn").textContent = n+" of 3";
-  $("tally").classList.toggle("done", n===3);
-  $("go").disabled = n!==3;
-  return n===3;
+  $("tallyn").textContent = n+" of 4";
+  $("tally").classList.toggle("done", n===4);
+  $("go").disabled = n!==4;
+  return n===4;
 }
 
 /* ---------- wiring ---------- */
@@ -448,6 +477,7 @@ zone("adrop","ain",files=>{
 });
 ["ts","te"].forEach(id=>$(id).addEventListener("input",e=>{ fmtTC(e.target); tally(); }));
 $("link").addEventListener("input",tally);
+document.querySelectorAll('input[name="style"]').forEach(r=>r.addEventListener("change",tally));
 
 /* ---------- submit ---------- */
 const code=()=>{ const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s="";
@@ -490,7 +520,8 @@ $("f").addEventListener("submit", async e=>{
       song_path:songPath,
       song_url: mode==="link" ? $("link").value.trim() : null,
       start_time:$("ts").value.trim(),
-      end_time:$("te").value.trim()
+      end_time:$("te").value.trim(),
+      style:(document.querySelector('input[name="style"]:checked')||{}).value||null
     });
     if(ie) throw ie;
 
