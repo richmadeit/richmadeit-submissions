@@ -94,6 +94,11 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
   background:var(--panel-2);border:1px solid var(--line);padding:7px 12px;margin:13px 0 4px;letter-spacing:.04em}
 .window b{color:var(--gold);font-weight:400}
 
+.stylechip{display:inline-block;font-family:'Oswald',sans-serif;font-weight:500;
+  font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+  background:rgba(212,175,90,.13);border:1px solid var(--gold);color:var(--gold);
+  padding:5px 11px;border-radius:3px;margin:13px 8px 0 0;vertical-align:middle}
+.stylechip.none{background:none;border-color:var(--line);color:var(--muted)}
 .shots{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .shots a{display:block;width:82px;height:82px;border:1px solid var(--line);border-radius:3px;overflow:hidden}
 .shots img{width:100%;height:100%;object-fit:cover;display:block}
@@ -196,6 +201,7 @@ const ago = iso => {
   return d + (d === 1 ? " day ago" : " days ago");
 };
 const toSec = v => { const m = (v || "").match(/^(\d{1,2}):([0-5]\d)$/); return m ? +m[1] * 60 + +m[2] : null; };
+const styleName = s => ({ realistic: "Realistic", anime: "Anime", gta: "Game style" })[s] || "No style picked";
 const signed = async path => {
   const { data } = await sb.storage.from(BUCKET).createSignedUrl(path, 3600);
   return data ? data.signedUrl : null;
@@ -258,6 +264,7 @@ async function card(r) {
     <div class="who">${esc(r.artist_name) || "<span>No name given</span>"}</div>
     <div class="contact">${esc(r.contact) || "No contact given"}</div>
     <div class="window"><b>${esc(r.start_time)}</b> to <b>${esc(r.end_time)}</b>${len ? " · " + len : ""}</div>
+    <span class="stylechip${r.style ? "" : " none"}">${styleName(r.style)}</span>
     <div class="shots"></div>
     <div class="audio"></div>
     <div class="acts"></div>
