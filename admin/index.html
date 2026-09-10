@@ -59,6 +59,10 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
 /* card */
 .card{border:1px solid var(--line);border-left:4px solid var(--gold);background:var(--panel);
   margin-bottom:18px;padding:18px}
+.acts button.copy{border-color:var(--gold);color:var(--gold)}
+.acts button.copy.done{border-color:var(--ok);color:var(--ok)}
+.acts button.dl{border-color:var(--gold);color:var(--gold)}
+
 /* payment block */
 .pay{border-top:1px solid var(--line);margin-top:16px;padding-top:14px}
 .payhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -146,6 +150,7 @@ audio{width:100%;margin-top:14px;display:block}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const SUPABASE_URL = "https://molqlfdjlmnlkscecngz.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vbHFsZmRqbG1ubGtzY2Vjbmd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODEzNjMsImV4cCI6MjA5MzE1NzM2M30._CR9A4H7-E7CYzIWdEO4PgRcCgBcORP2wAZqXrXE4Ec";
@@ -312,8 +317,101 @@ async function card(r) {
     au.append(link);
   }
 
-  // mark done / reopen
+  // ---- copy brief + download all ----
   const acts = el.querySelector(".acts");
+
+  const photoUrls = Array.from(shots.querySelectorAll("a")).map(a => a.href);
+  const songUrl = (el.querySelector("audio") || {}).src || null;
+
+  const copyBtn = document.createElement("button");
+  copyBtn.type = "button";
+  copyBtn.className = "copy";
+  copyBtn.textContent = "Copy brief";
+  const briefText = () => {
+    const lines = [
+      "REF: " + r.ref,
+      "ARTIST: " + (r.artist_name || "not given"),
+      "CONTACT: " + (r.contact || "not given"),
+      "STYLE: " + styleName(r.style),
+      "WINDOW: " + (r.start_time || "?") + " to " + (r.end_time || "?") +
+        (len ? "  (" + len + ")" : ""),
+      "PHOTOS: " + photoUrls.length,
+      r.song_url ? "SONG LINK: " + r.song_url : "SONG: uploaded file",
+      r.seconds_paid ? "PAID FOR: " + r.seconds_paid + " seconds ($" + r.seconds_paid + ")" : "",
+      "",
+      "Cut " + (r.start_time || "?") + " to " + (r.end_time || "?") +
+        " and build the seven-cut prompt in " + styleName(r.style).toLowerCase() + "."
+    ].filter(Boolean);
+    return lines.join("\n");
+  };
+
+  copyBtn.onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(briefText());
+      copyBtn.textContent = "Copied";
+      copyBtn.classList.add("done");
+      setTimeout(() => { copyBtn.textContent = "Copy brief"; copyBtn.classList.remove("done"); }, 1800);
+    } catch (e) {
+      copyBtn.textContent = "Couldn't copy";
+      console.error(e);
+    }
+  };
+  acts.append(copyBtn);
+
+  if (photoUrls.length || songUrl) {
+    const dlBtn = document.createElement("button");
+    dlBtn.type = "button";
+    dlBtn.className = "dl";
+    dlBtn.textContent = "Download folder";
+    dlBtn.onclick = async () => {
+      dlBtn.disabled = true;
+      dlBtn.textContent = "Packing";
+      try {
+        const zip = new JSZip();
+        const folder = zip.folder(r.ref);
+        folder.file("BRIEF.txt", briefText());
+
+        const ext = (path, fallback) => {
+          const m = (path || "").match(/\.([a-zA-Z0-9]{2,5})(?:\?|$)/);
+          return m ? m[1].toLowerCase() : fallback;
+        };
+
+        for (let i = 0; i < photoUrls.length; i++) {
+          dlBtn.textContent = "Packing photo " + (i + 1);
+          const blob = await (await fetch(photoUrls[i])).blob();
+          const e = ext((r.photo_paths || [])[i], "jpg");
+          folder.file("photo_" + (i + 1) + "." + e, blob);
+        }
+
+        if (songUrl) {
+          dlBtn.textContent = "Packing song";
+          const blob = await (await fetch(songUrl)).blob();
+          folder.file("song." + ext(r.song_path, "mp3"), blob);
+        }
+
+        dlBtn.textContent = "Zipping";
+        const out = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(out);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = r.ref + ".zip";
+        document.body.append(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+      } catch (e) {
+        console.error(e);
+        dlBtn.textContent = "Didn't pack";
+        setTimeout(() => { dlBtn.textContent = "Download folder"; }, 2200);
+        dlBtn.disabled = false;
+        return;
+      }
+      dlBtn.disabled = false;
+      dlBtn.textContent = "Download folder";
+    };
+    acts.append(dlBtn);
+  }
+
   const mark = document.createElement("button");
   const setLabel = () => {
     mark.textContent = r.status === "done" ? "Put it back" : "Mark it done";
