@@ -49,6 +49,11 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
   border-radius:3px;padding:9px 16px;font-family:inherit;font-size:14.5px;cursor:pointer}
 .filters button[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:#0d0b07;font-weight:600}
 
+.totals{display:flex;gap:26px;flex-wrap:wrap;border:1px solid var(--line);
+  border-left:4px solid var(--ok);background:var(--panel);padding:14px 18px;margin-bottom:22px}
+.totals div{display:flex;flex-direction:column;gap:2px}
+.totals .k{color:var(--muted);font-size:12.5px;letter-spacing:.03em}
+.totals .v{font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;color:var(--ok)}
 .state{color:var(--muted);padding:30px 0}
 
 /* card */
@@ -125,8 +130,10 @@ audio{width:100%;margin-top:14px;display:block}
     <div class="rulebar"></div>
     <div class="filters">
       <button id="fNew" aria-pressed="true">New</button>
+      <button id="fPaid" aria-pressed="false">Paid</button>
       <button id="fAll" aria-pressed="false">Everything</button>
     </div>
+    <div class="totals" id="totals" hidden></div>
     <div class="state" id="state">Loading…</div>
     <div id="list"></div>
   </main>
@@ -168,9 +175,11 @@ async function show() {
 
 /* ---------- filters ---------- */
 $("fNew").onclick = () => { filter = "new"; flip(); };
+$("fPaid").onclick = () => { filter = "paid"; flip(); };
 $("fAll").onclick = () => { filter = "all"; flip(); };
 function flip() {
   $("fNew").setAttribute("aria-pressed", filter === "new");
+  $("fPaid").setAttribute("aria-pressed", filter === "paid");
   $("fAll").setAttribute("aria-pressed", filter === "all");
   load();
 }
@@ -196,8 +205,13 @@ const signed = async path => {
 async function load() {
   $("list").innerHTML = "";
   $("state").textContent = "Loading…";
-  let q = sb.from("submissions").select("*").order("created_at", { ascending: false }).limit(60);
-  if (filter === "new") q = q.eq("status", "new");
+  let q = sb.from("submissions").select("*").limit(60);
+  if (filter === "paid") {
+    q = q.not("paid_at", "is", null).order("paid_at", { ascending: false });
+  } else {
+    if (filter === "new") q = q.eq("status", "new");
+    q = q.order("created_at", { ascending: false });
+  }
   const { data, error } = await q;
 
   if (error) {
@@ -205,10 +219,26 @@ async function load() {
     console.error(error); return;
   }
   if (!data.length) {
-    $("state").textContent = filter === "new" ? "Nothing new right now." : "Nothing here yet.";
+    $("totals").hidden = true;
+    $("state").textContent =
+      filter === "new" ? "Nothing new right now." :
+      filter === "paid" ? "Nobody has paid yet." : "Nothing here yet.";
     return;
   }
   $("state").textContent = "";
+
+  if (filter === "paid") {
+    const secs = data.reduce((t, r) => t + (r.seconds_paid || 0), 0);
+    const missing = data.filter(r => !r.seconds_paid).length;
+    $("totals").innerHTML =
+      '<div><span class="k">Paid</span><span class="v">' + data.length + '</span></div>' +
+      '<div><span class="k">Seconds owed</span><span class="v">' + secs + '</span></div>' +
+      '<div><span class="k">Value</span><span class="v">$' + secs + '</span></div>' +
+      (missing ? '<div><span class="k">Missing seconds</span><span class="v">' + missing + '</span></div>' : '');
+    $("totals").hidden = false;
+  } else {
+    $("totals").hidden = true;
+  }
   for (const row of data) $("list").append(await card(row));
 }
 
@@ -333,6 +363,7 @@ async function card(r) {
     if (error) { payWhen.textContent = "Didn't save"; console.error(error); return; }
     r.paid_at = next;
     paintPay();
+    if (filter === "paid" && !next) { el.remove(); load(); }
   };
 
   let secTimer = null;
