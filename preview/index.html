@@ -191,19 +191,15 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
 
     <section class="block">
       <h2>The song <span class="req">required</span></h2>
-      <p class="why">Upload the file if you have it — you'll be able to drag out your fifteen seconds and hear them. If it's only online, paste the link instead.</p>
+      <p class="why">Upload the song file — you’ll be able to drag out your fifteen seconds and hear them before you send.</p>
 
-      <div class="toggle" role="tablist">
-        <button type="button" id="tabFile" role="tab" aria-selected="true">Upload the file</button>
-        <button type="button" id="tabLink" role="tab" aria-selected="false">Paste a link</button>
-      </div>
 
       <div class="tab" id="paneFile">
         <label class="drop" id="adrop" for="ain">
           <div class="big">Add song file</div>
-          <div class="sub">MP3, WAV or M4A, up to 50 MB</div>
+          <div class="sub">MP3, WAV, M4A — or a screen recording. Up to 50 MB</div>
         </label>
-        <input type="file" id="ain" accept=".mp3,.m4a,.wav,.aac,.aiff,.flac,.mp4,audio/*">
+        <input type="file" id="ain" accept=".mp3,.m4a,.wav,.aac,.aiff,.flac,.mp4,.mov,.m4v,audio/*,video/*">
         <div id="arow"></div>
         <div class="loading" id="wload"></div>
 
@@ -221,11 +217,8 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
         </div>
       </div>
 
-      <div class="tab" id="paneLink" hidden>
-        <label for="link">Link to the song</label>
-        <input type="url" id="link" placeholder="YouTube, SoundCloud, Spotify, Dropbox" autocomplete="off">
-        <p class="hint">Make sure it's public, not private or unlisted-with-password.</p>
-      </div>
+      <p class="hint">No file? Screen record the song playing on your phone — Spotify,
+      Apple Music, YouTube, anywhere — and upload that. It works fine.</p>
     </section>
 
     <section class="block">
@@ -269,7 +262,7 @@ const BUCKET = "submissions";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const $ = id => document.getElementById(id);
 
-let photos = [], song = null, mode = "file";
+let photos = [], song = null;
 let dur = 0, winStart = 0, WIN = 15;
 let audioEl = null, peaks = null, raf = null;
 
@@ -438,21 +431,11 @@ function drawSong(){
   d.append(s,b); w.append(d);
 }
 
-$("tabFile").onclick = () => setMode("file");
-$("tabLink").onclick = () => setMode("link");
-function setMode(m){
-  mode = m;
-  $("tabFile").setAttribute("aria-selected", m==="file");
-  $("tabLink").setAttribute("aria-selected", m==="link");
-  $("paneFile").hidden = m!=="file";
-  $("paneLink").hidden = m!=="link";
-  if(m==="file" && peaks){ requestAnimationFrame(()=>{ drawWave(); placeSel(); }); }
-  tally();
-}
+
 
 /* ---------- tally ---------- */
 function tally(){
-  const songOK = mode==="file" ? !!song : /^https?:\/\/.+\..+/.test($("link").value.trim());
+  const songOK = !!song;
   const styleEl = document.querySelector('input[name="style"]:checked');
   const ok = [ !!styleEl, photos.length>=3, songOK, checkWindow() ];
   const n = ok.filter(Boolean).length;
@@ -473,11 +456,10 @@ function zone(dropId,inputId,handler){
 zone("pdrop","pin",addPhotos);
 zone("adrop","ain",files=>{
   const f=files[0]; if(!f) return;
-  if(f.size>50*1048576){ $("msg").textContent="That file is over 50 MB. Paste a link instead, or export a smaller one."; return; }
+  if(f.size>50*1048576){ $("msg").textContent="That file is over 50 MB. Try a shorter screen recording or a smaller export."; return; }
   song=f; $("msg").textContent=""; drawSong(); tally(); loadWave(f);
 });
 ["ts","te"].forEach(id=>$(id).addEventListener("input",e=>{ fmtTC(e.target); tally(); }));
-$("link").addEventListener("input",tally);
 document.querySelectorAll('input[name="style"]').forEach(r=>r.addEventListener("change",tally));
 
 /* ---------- submit ---------- */
@@ -494,7 +476,7 @@ $("f").addEventListener("submit", async e=>{
   if(audioEl && !audioEl.paused) audioEl.pause();
 
   const id=code();
-  const total=photos.length+(mode==="file"?1:0);
+  const total=photos.length+1;
   let done=0;
   const step=()=>{ done++; fill.style.width=Math.round(done/total*92)+"%"; };
 
@@ -506,9 +488,8 @@ $("f").addEventListener("submit", async e=>{
       if(error) throw error;
       photoPaths.push(p); step();
     }
-    let songPath=null;
-    if(mode==="file"){
-      songPath=`${id}/song_${clean(song.name)}`;
+    const songPath=`${id}/song_${clean(song.name)}`;
+    {
       const {error}=await sb.storage.from(BUCKET).upload(songPath,song);
       if(error) throw error;
       step();
@@ -519,7 +500,7 @@ $("f").addEventListener("submit", async e=>{
       contact:$("contact").value.trim(),
       photo_paths:photoPaths,
       song_path:songPath,
-      song_url: mode==="link" ? $("link").value.trim() : null,
+      song_url: null,
       start_time:$("ts").value.trim(),
       end_time:$("te").value.trim(),
       style:(document.querySelector('input[name="style"]:checked')||{}).value||null
