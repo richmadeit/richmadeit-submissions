@@ -109,7 +109,7 @@ input[type=file]{position:absolute;width:1px;height:1px;padding:0;margin:-1px;ov
 .loading{color:var(--muted);font-size:14.5px;margin-top:12px}
 
 /* style picker */
-.styles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.styles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .styles input{position:absolute;width:1px;height:1px;opacity:0;margin:-1px}
 .styles label{display:block;cursor:pointer;border:2px solid var(--line);border-radius:3px;
   overflow:hidden;background:var(--panel);transition:border-color .15s;margin:0}
@@ -158,8 +158,8 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
       <label for="name">Artist name</label>
       <input type="text" id="name" autocomplete="off">
       <div style="height:14px"></div>
-      <label for="contact">Instagram handle or email</label>
-      <input type="text" id="contact" autocomplete="off">
+      <label for="contact">Instagram, Facebook name, or email</label>
+      <input type="text" id="contact" autocomplete="off" placeholder="@yourhandle, your Facebook name, or email">
     </section>
 
     <section class="block">
@@ -169,10 +169,13 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
         <input type="radio" name="style" id="stAnime" value="anime">
         <label for="stAnime"><img src="styles/anime.jpg" alt="Anime style"><div class="nm">Anime</div></label>
 
+        <input type="radio" name="style" id="stReal" value="realistic">
+        <label for="stReal"><img src="styles/realistic.jpg" alt="Realistic style"><div class="nm">Realistic</div></label>
+
         <input type="radio" name="style" id="stGta" value="gta">
         <label for="stGta"><img src="styles/gta.jpg" alt="Open-world game style"><div class="nm">Game</div></label>
       </div>
-      <p class="hint">Want photoreal instead? That's done by request — message me and we'll set it up.</p>
+      <p class="hint">Realistic needs your best photos — clear, well lit, facing the camera. Blurry or filtered shots won't look like you. Anime and game style are more forgiving.</p>
     </section>
 
     <section class="block">
