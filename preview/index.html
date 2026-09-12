@@ -995,7 +995,12 @@ $("f").addEventListener("submit", async e=>{
     $("rid").textContent=id;
     $("deliveryConfirm").textContent=email;
     $("receipt").style.display="block";
-    window.scrollTo({top:0,behavior:"smooth"});
+    requestAnimationFrame(() => {
+      const receipt = $("receipt");
+      receipt.scrollIntoView({ behavior: "smooth", block: "start" });
+      receipt.setAttribute("tabindex", "-1");
+      receipt.focus({ preventScroll: true });
+    });
 
     // Fire conversion asynchronously after the real submission is safely stored.
     setTimeout(()=>rmiTrackSuccessfulLead(id),0);
