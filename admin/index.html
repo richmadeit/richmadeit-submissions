@@ -309,8 +309,22 @@ const renderDelivery = (root, info, ref, artist) => {
   if (info.email) {
     const a = document.createElement("a");
     const subject = "Your RichMadeIt preview is ready — " + ref;
-    const body = "Hey " + (artist || "there") + ",%0D%0A%0D%0AYour RichMadeIt preview is ready.%0D%0A%0D%0AIf you love it, reply here and I’ll send the clean unlocked file after payment.";
-    a.href = "mailto:" + encodeURIComponent(info.email) + "?subject=" + encodeURIComponent(subject) + "&body=" + body;
+    const body = "Hey " + (artist || "there") + ",\n\nYour RichMadeIt preview is ready.\n\nIf you love it, reply here and I’ll send the clean unlocked file after payment.";
+
+    // Open Gmail Compose in the RichMadeIt Gmail account.
+    // You must already be signed into rich.madeit3@gmail.com in this browser.
+    const gmailAccount = "rich.madeit3@gmail.com";
+    const gmailUrl =
+      "https://mail.google.com/mail/?" +
+      "authuser=" + encodeURIComponent(gmailAccount) +
+      "&view=cm&fs=1" +
+      "&to=" + encodeURIComponent(info.email) +
+      "&su=" + encodeURIComponent(subject) +
+      "&body=" + encodeURIComponent(body);
+
+    a.href = gmailUrl;
+    a.target = "_blank";
+    a.rel = "noopener";
     a.textContent = "Email preview";
     q.append(a);
   }
