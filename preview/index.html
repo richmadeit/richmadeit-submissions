@@ -218,6 +218,23 @@ body:before{
 .flow strong{display:block;font-size:13px;margin-top:2px}
 .flow span{display:block;color:var(--muted);font-size:11.5px;line-height:1.3;margin-top:3px}
 
+
+/* sample preview */
+.sampleproof{position:relative;overflow:hidden;border:1px solid rgba(212,175,90,.25);border-radius:16px;padding:18px;margin:12px 0 24px;background:linear-gradient(150deg,rgba(212,175,90,.08),rgba(15,14,17,.94) 45%,rgba(20,18,22,.82));box-shadow:var(--shadow)}
+.sampleproof:before{content:"";position:absolute;inset:auto -70px -90px auto;width:220px;height:220px;border-radius:50%;background:rgba(212,175,90,.11);filter:blur(30px);pointer-events:none}
+.samplehead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.samplehead .copy{min-width:0}
+.sampletag{display:inline-flex;align-items:center;gap:7px;color:#b9e9c5;background:rgba(94,194,122,.08);border:1px solid rgba(94,194,122,.22);border-radius:999px;padding:5px 9px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+.sampletag:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(94,194,122,.07)}
+.sampleproof h2{font-family:'Oswald',sans-serif;font-size:24px;line-height:1.05;margin:0;text-transform:uppercase}
+.sampleproof .sub{color:var(--muted);font-size:13.5px;line-height:1.4;margin:7px 0 0;max-width:42ch}
+.sampleproof .sound{flex:0 0 auto;color:var(--gold2);font-size:11.5px;border:1px solid rgba(212,175,90,.2);border-radius:999px;padding:7px 9px;background:rgba(0,0,0,.2)}
+.samplevideo{position:relative;max-width:350px;margin:0 auto;border-radius:15px;overflow:hidden;background:#050505;border:1px solid rgba(255,255,255,.09);box-shadow:0 22px 46px rgba(0,0,0,.45)}
+.samplevideo video{display:block;width:100%;height:auto;aspect-ratio:768/1344;background:#050505;object-fit:cover}
+.samplecaption{display:flex;align-items:center;justify-content:center;gap:7px;text-align:center;color:var(--muted);font-size:12px;margin:12px auto 0}
+.samplecaption b{color:var(--paper);font-weight:600}
+@media(max-width:520px){.sampleproof{padding:16px 13px}.sampleproof h2{font-size:22px}.samplehead{gap:8px}.samplehead .sound{font-size:10.5px;padding:6px 8px}.samplevideo{max-width:320px}}
+
 .price{position:relative;overflow:hidden;border:1px solid rgba(212,175,90,.28);border-left:0;border-radius:16px;padding:20px;background:linear-gradient(145deg,rgba(212,175,90,.11),rgba(20,18,22,.82) 52%);box-shadow:var(--shadow)}
 .price:before{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:-55px;top:-70px;background:rgba(212,175,90,.16);filter:blur(20px)}
 .price .lead{font-size:14px;letter-spacing:.12em}
@@ -347,6 +364,25 @@ src="https://www.facebook.com/tr?id=1073144191970422&ev=PageView&noscript=1"
       <div class="flowitem"><span class="num">02</span><strong>I build it</strong><span>Your 15-sec preview</span></div>
       <div class="flowitem"><span class="num">03</span><strong>You decide</strong><span>Unlock only if you love it</span></div>
     </div>
+
+    <section class="sampleproof" aria-labelledby="sampleTitle">
+      <div class="samplehead">
+        <div class="copy">
+          <div class="sampletag">Real locked preview</div>
+          <h2 id="sampleTitle">See what you'll receive</h2>
+          <p class="sub">This is a real 15-second preview example. Yours is built from <b>your photos + your song</b>.</p>
+        </div>
+        <div class="sound">🔊 Sound on</div>
+      </div>
+
+      <div class="samplevideo">
+        <video id="samplePreviewVideo" controls playsinline preload="metadata" controlsList="nodownload noplaybackrate" disablePictureInPicture oncontextmenu="return false;" aria-label="RichMadeIt sample locked music video preview">
+          <source src="sample-preview.mp4" type="video/mp4">
+          Your browser doesn't support video playback.
+        </video>
+      </div>
+      <div class="samplecaption"><span>👀</span><span><b>Preview first.</b> Unlock the clean 15-second file for $20 only if you love it.</span></div>
+    </section>
 
     <section class="price">
       <div class="lead">Preview first. Pay after you see it.</div>
@@ -760,6 +796,16 @@ tally();
    No email, phone number, username, artist name, or other PII is sent to ad pixels.
    ============================================================ */
 
+
+function rmiSafeTrack(label, fn){
+  try{
+    fn();
+  }catch(err){
+    // Ad/tracking code must NEVER block a customer submission.
+    console.warn("[RICHMADEIT tracking] "+label+" failed", err);
+  }
+}
+
 function rmiTrackingPayload(){
   const styleEl = document.querySelector('input[name="style"]:checked');
   const a = toSec($("ts").value), b = toSec($("te").value);
@@ -776,44 +822,78 @@ function rmiTrackingPayload(){
 }
 
 function rmiTrackBuildClick(){
-  const p = rmiTrackingPayload();
+  rmiSafeTrack("preview_build_click", ()=>{
+    const p = rmiTrackingPayload();
 
-  // Meta: diagnostic custom event
-  if(typeof window.fbq === "function"){
-    window.fbq("trackCustom", "PreviewBuildClick", p);
-  }
+    if(typeof window.fbq === "function"){
+      window.fbq("trackCustom", "PreviewBuildClick", p);
+    }
 
-  // TikTok: button interaction event
-  if(window.ttq && typeof window.ttq.track === "function"){
-    window.ttq.track("ClickButton");
-  }
+    if(window.ttq && typeof window.ttq.track === "function"){
+      window.ttq.track("ClickButton");
+    }
 
-  // Google Tag Manager / GA-compatible data layer
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({event:"preview_build_click", ...p});
+    window.dataLayer = Array.isArray(window.dataLayer) ? window.dataLayer : [];
+    window.dataLayer.push({event:"preview_build_click", ...p});
 
-  console.info("[RICHMADEIT tracking] preview_build_click", p);
+    console.info("[RICHMADEIT tracking] preview_build_click", p);
+  });
 }
 
 function rmiTrackSuccessfulLead(ref){
-  const p = {...rmiTrackingPayload(), submission_ref: ref};
+  rmiSafeTrack("preview_submitted", ()=>{
+    const p = {...rmiTrackingPayload(), submission_ref: ref};
 
-  // Meta standard conversion event
-  if(typeof window.fbq === "function"){
-    window.fbq("track", "Lead");
-  }
+    if(typeof window.fbq === "function"){
+      window.fbq("track", "Lead");
+    }
 
-  // TikTok current standard lead event for a successful form submission
-  if(window.ttq && typeof window.ttq.track === "function"){
-    window.ttq.track("Lead");
-  }
+    if(window.ttq && typeof window.ttq.track === "function"){
+      window.ttq.track("Lead");
+    }
 
-  // Google Tag Manager / GA-compatible data layer
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({event:"preview_submitted", ...p});
+    window.dataLayer = Array.isArray(window.dataLayer) ? window.dataLayer : [];
+    window.dataLayer.push({event:"preview_submitted", ...p});
 
-  console.info("[RICHMADEIT tracking] preview_submitted", p);
+    console.info("[RICHMADEIT tracking] preview_submitted", p);
+  });
 }
+
+/* ---------- sample preview engagement ---------- */
+(function(){
+  const v = $("samplePreviewVideo");
+  if(!v) return;
+  let played=false, halfway=false, completed=false;
+
+  const trackSample = (eventName, extra={}) => {
+    rmiSafeTrack(eventName, ()=>{
+      const p = {sample:"believe_in_love", ...extra};
+      if(typeof window.fbq === "function") window.fbq("trackCustom", eventName, p);
+      window.dataLayer = Array.isArray(window.dataLayer) ? window.dataLayer : [];
+      window.dataLayer.push({event:eventName, ...p});
+      console.info("[RICHMADEIT tracking] "+eventName, p);
+    });
+  };
+
+  v.addEventListener("play", ()=>{
+    if(played) return;
+    played=true;
+    trackSample("SamplePreviewPlay");
+  });
+  v.addEventListener("timeupdate", ()=>{
+    if(halfway || !v.duration) return;
+    if(v.currentTime / v.duration >= .5){
+      halfway=true;
+      trackSample("SamplePreviewHalf");
+    }
+  });
+  v.addEventListener("ended", ()=>{
+    if(completed) return;
+    completed=true;
+    trackSample("SamplePreviewComplete");
+  });
+})();
+
 
 /* ---------- submit ---------- */
 const code=()=>{ const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s="";
@@ -823,6 +903,7 @@ const clean=n=>n.replace(/[^a-zA-Z0-9._-]/g,"_");
 $("f").addEventListener("submit", async e=>{
   e.preventDefault();
   if(!tally()) return;
+
   const go=$("go"), bar=$("bar"), fill=bar.querySelector("i"), msg=$("msg");
   const email=$("email").value.trim();
   const social=$("social").value.trim();
@@ -842,59 +923,99 @@ $("f").addEventListener("submit", async e=>{
   if(phone) contactParts.push("Phone: "+phone);
   const deliveryContact = contactParts.join(" | ");
 
-  // Fully qualified CTA click: every required field has passed validation.
+  // Tracking is isolated so a blocked pixel/ad blocker can never break the form.
   rmiTrackBuildClick();
 
-  go.disabled=true; go.textContent="Uploading your preview request…";
-  bar.style.display="block"; msg.textContent="";
+  go.disabled=true;
+  go.textContent="Uploading your preview request…";
+  bar.style.display="block";
+  msg.textContent="";
   if(audioEl && !audioEl.paused) audioEl.pause();
 
   const id=code();
   const total=photos.length+1;
   let done=0;
+  let stage="starting";
   const step=()=>{ done++; fill.style.width=Math.round(done/total*92)+"%"; };
 
   try{
     const photoPaths=[];
+
     for(let i=0;i<photos.length;i++){
+      stage="uploading photo "+(i+1);
       const p=`${id}/photo_${i+1}_${clean(photos[i].name)}`;
       const {error}=await sb.storage.from(BUCKET).upload(p,photos[i]);
       if(error) throw error;
-      photoPaths.push(p); step();
+      photoPaths.push(p);
+      step();
     }
+
+    stage="uploading song";
     const songPath=`${id}/song_${clean(song.name)}`;
     {
       const {error}=await sb.storage.from(BUCKET).upload(songPath,song);
       if(error) throw error;
       step();
     }
-    const {error:ie}=await sb.from("submissions").insert({
+
+    stage="saving submission";
+    const payload={
       ref:id,
       artist_name:$("name").value.trim(),
       contact:deliveryContact,
       photo_paths:photoPaths,
       song_path:songPath,
-      song_url: null,
+      song_url:null,
       start_time:$("ts").value.trim(),
       end_time:$("te").value.trim(),
       style:(document.querySelector('input[name="style"]:checked')||{}).value||null
-    });
+    };
+
+    let {error:ie}=await sb.from("submissions").insert(payload);
+
+    // If an older schema has a short contact column, fall back to guaranteed-delivery email
+    // instead of losing the entire order. Optional social/phone remain optional.
+    const tooLong = ie && (
+      ie.code === "22001" ||
+      /too long|value too long|character varying/i.test(ie.message || "")
+    );
+    if(tooLong){
+      console.warn("[RICHMADEIT] Contact field too long; retrying with email only.");
+      payload.contact="Email: "+email;
+      ({error:ie}=await sb.from("submissions").insert(payload));
+    }
+
     if(ie) throw ie;
 
-    // Count the conversion only after the request is actually saved successfully.
-    rmiTrackSuccessfulLead(id);
-
+    stage="complete";
     fill.style.width="100%";
+
+    // Show success FIRST. Tracking happens afterward and cannot change the result.
     $("f").style.display="none";
     $("rid").textContent=id;
     $("deliveryConfirm").textContent=email;
     $("receipt").style.display="block";
     window.scrollTo({top:0,behavior:"smooth"});
+
+    // Fire conversion asynchronously after the real submission is safely stored.
+    setTimeout(()=>rmiTrackSuccessfulLead(id),0);
+
   }catch(err){
-    msg.textContent="That didn't go through. Check your connection and hit send again — nothing was lost.";
-    console.error(err);
-    go.disabled=false; go.textContent="Build my free preview";
-    bar.style.display="none"; fill.style.width="0";
+    console.error("[RICHMADEIT submission error]", {stage, error:err});
+
+    const debug = new URLSearchParams(location.search).get("debug")==="1";
+    msg.textContent="That didn't go through while "+stage+". Your files are still on this page — try again.";
+    if(debug){
+      const detail = err && (err.message || err.error_description || err.code)
+        ? "  ["+(err.code ? err.code+": " : "")+(err.message || err.error_description || "")+"]"
+        : "";
+      msg.textContent += detail;
+    }
+
+    go.disabled=false;
+    go.textContent="Build my free preview";
+    bar.style.display="none";
+    fill.style.width="0";
   }
 });
 
