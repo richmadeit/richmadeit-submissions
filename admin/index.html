@@ -92,7 +92,19 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
 .when{color:var(--muted);font-size:13.5px}
 .who{font-family:'Oswald',sans-serif;font-weight:500;font-size:21px;margin:8px 0 2px}
 .who span{color:var(--muted);font-family:'Barlow',sans-serif;font-weight:400;font-size:15px}
-.contact{color:var(--muted);font-size:15px;word-break:break-all}
+.contact{color:var(--muted);font-size:15px;word-break:break-word}
+.delivery{display:grid;gap:8px;margin:10px 0 2px}
+.delivery-row{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--panel-2);border:1px solid var(--line);padding:9px 11px;border-radius:3px}
+.delivery-row .dk{color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;min-width:58px}
+.delivery-row .dv{color:var(--paper);font-size:14.5px;text-align:right;word-break:break-word}
+.delivery-row.primary{border-left:3px solid var(--gold)}
+.delivery-row a{color:var(--gold);text-decoration:none}
+.delivery-row a:hover{text-decoration:underline}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.quick a,.quick button{background:var(--panel-2);border:1px solid var(--gold);color:var(--gold);
+  border-radius:3px;padding:8px 12px;font-family:inherit;font-size:13.5px;cursor:pointer;text-decoration:none}
+.quick a:hover,.quick button:hover{background:rgba(212,175,90,.08)}
 
 .window{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:15px;
   background:var(--panel-2);border:1px solid var(--line);padding:7px 12px;margin:13px 0 4px;letter-spacing:.04em}
@@ -207,6 +219,125 @@ const ago = iso => {
 };
 const toSec = v => { const m = (v || "").match(/^(\d{1,2}):([0-5]\d)$/); return m ? +m[1] * 60 + +m[2] : null; };
 const styleName = s => ({ realistic: "Realistic", anime: "Anime", gta: "Game style" })[s] || "No style picked";
+
+const parseContact = raw => {
+  const out = { email:"", socialPlatform:"", social:"", phone:"", legacy:"" };
+  const s = (raw || "").trim();
+  if (!s) return out;
+
+  // New format from the preview page:
+  // Email: x | Social: TikTok @name | Phone: 555...
+  if (s.includes("Email:") || s.includes("Social:") || s.includes("Phone:")) {
+    s.split("|").map(x => x.trim()).forEach(part => {
+      let m;
+      if ((m = part.match(/^Email:\s*(.+)$/i))) out.email = m[1].trim();
+      else if ((m = part.match(/^Phone:\s*(.+)$/i))) out.phone = m[1].trim();
+      else if ((m = part.match(/^Social:\s*(.*)$/i))) {
+        const rest = m[1].trim();
+        const sm = rest.match(/^(TikTok|Instagram|Facebook|Other)\s+(.+)$/i);
+        if (sm) {
+          out.socialPlatform = sm[1];
+          out.social = sm[2].trim();
+        } else {
+          out.social = rest;
+        }
+      }
+    });
+  } else {
+    // Backward compatibility for older submissions that only stored one contact string.
+    out.legacy = s;
+  }
+  return out;
+};
+
+const socialUrl = (platform, handle) => {
+  const h = (handle || "").trim().replace(/^@/, "");
+  if (!h) return "";
+  const p = (platform || "").toLowerCase();
+  if (p === "tiktok") return "https://www.tiktok.com/@" + encodeURIComponent(h);
+  if (p === "instagram") return "https://www.instagram.com/" + encodeURIComponent(h) + "/";
+  if (p === "facebook") return "https://www.facebook.com/search/top?q=" + encodeURIComponent(handle);
+  return "";
+};
+
+const renderDelivery = (root, info, ref, artist) => {
+  root.innerHTML = "";
+  const rows = [];
+
+  if (info.email) rows.push({k:"Email", v:info.email, href:"mailto:"+encodeURIComponent(info.email), primary:true});
+  if (info.social) {
+    const href = socialUrl(info.socialPlatform, info.social);
+    rows.push({k:info.socialPlatform || "Social", v:info.social, href});
+  }
+  if (info.phone) rows.push({k:"Phone", v:info.phone, href:"tel:"+info.phone.replace(/[^\d+]/g,"")});
+  if (info.legacy) rows.push({k:"Contact", v:info.legacy, href:""});
+
+  if (!rows.length) {
+    const d = document.createElement("div");
+    d.className = "delivery-row";
+    d.innerHTML = '<span class="dk">Contact</span><span class="dv">No contact given</span>';
+    root.append(d);
+    return;
+  }
+
+  rows.forEach(r => {
+    const row = document.createElement("div");
+    row.className = "delivery-row" + (r.primary ? " primary" : "");
+
+    const k = document.createElement("span");
+    k.className = "dk";
+    k.textContent = r.k;
+
+    const v = document.createElement(r.href ? "a" : "span");
+    v.className = "dv";
+    v.textContent = r.v;
+    if (r.href) {
+      v.href = r.href;
+      if (r.href.startsWith("http")) {
+        v.target = "_blank";
+        v.rel = "noopener";
+      }
+    }
+
+    row.append(k, v);
+    root.append(row);
+  });
+
+  const q = document.createElement("div");
+  q.className = "quick";
+
+  if (info.email) {
+    const a = document.createElement("a");
+    const subject = "Your RichMadeIt preview is ready — " + ref;
+    const body = "Hey " + (artist || "there") + ",%0D%0A%0D%0AYour RichMadeIt preview is ready.%0D%0A%0D%0AIf you love it, reply here and I’ll send the clean unlocked file after payment.";
+    a.href = "mailto:" + encodeURIComponent(info.email) + "?subject=" + encodeURIComponent(subject) + "&body=" + body;
+    a.textContent = "Email preview";
+    q.append(a);
+  }
+
+  if (info.phone) {
+    const a = document.createElement("a");
+    const num = info.phone.replace(/[^\d+]/g,"");
+    a.href = "sms:" + num + "?&body=" + encodeURIComponent("Your RichMadeIt preview is ready 🎬 Check your email for the preview.");
+    a.textContent = "Text them";
+    q.append(a);
+  }
+
+  if (info.social) {
+    const u = socialUrl(info.socialPlatform, info.social);
+    if (u) {
+      const a = document.createElement("a");
+      a.href = u;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = "Open " + (info.socialPlatform || "social");
+      q.append(a);
+    }
+  }
+
+  if (q.children.length) root.append(q);
+};
+
 const signed = async path => {
   const { data } = await sb.storage.from(BUCKET).createSignedUrl(path, 3600);
   return data ? data.signedUrl : null;
@@ -260,6 +391,7 @@ async function card(r) {
 
   const a = toSec(r.start_time), b = toSec(r.end_time);
   const len = (a !== null && b !== null) ? (b - a) + " seconds" : "";
+  const contactInfo = parseContact(r.contact);
 
   el.innerHTML = `
     <div class="chead">
@@ -267,7 +399,7 @@ async function card(r) {
       <span class="when">${ago(r.created_at)}</span>
     </div>
     <div class="who">${esc(r.artist_name) || "<span>No name given</span>"}</div>
-    <div class="contact">${esc(r.contact) || "No contact given"}</div>
+    <div class="contact delivery"></div>
     <div class="window"><b>${esc(r.start_time)}</b> to <b>${esc(r.end_time)}</b>${len ? " · " + len : ""}</div>
     <span class="stylechip${r.style ? "" : " none"}">${styleName(r.style)}</span>
     <div class="shots"></div>
@@ -285,6 +417,8 @@ async function card(r) {
         <span class="saved">Saved</span>
       </div>
     </div>`;
+
+  renderDelivery(el.querySelector(".delivery"), contactInfo, r.ref, r.artist_name);
 
   // photos
   const shots = el.querySelector(".shots");
@@ -331,7 +465,10 @@ async function card(r) {
     const lines = [
       "REF: " + r.ref,
       "ARTIST: " + (r.artist_name || "not given"),
-      "CONTACT: " + (r.contact || "not given"),
+      contactInfo.email ? "EMAIL: " + contactInfo.email : "",
+      contactInfo.social ? "SOCIAL: " + (contactInfo.socialPlatform ? contactInfo.socialPlatform + " " : "") + contactInfo.social : "",
+      contactInfo.phone ? "PHONE: " + contactInfo.phone : "",
+      contactInfo.legacy ? "CONTACT: " + contactInfo.legacy : "",
       "STYLE: " + styleName(r.style),
       "WINDOW: " + (r.start_time || "?") + " to " + (r.end_time || "?") +
         (len ? "  (" + len + ")" : ""),
