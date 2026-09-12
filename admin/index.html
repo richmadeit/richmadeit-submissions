@@ -309,7 +309,25 @@ const renderDelivery = (root, info, ref, artist) => {
   if (info.email) {
     const a = document.createElement("a");
     const subject = "Your RichMadeIt preview is ready — " + ref;
-    const body = "Hey " + (artist || "there") + ",\n\nYour RichMadeIt preview is ready.\n\nIf you love it, reply here and I’ll send the clean unlocked file after payment.";
+    const body =
+      "Hey " + (artist || "there") + ",\n\n" +
+      "Your preview is ready 🎬\n\n" +
+      "$20 unlocks the clean 15-second video — no watermark, no blur, full quality.\n\n" +
+      "PAYMENT OPTIONS\n" +
+      "Zelle: 281-222-9301\n" +
+      "Apple Pay: 313-858-0435\n" +
+      "Cash App: https://cash.app/$toonclipz\n" +
+      "(ToonClipz is my other brand — same person.)\n\n" +
+      "After you pay, reply with a screenshot and the name you sent payment from. I’ll send the clean file right back.\n\n" +
+      "LONGER VIDEO PRICING\n" +
+      "15 sec — $20\n" +
+      "30 sec — $35\n" +
+      "60 sec — $65\n" +
+      "2 min — $125\n" +
+      "3 min — $185\n" +
+      "4 min — $245\n\n" +
+      "Pricing is $5 one-time character setup + $1 per second. Your character is built now, so there’s no setup fee on anything you order after this.\n\n" +
+      "#RICHMADEIT_";
 
     // Open Gmail Compose in the RichMadeIt Gmail account.
     // You must already be signed into rich.madeit3@gmail.com in this browser.
