@@ -307,6 +307,33 @@ const renderDelivery = (root, info, ref, artist) => {
   q.className = "quick";
 
   if (info.email) {
+    // STARTER EMAIL — send this BEFORE doing any work.
+    const starterEmail = document.createElement("a");
+    const starterSubject = "Confirm your RichMadeIt preview request — " + ref;
+    const starterBody =
+      "Hey " + (artist || "there") + ",\n\n" +
+      "I got your RichMadeIt music-video preview request 🎬\n\n" +
+      "Before I start working on it, reply YES to this email so I know you still want the preview and I have the right contact info.\n\n" +
+      "I won’t start the preview until I hear back from you.\n\n" +
+      "Reference: " + ref + "\n\n" +
+      "#RICHMADEIT_";
+
+    const gmailAccount = "rich.madeit3@gmail.com";
+    const starterGmailUrl =
+      "https://mail.google.com/mail/?" +
+      "authuser=" + encodeURIComponent(gmailAccount) +
+      "&view=cm&fs=1" +
+      "&to=" + encodeURIComponent(info.email) +
+      "&su=" + encodeURIComponent(starterSubject) +
+      "&body=" + encodeURIComponent(starterBody);
+
+    starterEmail.href = starterGmailUrl;
+    starterEmail.target = "_blank";
+    starterEmail.rel = "noopener";
+    starterEmail.textContent = "Starter email";
+    q.append(starterEmail);
+
+    // PREVIEW EMAIL — send this after the preview is finished.
     const a = document.createElement("a");
     const subject = "Your RichMadeIt preview is ready — " + ref;
     const body =
@@ -329,9 +356,6 @@ const renderDelivery = (root, info, ref, artist) => {
       "Pricing is $5 one-time character setup + $1 per second. Your character is built now, so there’s no setup fee on anything you order after this.\n\n" +
       "#RICHMADEIT_";
 
-    // Open Gmail Compose in the RichMadeIt Gmail account.
-    // You must already be signed into rich.madeit3@gmail.com in this browser.
-    const gmailAccount = "rich.madeit3@gmail.com";
     const gmailUrl =
       "https://mail.google.com/mail/?" +
       "authuser=" + encodeURIComponent(gmailAccount) +
@@ -348,10 +372,23 @@ const renderDelivery = (root, info, ref, artist) => {
   }
 
   if (info.phone) {
-    const a = document.createElement("a");
     const num = info.phone.replace(/[^\d+]/g,"");
-    a.href = "sms:" + num + "?&body=" + encodeURIComponent("Your RichMadeIt preview is ready 🎬 Check your email for the preview.");
-    a.textContent = "Text them";
+
+    // STARTER TEXT — send this BEFORE doing any work.
+    const starterText = document.createElement("a");
+    const starterSms =
+      "Hey " + (artist || "there") + ", this is RichMadeIt 🎬 I got your music-video preview request (" + ref + "). " +
+      "Reply YES so I know I have the right number and you still want me to make it. I won’t start until I hear back from you.";
+    starterText.href = "sms:" + num + "?&body=" + encodeURIComponent(starterSms);
+    starterText.textContent = "Starter text";
+    q.append(starterText);
+
+    // PREVIEW TEXT — send this after the preview is finished.
+    const a = document.createElement("a");
+    a.href = "sms:" + num + "?&body=" + encodeURIComponent(
+      "Your RichMadeIt preview is ready 🎬 Check your email for the preview. If you don’t see it, reply here and I’ll help."
+    );
+    a.textContent = "Preview text";
     q.append(a);
   }
 
