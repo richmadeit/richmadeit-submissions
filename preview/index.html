@@ -171,20 +171,20 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
       <p class="fine">Once your character's built, there's no setup fee next time.</p>
     </section>
 
-    <div class="tally" id="tally"><span class="n" id="tallyn">0 of 6</span><span>ready to send</span></div>
+    <div class="tally" id="tally"><span class="n" id="tallyn">0 of 5</span><span>ready to send</span></div>
 
     <section class="block">
       <h2>Who is this for</h2>
-      <p class="why">Email and phone are required so I can get your preview back to you fast.</p>
+      <p class="why">Phone number is required so I can text your preview to you. Email is optional as a backup.</p>
       <label for="name">Artist name</label>
       <input type="text" id="name" autocomplete="off">
       <div style="height:14px"></div>
-      <label for="email">Email <span class="req">required</span></label>
+      <label for="email">Email <span style="color:var(--muted);font-weight:400">optional</span></label>
       <input type="email" id="email" autocomplete="email" placeholder="you@example.com">
       <div style="height:14px"></div>
       <label for="phone">Phone number <span class="req">required</span></label>
       <input type="tel" id="phone" autocomplete="tel" inputmode="tel" placeholder="(555) 555-5555">
-      <p class="hint">I’ll use your email or phone to send your preview and unlock instructions.</p>
+      <p class="hint">I’ll text your preview to the phone number above. Add an email if you want a backup copy.</p>
     </section>
 
     <section class="block">
@@ -265,7 +265,7 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
 
   <section class="receipt" id="receipt">
     <h2>Got it</h2>
-    <p>Everything came through. I’ll send your preview to the email or phone number you gave me.</p>
+    <p>Everything came through. I’ll text your preview to the phone number you gave me.</p>
     <div class="id" id="rid"></div>
     <p class="idl">Your reference — screenshot this</p>
     <p>When the preview lands it'll be watermarked and blurred at the end. Twenty dollars unlocks the clean file. Once your character's built there's no setup fee again.</p>
@@ -460,7 +460,8 @@ function drawSong(){
 
 /* ---------- tally ---------- */
 function validEmail(){
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($("email").value.trim());
+  const value = $("email").value.trim();
+  return !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 function validPhone(){
   return $("phone").value.replace(/\D/g,"").length >= 10;
@@ -468,12 +469,13 @@ function validPhone(){
 function tally(){
   const songOK = !!song;
   const styleEl = document.querySelector('input[name="style"]:checked');
-  const ok = [ validEmail(), validPhone(), !!styleEl, photos.length>=3, songOK, checkWindow() ];
-  const n = ok.filter(Boolean).length;
-  $("tallyn").textContent = n+" of 6";
-  $("tally").classList.toggle("done", n===6);
-  $("go").disabled = n!==6;
-  return n===6;
+  const required = [ validPhone(), !!styleEl, photos.length>=3, songOK, checkWindow() ];
+  const n = required.filter(Boolean).length;
+  const emailOK = validEmail();
+  $("tallyn").textContent = n+" of 5";
+  $("tally").classList.toggle("done", n===5 && emailOK);
+  $("go").disabled = !(n===5 && emailOK);
+  return n===5 && emailOK;
 }
 
 /* ---------- wiring ---------- */
