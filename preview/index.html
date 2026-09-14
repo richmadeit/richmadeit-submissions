@@ -160,6 +160,27 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
 .mini{color:var(--muted);font-size:13.5px}
 @media(prefers-reduced-motion:reduce){.rule{animation:none}*{transition:none!important}}
 </style>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '107314419704222');
+fbq('track', 'PageView');
+console.info('[RICHMADEIT tracking] Meta Pixel loaded: 107314419704222');
+</script>
+<noscript>
+  <img height="1" width="1" style="display:none"
+       src="https://www.facebook.com/tr?id=107314419704222&ev=PageView&noscript=1"/>
+</noscript>
+<!-- End Meta Pixel Code -->
+
 </head>
 <body>
 <div class="wrap">
@@ -528,6 +549,48 @@ zone("adrop","ain",files=>{
 ["email","phone"].forEach(id=>$(id).addEventListener("input",tally));
 document.querySelectorAll('input[name="style"]').forEach(r=>r.addEventListener("change",tally));
 
+
+/* ============================================================
+   RICHMADEIT AD TRACKING
+   - PageView fires from the Meta base tag above.
+   - PreviewBuildClick fires when the completed form is submitted.
+   - Lead fires ONLY after Supabase confirms the request was saved.
+   No customer PII is sent in these events.
+   ============================================================ */
+function rmiTrackingPayload(){
+  const styleEl = document.querySelector('input[name="style"]:checked');
+  const a = toSec($("ts").value), b = toSec($("te").value);
+  return {
+    form_name: "music_promo_preview",
+    offer: "30_second_promo_60",
+    style: styleEl ? styleEl.value : "",
+    photo_count: photos.length,
+    clip_seconds: (a!==null && b!==null) ? Math.max(0,b-a) : 0
+  };
+}
+
+function rmiTrackBuildClick(){
+  const p = rmiTrackingPayload();
+  if(typeof window.fbq === "function"){
+    window.fbq("trackCustom", "PreviewBuildClick", p);
+  }
+  console.info("[RICHMADEIT tracking] PreviewBuildClick", p);
+}
+
+function rmiTrackSuccessfulLead(ref){
+  const p = {...rmiTrackingPayload(), submission_ref: ref};
+  if(typeof window.fbq === "function"){
+    window.fbq("track", "Lead", {
+      content_name: "30-second music promo preview",
+      content_category: "music promo",
+      value: 60.00,
+      currency: "USD"
+    });
+  }
+  console.info("[RICHMADEIT tracking] Lead", p);
+}
+
+
 /* ---------- submit ---------- */
 const code=()=>{ const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s="";
   for(let i=0;i<5;i++) s+=c[Math.floor(Math.random()*c.length)]; return "RMI-"+s; };
@@ -536,6 +599,9 @@ const clean=n=>n.replace(/[^a-zA-Z0-9._-]/g,"_");
 $("f").addEventListener("submit", async e=>{
   e.preventDefault();
   if(!tally()) return;
+
+  // Completed/validated form submit signal.
+  rmiTrackBuildClick();
   const go=$("go"), bar=$("bar"), fill=bar.querySelector("i"), msg=$("msg");
   go.disabled=true; go.textContent="Sending";
   bar.style.display="block"; msg.textContent="";
@@ -572,6 +638,9 @@ $("f").addEventListener("submit", async e=>{
       style:(document.querySelector('input[name="style"]:checked')||{}).value||null
     });
     if(ie) throw ie;
+
+    // Count a lead only after the submission is safely saved.
+    rmiTrackSuccessfulLead(id);
 
     fill.style.width="100%";
     $("f").style.display="none";
