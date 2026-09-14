@@ -347,9 +347,10 @@ const renderDelivery = (root, info, ref, artist) => {
       "PAYMENT OPTIONS\n" +
       "Zelle: 281-222-9301\n" +
       "Apple Pay: 313-858-0435\n" +
-      "Cash App: https://cash.app/$toonclipz\n" +
+      "Cash App: $toonclipz\n" +
+      "Cash App link: https://cash.app/$toonclipz\n" +
       "(ToonClipz is my other brand — same person.)\n\n" +
-      "After you pay, reply with a screenshot and the name you sent payment from. Your full 30-second promo will be completed within 24–48 hours.\n\n" +
+      "After payment, reply with a screenshot and the name you sent payment from. Your full 30-second promo will be completed within 24–48 hours.\n\n" +
       "#RICHMADEIT_";
 
     const gmailUrl =
@@ -381,9 +382,17 @@ const renderDelivery = (root, info, ref, artist) => {
 
     // PREVIEW TEXT — send this after the preview is finished.
     const a = document.createElement("a");
-    a.href = "sms:" + num + "?&body=" + encodeURIComponent(
-      "Your RichMadeIt preview is ready 🎬 Love it? $60 unlocks the full 30-second promo — clean first 15 seconds + the second 15 seconds built. Reply here to unlock. Full promo completed within 24–48 hours."
-    );
+    const previewSms =
+      "Your RichMadeIt preview is ready 🎬\n\n" +
+      "Love it? $60 unlocks the full 30-second promo — clean first 15 sec + second 15 built and stitched together.\n\n" +
+      "PAYMENT OPTIONS\n" +
+      "Zelle: 281-222-9301\n" +
+      "Apple Pay: 313-858-0435\n" +
+      "Cash App: $toonclipz\n" +
+      "(ToonClipz is my other brand — same person.)\n\n" +
+      "After payment, reply with a screenshot + the name you sent it from. Full promo completed within 24–48 hours.\n\n" +
+      "#RICHMADEIT_";
+    a.href = "sms:" + num + "?&body=" + encodeURIComponent(previewSms);
     a.textContent = "Preview text";
     q.append(a);
   }
