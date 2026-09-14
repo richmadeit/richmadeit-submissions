@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Start your preview — RichMadeIt</title>
-<meta name="description" content="Send your photos, your song, and the fifteen seconds you want. That starts your preview.">
+<title>Start your 30-second music promo — RichMadeIt</title>
+<meta name="description" content="Send your photos and song. See your first 15 seconds before you pay, then unlock the full 30-second music promo for $60.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
@@ -146,6 +146,18 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
 .receipt .idl{color:var(--muted);font-size:14px;margin:0 0 30px}
 .receipt p{color:var(--muted);max-width:40ch;margin:0 auto 12px}
 
+
+.example{border:1px solid var(--line);background:linear-gradient(180deg,#171419,#0b0a0c);border-radius:9px;padding:18px;margin:0 0 28px}
+.example .eyebrow{font-family:'Oswald',sans-serif;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;font-size:13px;margin:0 0 6px}
+.example h2{font-family:'Oswald',sans-serif;text-transform:uppercase;font-weight:600;font-size:24px;line-height:1.05;margin:0 0 8px}
+.example p{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+.example video{display:block;width:100%;max-height:620px;aspect-ratio:9/16;object-fit:cover;background:#050505;border:1px solid var(--line);border-radius:6px}
+.steps{display:grid;gap:9px;margin-top:13px}
+.step{display:flex;gap:10px;align-items:flex-start;color:var(--paper);font-size:14.5px}
+.step b{display:inline-grid;place-items:center;flex:0 0 24px;height:24px;border-radius:50%;background:var(--gold);color:#0b0906;font-family:'Oswald',sans-serif}
+.offerline{font-family:'Oswald',sans-serif;font-size:25px;line-height:1.05;text-transform:uppercase;margin:10px 0 8px;color:var(--paper)}
+.offerline strong{color:var(--gold)}
+.mini{color:var(--muted);font-size:13.5px}
 @media(prefers-reduced-motion:reduce){.rule{animation:none}*{transition:none!important}}
 </style>
 </head>
@@ -154,37 +166,59 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
 
   <form id="f" novalidate>
     <header class="hero">
-      <h1>Start your<em>preview</em></h1>
+      <h1>Start your<em>music promo</em></h1>
       <div class="rule"></div>
-      <p>Fifteen seconds, built from your photos and your song. Send your details, photos, song, and clip time below and I'll get to work. <b>Nothing to pay yet.</b></p>
+      <p>Send your photos + your song and I’ll build the <b>first 15 seconds</b> of your promo so you can see it before you pay. Love it? Unlock the <b>full 30-second music promo for $60.</b></p>
     </header>
 
     <section class="price">
-      <div class="lead">What it costs</div>
-      <p>The 15-second preview is <b>free</b> — you see your video before you pay anything.</p>
-      <p><b>$20</b> unlocks the clean file, no watermark, no blur.</p>
-      <p class="fine">Longer videos are $5 one-time character setup + $1 per second:</p>
-      <div class="tiers">
-        <span>15 sec <b>$20</b></span><span>30 sec <b>$35</b></span><span>60 sec <b>$65</b></span>
-        <span>2 min <b>$125</b></span><span>3 min <b>$185</b></span><span>4 min <b>$245</b></span>
-      </div>
-      <p class="fine">Once your character's built, there's no setup fee next time.</p>
+      <div class="lead">One offer. One price.</div>
+      <div class="offerline">Full 30-second music promo — <strong>$60</strong></div>
+      <p><b>See your first 15 seconds before you pay.</b> Your preview is watermarked so you can see the concept, likeness, style, and performance first.</p>
+      <p>Love it? Pay <b>$60</b> to unlock the clean first 15 seconds and have the next 15 seconds built and stitched into your finished 30-second promo.</p>
+      <p class="fine">Full 30-second delivery: typically 1–3 business days after payment. No full-song or multi-minute video packages.</p>
     </section>
 
-    <div class="tally" id="tally"><span class="n" id="tallyn">0 of 5</span><span>ready to send</span></div>
+    <section class="example">
+      <p class="eyebrow">Step 1 — Your 15-second preview</p>
+      <h2>This is what you see before you pay</h2>
+      <p>Your first 15 seconds are built first and delivered as a locked preview so you can judge the likeness, style, performance, and overall concept.</p>
+      <video controls playsinline preload="metadata" poster="">
+        <source src="trippie-redd-15sec-preview-example.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </section>
+
+    <section class="example">
+      <p class="eyebrow">Step 2 — Full 30-second promo</p>
+      <h2>Love the preview? Unlock the full result for $60</h2>
+      <p>After payment, you get the clean first 15 seconds and I build the second 15 seconds, then stitch both sections together into one finished 30-second music promo.</p>
+      <video controls playsinline preload="metadata" poster="">
+        <source src="trippie-redd-full-30sec-example.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <div class="steps">
+        <div class="step"><b>1</b><span>You send 3–5 photos, your song, and the strongest 15-second section.</span></div>
+        <div class="step"><b>2</b><span>I text you to confirm the request, then build your first 15-second preview.</span></div>
+        <div class="step"><b>3</b><span>If you love it, $60 unlocks the clean preview and starts the second 15 seconds.</span></div>
+        <div class="step"><b>4</b><span>I stitch both sections together and deliver the finished 30-second promo.</span></div>
+      </div>
+    </section>
+
+    <div class="tally" id="tally"><span class="n" id="tallyn">0 of 6</span><span>ready to send</span></div>
 
     <section class="block">
       <h2>Who is this for</h2>
-      <p class="why">Phone number is required so I can text your preview to you. Email is optional as a backup.</p>
+      <p class="why">Email and phone are required. I’ll text you to verify the request before I start your preview.</p>
       <label for="name">Artist name</label>
       <input type="text" id="name" autocomplete="off">
       <div style="height:14px"></div>
-      <label for="email">Email <span style="color:var(--muted);font-weight:400">optional</span></label>
+      <label for="email">Email <span class="req">required</span></label>
       <input type="email" id="email" autocomplete="email" placeholder="you@example.com">
       <div style="height:14px"></div>
       <label for="phone">Phone number <span class="req">required</span></label>
       <input type="tel" id="phone" autocomplete="tel" inputmode="tel" placeholder="(555) 555-5555">
-      <p class="hint">I’ll text your preview to the phone number above. Add an email if you want a backup copy.</p>
+      <p class="hint">I’ll use your phone to verify your request and send the preview/unlock details. Keep the email as a backup contact.</p>
     </section>
 
     <section class="block">
@@ -216,7 +250,7 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
 
     <section class="block">
       <h2>The song <span class="req">required</span></h2>
-      <p class="why">Upload the song file — you’ll be able to drag out your fifteen seconds and hear them before you send.</p>
+      <p class="why">Upload the song file — you’ll choose the strongest 15 seconds to become the first half of your 30-second promo.</p>
 
 
       <div class="tab" id="paneFile">
@@ -247,8 +281,8 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
     </section>
 
     <section class="block">
-      <h2>The fifteen seconds <span class="req">required</span></h2>
-      <p class="why">Play the song above and pick the part you want people to hear first. This is the only part that gets made, so choose the strongest fifteen seconds you have.</p>
+      <h2>Your first 15 seconds <span class="req">required</span></h2>
+      <p class="why">Pick the strongest 15 seconds to start the promo. This is the section I build first for your preview. After you unlock the full promo, I continue the visual for another 15 seconds and stitch both parts together.</p>
       <div class="pair tc">
         <div><label for="ts">Starts at</label><input type="text" id="ts" inputmode="numeric" placeholder="0:00"></div>
         <div><label for="te">Ends at</label><input type="text" id="te" inputmode="numeric" placeholder="0:15"></div>
@@ -257,18 +291,18 @@ button.go:disabled{background:var(--panel-2);color:#5a5560;cursor:not-allowed}
     </section>
 
     <div class="send">
-      <button type="submit" class="go" id="go" disabled>Send it</button>
+      <button type="submit" class="go" id="go" disabled>Start my preview</button>
       <div class="bar" id="bar"><i></i></div>
       <div class="msg" id="msg"></div>
     </div>
   </form>
 
   <section class="receipt" id="receipt">
-    <h2>Got it</h2>
-    <p>Everything came through. I’ll text your preview to the phone number you gave me.</p>
+    <h2>Request received</h2>
+    <p>Everything came through. I’ll text you first to confirm the request before I begin.</p>
     <div class="id" id="rid"></div>
     <p class="idl">Your reference — screenshot this</p>
-    <p>When the preview lands it'll be watermarked and blurred at the end. Twenty dollars unlocks the clean file. Once your character's built there's no setup fee again.</p>
+    <p>Your first 15-second preview will be watermarked. If you love it, <b>$60</b> unlocks the clean first 15 seconds and starts production on the second 15 seconds. Your completed 30-second promo is typically delivered within 1–3 business days after payment.</p>
   </section>
 
 </div>
@@ -460,8 +494,7 @@ function drawSong(){
 
 /* ---------- tally ---------- */
 function validEmail(){
-  const value = $("email").value.trim();
-  return !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($("email").value.trim());
 }
 function validPhone(){
   return $("phone").value.replace(/\D/g,"").length >= 10;
@@ -469,13 +502,12 @@ function validPhone(){
 function tally(){
   const songOK = !!song;
   const styleEl = document.querySelector('input[name="style"]:checked');
-  const required = [ validPhone(), !!styleEl, photos.length>=3, songOK, checkWindow() ];
-  const n = required.filter(Boolean).length;
-  const emailOK = validEmail();
-  $("tallyn").textContent = n+" of 5";
-  $("tally").classList.toggle("done", n===5 && emailOK);
-  $("go").disabled = !(n===5 && emailOK);
-  return n===5 && emailOK;
+  const ok = [ validEmail(), validPhone(), !!styleEl, photos.length>=3, songOK, checkWindow() ];
+  const n = ok.filter(Boolean).length;
+  $("tallyn").textContent = n+" of 6";
+  $("tally").classList.toggle("done", n===6);
+  $("go").disabled = n!==6;
+  return n===6;
 }
 
 /* ---------- wiring ---------- */
@@ -549,7 +581,7 @@ $("f").addEventListener("submit", async e=>{
   }catch(err){
     msg.textContent="That didn't go through. Check your connection and hit send again — nothing was lost.";
     console.error(err);
-    go.disabled=false; go.textContent="Send it";
+    go.disabled=false; go.textContent="Start my preview";
     bar.style.display="none"; fill.style.width="0";
   }
 });
