@@ -338,22 +338,18 @@ const renderDelivery = (root, info, ref, artist) => {
     const subject = "Your RichMadeIt preview is ready — " + ref;
     const body =
       "Hey " + (artist || "there") + ",\n\n" +
-      "Your preview is ready 🎬\n\n" +
-      "$20 unlocks the clean 15-second video — no watermark, no blur, full quality.\n\n" +
+      "Your 15-second RichMadeIt preview is ready 🎬\n\n" +
+      "Love it? $60 unlocks the full 30-second music promo.\n\n" +
+      "That includes:\n" +
+      "• the clean first 15 seconds\n" +
+      "• the second 15 seconds built\n" +
+      "• both parts stitched into one finished 30-second promo\n\n" +
       "PAYMENT OPTIONS\n" +
       "Zelle: 281-222-9301\n" +
       "Apple Pay: 313-858-0435\n" +
       "Cash App: https://cash.app/$toonclipz\n" +
       "(ToonClipz is my other brand — same person.)\n\n" +
-      "After you pay, reply with a screenshot and the name you sent payment from. I’ll send the clean file right back.\n\n" +
-      "LONGER VIDEO PRICING\n" +
-      "15 sec — $20\n" +
-      "30 sec — $35\n" +
-      "60 sec — $65\n" +
-      "2 min — $125\n" +
-      "3 min — $185\n" +
-      "4 min — $245\n\n" +
-      "Pricing is $5 one-time character setup + $1 per second. Your character is built now, so there’s no setup fee on anything you order after this.\n\n" +
+      "After you pay, reply with a screenshot and the name you sent payment from. Your full 30-second promo will be completed within 24–48 hours.\n\n" +
       "#RICHMADEIT_";
 
     const gmailUrl =
@@ -384,26 +380,10 @@ const renderDelivery = (root, info, ref, artist) => {
     q.append(starterText);
 
     // PREVIEW TEXT — send this after the preview is finished.
-    // This opens the customer's text thread with the full sales/payment message prefilled.
-    // Attach the locked MP4 manually after Messages opens.
     const a = document.createElement("a");
-    const previewSms =
-      "Your RichMadeIt preview is ready 🎬🔥\n\n" +
-      "Watch the video attached.\n\n" +
-      "LOVE IT? Reply UNLOCK and send payment for the clean version — no watermark, no blur, full quality.\n\n" +
-      "PRICING\n" +
-      "15 sec — $20\n" +
-      "30 sec — $35\n" +
-      "1 min — $65\n" +
-      "3 min — $185\n\n" +
-      "PAYMENT OPTIONS\n" +
-      "Zelle: 281-222-9301\n" +
-      "Apple Pay: 313-858-0435\n" +
-      "Cash App: $toonclipz\n\n" +
-      "(ToonClipz is my other brand — same person.)\n\n" +
-      "After payment, send me a screenshot + the name you paid under and I’ll send the clean video.\n\n" +
-      "#RICHMADEIT_";
-    a.href = "sms:" + num + "?&body=" + encodeURIComponent(previewSms);
+    a.href = "sms:" + num + "?&body=" + encodeURIComponent(
+      "Your RichMadeIt preview is ready 🎬 Love it? $60 unlocks the full 30-second promo — clean first 15 seconds + the second 15 seconds built. Reply here to unlock. Full promo completed within 24–48 hours."
+    );
     a.textContent = "Preview text";
     q.append(a);
   }
