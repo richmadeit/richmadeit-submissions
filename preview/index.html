@@ -212,14 +212,11 @@ console.info('[RICHMADEIT tracking] Meta Pixel loaded: 1073144191970422');
 
     <section class="block" id="eligibility">
       <h2>1. Is your AI artist ready?</h2>
-      <p class="why">Have a finished song and an existing AI artist? Share your work for review. No follower minimum.</p>
+      <p class="why">Have a finished song and an existing AI artist? Upload your song and consistent artist images for review. No published profile needed.</p>
       <label class="check"><input type="checkbox" id="eligible"><span>I have a finished song and consistent images of my existing AI artist. This request is for that character.</span></label>
-      <label for="work">AI artist profile or published work link <span class="req">required</span></label>
-      <input type="url" id="work" placeholder="https://…" maxlength="1000" autocomplete="url">
-      <p class="hint">Link directly to your artist or their work. Make sure I can open it without requesting access.</p>
       <details><summary>Have a song, but no AI artist yet?</summary><p>Create your artist and 3–5 consistent reference images first, then apply. Character creation is not included in this preview offer.</p></details>
     </section>
-    <div class="tally" id="tally"><span class="n" id="tallyn">0 of 10</span><span>application requirements complete</span></div>
+    <div class="tally" id="tally"><span class="n" id="tallyn">0 of 9</span><span>application requirements complete</span></div>
 
     <section class="block">
       <h2>2. Your artist &amp; contact details</h2>
@@ -530,16 +527,15 @@ function validEmail(){
 function validPhone(){
   return $("phone").value.replace(/\D/g,"").length >= 10;
 }
-function validWork(){try {const u=new URL($("work").value.trim()); return ["https:","http:"].includes(u.protocol)&&u.hostname.includes(".");}catch{return false;}}
 function tally(){
   const songOK = !!song;
   const styleEl = document.querySelector('input[name="style"]:checked');
-  const ok = [ validEmail(), validPhone(), !!styleEl, photos.length>=3, songOK, checkWindow(), $("name").value.trim().length>0, validWork(), $("eligible").checked, $("priceOK").checked && $("contactOK").checked ];
+  const ok = [ validEmail(), validPhone(), !!styleEl, photos.length>=3, songOK, checkWindow(), $("name").value.trim().length>0, $("eligible").checked, $("priceOK").checked && $("contactOK").checked ];
   const n = ok.filter(Boolean).length;
-  $("tallyn").textContent = n+" of 10";
-  $("tally").classList.toggle("done", n===10);
-  $("go").disabled = submitting || n!==10;
-  return n===10;
+  $("tallyn").textContent = n+" of "+ok.length;
+  $("tally").classList.toggle("done", n===ok.length);
+  $("go").disabled = submitting || n!==ok.length;
+  return n===ok.length;
 }
 
 ["eligible","priceOK","contactOK"].forEach(id=>$(id).addEventListener("change",tally));
@@ -559,7 +555,7 @@ zone("adrop","ain",files=>{
   song=f; $("msg").textContent=""; drawSong(); tally(); loadWave(f);
 });
 ["ts","te"].forEach(id=>$(id).addEventListener("input",e=>{ fmtTC(e.target); if(checkWindow()){winStart=toSec($("ts").value);placeSel();} tally(); }));
-["email","phone","name","work"].forEach(id=>$(id).addEventListener("input",tally));
+["email","phone","name"].forEach(id=>$(id).addEventListener("input",tally));
 document.querySelectorAll('input[name="style"]').forEach(r=>r.addEventListener("change",tally));
 
 
@@ -644,7 +640,7 @@ $("f").addEventListener("submit", async e=>{
     const {error:ie}=await sb.from("submissions").insert({
       ref:id,
       artist_name:$("name").value.trim(),
-      contact:`Email: ${$("email").value.trim()} | Phone: ${$("phone").value.trim()} | AI artist work: ${$("work").value.trim()} | Existing AI artist: confirmed | $60 full 30-second offer: acknowledged | Application contact: agreed | Review: pending`,
+      contact:`Email: ${$("email").value.trim()} | Phone: ${$("phone").value.trim()} | Existing AI artist: confirmed | $60 full 30-second offer: acknowledged | Application contact: agreed | Review: pending`,
       photo_paths:photoPaths,
       song_path:songPath,
       song_url: null,
