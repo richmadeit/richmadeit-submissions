@@ -1,0 +1,29 @@
+Create ONE continuous 30-second music video generation with the ten shots below. All timestamps refer to the same 30-second output and the same uninterrupted audio. Do not make separate clips or restart the song at cuts. Format: 4:3.
+
+REFERENCE ROLES
+@image1: Rich / the lead singer, wearing the selected outfit. Preserve his face, beard, sunglasses, matching fedora, tattoos and naturally muscular build without enlarging his arms.
+@image2: Destiny / the partner, wearing her coordinated bodycon dress and strappy stilettos. Preserve her exact face, curls, skin tone and proportions.
+@image3: the burgundy record-stage environment reference. Use it for the location, lighting and set design only, not character identity or a required first frame.
+@audio1: the complete 30-second song excerpt. This is the master performance timing and vocal reference.
+For your own version, substitute your two artists and song while keeping these reference roles separate. Both characters are adults. Rich is slightly taller than Destiny when standing together, including with her heels.
+
+ATMOSPHERE AND STAGING
+Old-school late-1980s/early-1990s New Jack Swing R&B romance: burgundy velvet curtains, warm amber stage beams, restrained haze, soft highlights and natural skin texture. A giant vinyl record is a slowly rotating platform. Destiny sits in a velvet chair secured to the record; chair and seated partner visibly turn with the platform. Rich stands and walks on the same disc. He takes measured steps relative to its surface. No sliding feet, floating furniture or independent chair spinning. Keep the platform edge or background visible in wider shots so its slow rotation reads clearly.
+
+PERFORMANCE AND AUDIO
+Rich sings emotionally to Destiny, not to the camera. His torso and attention stay oriented toward her. Destiny reacts silently with a level chin, a soft smile and natural eye contact. She does not mouth his lead vocal. Use the actual words, phrase lengths and pauses from @audio1; do not invent lyrics or retime the song to fit the cuts. Sustained sung vowels should have stable, natural mouth shapes; relax his mouth during vocal rests. Shot timings below direct visuals, not lyric timestamps. Keep his mouth visible in singing close-ups and avoid exaggerated jaw movement. No additional speech, music or sound effects.
+
+ONE 30-SECOND GENERATION / TEN CONNECTED SHOTS
+00:00–00:03 — Moving medium-wide two-shot. Begin already in motion: Rich takes a relaxed step toward the seated Destiny and sings to her. Dolly diagonally toward them. Reveal the rotating record edge and slowly shifting curtain background.
+00:03–00:06 — Moving over-Destiny’s-shoulder view of Rich. The camera glides sideways as he sings toward her face. Keep his mouth unobstructed; never have him turn to address the lens.
+00:06–00:09 — Lateral medium two-shot. Rich walks a short arc around the chair, offering an open hand. Destiny turns toward him and accepts it gently. Camera tracks with him while the record continues turning slowly.
+00:09–00:12 — Gentle push toward Destiny’s three-quarter reaction, with Rich’s shoulder and offered hand still in frame. She smiles at him, chin level, without looking down. Keep fingers natural and the touch simple.
+00:12–00:15 — Low-to-eye-level rising medium shot. Rich arrives beside and slightly behind the chair. He bends naturally toward her ear while singing. Camera rises smoothly to reveal both faces in profile; no abrupt punch-in.
+00:15–00:18 — Slow lateral close two-shot. Rich continues singing softly beside her ear. Destiny faces forward with a pleased smile, then subtly turns toward him. Frame them together rather than isolating an extreme close-up of his mouth.
+00:18–00:21 — Reverse three-quarter camera arc. Rich gently rests a hand on her shoulder; she places her hand over his. Keep the contact affectionate and relaxed. No gripping or pulling her neck. Camera keeps drifting around their shared interaction.
+00:21–00:24 — Moving medium shot from the other side. Rich steps back toward her side, still singing to her when the audio has vocals. Destiny follows him with her eyes. Continue the platform rotation and carry their hand positions naturally across the cut.
+00:24–00:27 — Slowly pushing close two-shot. Show a warm shared smile and a light hand squeeze. Keep both identities stable. If this is an instrumental moment, let the singer breathe and react instead of continuing random mouth movement.
+00:27–00:30 — Graceful widening crane-back. Rich remains close behind and beside the chair, hands resting lightly on her shoulders; Destiny smiles contentedly. Reveal both artists and the turning record for the final image. Camera remains moving through the last frame. No freeze frame or fade that shortens the performance.
+
+CONTINUITY
+Every shot has smooth, motivated camera movement. Use clean cuts between distinct angles, preserving motion direction and believable positions. Do not add extra cuts, abrupt zooms or frantic orbiting. Keep faces, clothing, chair, record speed, lighting and hand contact consistent. Do not blend faces, duplicate artists, swap outfits or distort fingers. No captions, watermarks, logos or generated text.
