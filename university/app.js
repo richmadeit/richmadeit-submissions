@@ -1,12 +1,7 @@
 'use strict';
 const cfg = window.RMU_OFFER || {};
 const safeHttps = s => { try { const u = new URL(s); return u.protocol === 'https:' ? u.href : ''; } catch { return ''; } };
-const handle = String(cfg.universityInstagram || '').replace(/^@/, '').trim();
-const purchase = safeHttps(cfg.checkoutUrl) || (/^[A-Za-z0-9._]{1,30}$/.test(handle) ? 'https://ig.me/m/' + encodeURIComponent(handle) : '');
-if (purchase) {
-  document.querySelectorAll('.buy').forEach(a => { a.href = purchase; a.textContent = cfg.checkoutUrl ? 'Get the workbook — $49' : 'Message WORKBOOK — $49'; });
-  document.getElementById('purchaseHelp').textContent = cfg.checkoutUrl ? 'Use the secure checkout to review the price and terms before paying.' : 'Message WORKBOOK to @' + handle + '. We will confirm payment and how you receive buyer access.';
-} else { document.getElementById('launchWarning').hidden = false; }
+// Contact links are ordinary anchors in the HTML, so they also work without JavaScript.
 if (safeHttps(cfg.buyerLoginUrl)) { const a = document.getElementById('buyerLogin'); a.href = safeHttps(cfg.buyerLoginUrl); a.hidden = false; }
 document.addEventListener('click', async e => {
   const b = e.target.closest('[data-copy]'); if (!b) return;
