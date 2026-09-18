@@ -1,0 +1,19 @@
+RICHMADEIT UNIVERSITY — H3 ROOFTOP MINI TUTORIAL
+
+1. Select MiniMax H3 and Omni Reference.
+2. Add your artist reference as @Image1, microphone reference as @Image2, and rooftop/location reference as @Image3. Use the actual tag assigned by the interface; if it differs, change the corresponding tag in the prompt.
+3. Add your song audio as @Audio1. Use the built-in Trim Audio window to select the intended section on the waveform, preview it, and click Confirm. Keep the selected audio within the displayed 15-second limit. The supplied recording demonstrates an approximately 15-second attachment; it does not demonstrate a full-song upload.
+4. Copy H3_ROOFTOP_COPY_PROMPT.txt into the prompt box. Replace RICHMADEIT with your own branding if needed, and align the location description with your supplied image.
+5. For the demonstrated setup, select 4:3, 2K, and 15 seconds. The screenshot shows one output and 180 credits. Using the discounted monthly plans in the supplied screenshots: Standard = 180 x ($10.50 / 1,000) = $1.89; Pro = 180 x ($38 / 4,500) = $1.52 rounded ($1.52 exactly). These are allocated subscription-credit costs, not a standalone purchase price. The monthly plan is paid up front. Assumes all included credits are used; unused credits and retries raise the effective cost per usable clip. This estimate uses the actual 180-credit quote for this 15-second, 2K, audio-reference setup, not the generic per-second rate. Check your current plan and generation quote.
+6. Create the clip and inspect face consistency, microphone continuity, lip-sync, and camera movement. These are prompt instructions, not guaranteed results.
+7. For the next segment, reuse the same image references and prompt; replace only @Audio1 with the next exact 15-second excerpt.
+
+PROMPT CLARIFICATIONS
+The supplied original described a “full song reference,” but the screenshot contains a 15.0-second audio attachment. The reusable version specifies the selected excerpt. H3’s built-in Trim Audio window can be used to choose and preview the section.
+“4 cuts” is clarified as four shots / three transitions to avoid ambiguity. This lesson keeps the rooftop four-shot method; it does not use the separate five-shot office method.
+
+The tutorial annotates an already-configured screen and actual scrolling footage. It does not show an upload dialog or pretend to record a new generation.
+
+FREE PROMPT: https://richmadeit.netlify.app/university/
+Optional $49 workbook + templates: message @richmadeit_university.
+AI generation fees are separate. A subtle original instrumental plays under the tutorial steps and end card. It fades out before the full performance; the result sections retain the supplied song without the added background track.

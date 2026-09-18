@@ -1,0 +1,32 @@
+RICHMADEIT PERFORMANCE — ROOFTOP HELIPAD
+REUSABLE MASTER PROMPT — 15 SECONDS, FOUR MOVING SHOTS
+
+REFERENCE ROLES
+@Image1 is the character reference. Every panel shows the SAME physical person. Preserve the same face shape, features, skin tone, hairstyle, build, tattoos, accessories, and styled outfit. Generate only ONE performer. Do not recreate the reference-sheet grid, duplicate the artist, or switch identities.
+
+@Image2 is the microphone reference. Preserve the handheld microphone’s design, color, proportions, and gold accent details. The hand shown in the microphone reference is not the artist’s identity reference. No microphone stand. Keep one consistent microphone throughout.
+
+@Image3 is the location reference: rooftop helipad, glowing gold RICHMADEIT ring embedded in the concrete, city skyline, atmospheric haze. Preserve the same rooftop layout and lighting throughout.
+
+@Audio1 is the EXACT 15-second song excerpt for THIS generation. Use this supplied excerpt continuously from beginning to end. Do not choose a different section, repeat, reorder, replace, time-stretch, speed up, slow down, or pitch-shift the audio. Do not add speech or sound effects. Mouth shapes, breath, and phrasing follow the attached vocal; do not invent lyrics.
+
+CAMERA AND TIMING
+Create a cinematic 15-second performance in 4:3 with FOUR distinct shots, separated by three cuts. Camera movement continues within every shot. All shots feature the same performing artist; no static shots.
+
+0:00–0:03.75 — First moving performance shot.
+0:03.75–0:07.50 — Second moving performance shot.
+0:07.50–0:11.25 — Third moving performance shot.
+0:11.25–0:15.00 — Fourth moving performance shot.
+
+Choose four different camera moves from: slow push-in, shallow orbit left, shallow orbit right, gentle crane up, gentle crane down, low-angle hero push-in, side tracking toward a three-quarter view, handheld sway, dolly-out reveal, or shallow arc. Vary the order between generations while preserving readable performance. Keep the mouth visible during vocals. Every visible singing performance stays at normal 1X speed; no slow-motion lip-sync or speed ramps.
+
+MICROPHONE AND PERFORMANCE
+The artist holds the microphone naturally and confidently. Bring it closer during stronger vocal moments while keeping the lips visible from the camera angle. Lower it naturally during instrumental spaces. Keep hand and microphone contact anatomically believable.
+
+Allow confident walking, pivots, subtle steps, and expressive gestures across the open helipad. Match the energy of the supplied music. Maintain natural rhythm, engaged attention toward the camera, realistic jaw movement, and precise lip-sync to the attached audio. Wind subtly moves hair and clothing.
+
+VISUAL STYLE
+Cool blue-white night ambience and city glow, warm gold rim light from the helipad ring, gentle drifting haze, distant safety railing and city lights. Gold RICHMADEIT lettering remains part of the concrete environment. Shallow cinematic depth of field, soft oval bokeh, subtle highlight halation, fine 35mm film grain, moody blue-and-charcoal grade, natural skin texture, photorealistic cinematic lighting.
+
+CONTINUITY
+Preserve artist identity, wardrobe, microphone, rooftop geometry, and lighting across cuts. One continuous soundtrack. No clones, face switching, plastic skin, distorted hands, added subtitles, captions, title cards, or graphic overlays.
