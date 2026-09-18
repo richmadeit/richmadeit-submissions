@@ -1,1 +1,9 @@
-Create a 30-second romantic AI music-video performance using @image1 as the lead singer, @image2 as the second artist, @image3 as the location reference, and @audio1 as the master song timing. Keep the lead singer emotionally focused on the second artist. Begin with a moving two-shot, transition to a close reaction, and finish with a wider reveal of the location. Preserve both identities, natural hands, consistent clothing, clear singing mouth movement, and smooth motivated camera motion.
+Create a realistic 30-second romantic music-video scene in 4:3 using @Image1 as the lead singer, @Image2 as the listener, and @Audio1 as the exact 30-second song excerpt.
+
+These are two separate people. Preserve each person's likeness, complexion, hair, build, and wardrobe. Never merge or switch their identities.
+
+The lead sings directly to the listener with visible lip-sync at normal 1x speed. Keep the singer's mouth unobstructed. The listener responds through eye contact and subtle expressions without mouthing the lead vocal.
+
+Place them in an intimate lounge with warm amber lighting and deep burgundy curtains. Coordinate evening outfits and keep the setting and positions coherent across shots. Alternate a moving two-shot, singer close-up, over-the-shoulder view, and listener reaction. Time cuts to the phrasing of the attached song. Use gentle camera motion, realistic skin texture, and natural hands.
+
+Use @Audio1 continuously and unchanged. No repeated or reordered lyrics, speed changes, added dialogue, or new music. No subtitles, overlays, duplicate characters, or identity drift.

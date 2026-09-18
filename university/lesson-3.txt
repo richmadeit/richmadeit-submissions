@@ -1,1 +1,17 @@
-Create one continuous 15-second AI music video with six connected shots using @image1 for the artist and @audio1 for exact vocal timing. Use a moving medium-wide opener, an over-the-shoulder angle, a lateral tracking shot, a reaction close-up, a low-to-eye-level rise, and a smooth widening finish. Preserve movement direction, artist identity, clothing, lighting, and location continuity. Avoid abrupt zooms, duplicate subjects, frozen camera work, and random mouth movement during vocal pauses.
+RICHMADEIT PERFORMANCE — ROOFTOP HELIPAD MASTER PROMPT
+
+Use @Image1 as the locked artist identity. Preserve the same face shape, features, skin tone, hairstyle, build, and styled outfit across every generation.
+
+Use @Image2 as the locked handheld microphone reference. Preserve its design, color, and gold accent details. No microphone stand. The performer holds it naturally throughout.
+
+Use @Image3 as the locked rooftop helipad setting: glowing gold RICHMADEIT ring embedded in the concrete, city skyline, safety railing, night atmosphere, and drifting haze. Keep this location and lighting consistent across every generation.
+
+Use @Audio1 as the exact 15-second soundtrack for this segment. Match the vocal with precise, natural lip-sync for the full clip. Do not replace, repeat, reorder, speed up, slow down, or add audio.
+
+Create one cinematic 15-second music-video performance with FOUR DISTINCT CUTS. Keep the camera moving in every cut. Select four different moves from: slow push-in, orbit left, orbit right, crane up, crane down, low-angle hero push-in, high-angle look-down, tracking shot, handheld sway, whip-pan reveal, dolly-out reveal, arc shot, over-the-shoulder-to-face reveal, or drone-style rise. Do not repeat a camera move within this clip. In later segments, vary the selection and order so the performance stays fresh while the artist and world remain consistent.
+
+The performer moves confidently across the open helipad—walking, pivoting, stepping toward or away from camera, holding grounded moments, and using natural gestures that follow the music. Raise the microphone closer during emphasized vocals and relax it lower during softer or instrumental moments. Keep visible singing at normal 1× speed with realistic jaw, mouth, breath, head, and shoulder movement. Maintain engaged eye contact during connective moments. Wind subtly moves hair and clothing.
+
+Use cool blue-white ambient light from the night sky and city, contrasted with warm gold rim light from the illuminated helipad ring. Use shallow cinematic depth of field, creamy bokeh, soft highlight halation, subtle 35mm film grain, moody blue-and-charcoal color, and natural skin texture.
+
+Format: 4:3. Ultra-photorealistic. No static shots, identity drift, duplicate artist, wardrobe changes, microphone changes, location changes, plastic skin, spotty rendering, warped hands, captions, subtitles, generated text, or added logos.

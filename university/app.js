@@ -17,8 +17,23 @@ document.addEventListener('click', async e => {
 });
 function filterLessons() {
   const q = document.getElementById('search').value.trim().toLowerCase(); const c = document.getElementById('category').value; let n = 0;
-  document.querySelectorAll('.lesson').forEach(el => { const show = (!q || el.dataset.search.toLowerCase().includes(q)) && (c === 'all' || c === el.dataset.category); el.hidden = !show; if(show)n++; });
-  document.getElementById('lessonCount').textContent = n + (n === 1 ? ' lesson' : ' lessons') + ' available'; document.getElementById('noResults').hidden = n !== 0;
+  document.querySelectorAll('.lesson').forEach(el => { const show = (!q || el.dataset.search.toLowerCase().includes(q)) && (c === 'all' || c === el.dataset.category); el.hidden = !show; if (!show) el.querySelectorAll('video').forEach(v => v.pause()); if(show)n++; });
+  document.getElementById('lessonCount').textContent = n + (n === 1 ? ' video lesson' : ' video lessons') + ' available'; document.getElementById('noResults').hidden = n !== 0;
 }
 document.getElementById('search').addEventListener('input', filterLessons);
 document.getElementById('category').addEventListener('change', filterLessons);
+
+// Avoid overlapping audio when browsing lessons and the featured comparison.
+document.addEventListener('play', e => {
+  if (e.target.tagName !== 'VIDEO') return;
+  document.querySelectorAll('video').forEach(v => { if (v !== e.target) v.pause(); });
+}, true);
+document.querySelectorAll('.lesson video').forEach(v => {
+  v.addEventListener('error', () => {
+    const note = v.parentElement.querySelector('figcaption');
+    if (note && !note.dataset.failed) {
+      note.dataset.failed = 'true';
+      note.prepend('Video could not load. Try the direct link: ');
+    }
+  });
+});
