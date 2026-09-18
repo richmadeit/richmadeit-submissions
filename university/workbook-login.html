@@ -1,45 +1,6 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="robots" content="noindex,nofollow,noarchive">
-<meta name="theme-color" content="#162c27">
-<title>RichMadeIt University · Buyer Login</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer"><title>Buyer access · RichMadeIt University</title>
 <style>
-:root{color-scheme:light;--ink:#202b2a;--green:#23574a;--gold:#edc66b;--paper:#f4f2eb;--muted:#62706b;--line:#d6ddd5;--white:#fffefa}*{box-sizing:border-box}body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:20px;background:linear-gradient(145deg,#11251f,#254b40);color:var(--ink);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.card{width:min(460px,100%);background:var(--white);border-radius:20px;padding:clamp(24px,6vw,38px);box-shadow:0 24px 70px #071a1488}.seal{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:var(--gold);font:800 25px Georgia;margin-bottom:18px}.eyebrow{margin:0;color:var(--green);font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}h1{font:clamp(31px,9vw,43px)/1.08 Georgia,serif;letter-spacing:-.035em;margin:10px 0 14px}p{margin:0 0 18px}.muted{color:var(--muted);font-size:14px}.button{width:100%;min-height:52px;border:1px solid var(--green);border-radius:10px;padding:13px 16px;background:var(--green);color:white;font:700 16px system-ui;cursor:pointer}.button:hover{filter:brightness(1.08)}.button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}.secondary{margin-top:10px;background:transparent;color:var(--green)}.status{min-height:46px;margin:15px 0 0;padding:12px;border-radius:9px;background:#edf2ea;color:#294339;font-size:14px}.status.error{background:#fff0e9;color:#8c3325}.email{font-weight:750;overflow-wrap:anywhere}.steps{border-top:1px solid var(--line);margin-top:22px;padding-top:18px;font-size:13px;color:var(--muted)}[hidden]{display:none!important}
-</style>
-</head>
-<body>
-<main class="card">
-  <div class="seal" aria-hidden="true">R</div>
-  <p class="eyebrow">RichMadeIt University</p>
-  <h1>Your paid workbook</h1>
-  <p>Sign in with the same Google email you sent after payment. There is no workbook password to remember.</p>
-  <button class="button" id="googleLogin" type="button">Continue with Google</button>
-  <button class="button secondary" id="openWorkbook" type="button" hidden>Open my workbook</button>
-  <button class="button secondary" id="signOut" type="button" hidden>Sign out</button>
-  <div class="status" id="status" role="status" aria-live="polite">Checking your access…</div>
-  <div class="steps"><b>Paid but not approved yet?</b> Send the Gmail used for payment to RichMadeIt. After it is approved, return here and sign in again. Buyer Telegram access is included after verification.</div>
-</main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script>
-(() => {
-  const config=window.RMIU_SUPABASE||{},status=document.getElementById('status'),login=document.getElementById('googleLogin'),open=document.getElementById('openWorkbook'),signOut=document.getElementById('signOut');
-  const configured=config.url&&!config.url.startsWith('PASTE_')&&config.publishableKey&&!config.publishableKey.startsWith('PASTE_');
-  if(!configured){status.className='status error';status.textContent='Setup is not finished yet. Add the Supabase project URL and public key to supabase-config.js.';login.disabled=true;return;}
-  const client=supabase.createClient(config.url,config.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-  const setStatus=(message,error=false)=>{status.className='status'+(error?' error':'');status.textContent=message;};
-  async function getApproval(email){const {data,error}=await client.from('approved_buyers').select('active').eq('email',email.toLowerCase()).maybeSingle();if(error)throw error;return Boolean(data&&data.active);}
-  async function launchWorkbook(){setStatus('Opening your private workbook…');const {data,error}=await client.storage.from(config.bucket).createSignedUrl(config.workbookFile,60);if(error||!data?.signedUrl){setStatus('Your login is approved, but the workbook could not be opened. Contact RichMadeIt.',true);return;}location.assign(data.signedUrl);}
-  async function refresh(){const {data:{session}}=await client.auth.getSession();if(!session){login.hidden=false;open.hidden=true;signOut.hidden=true;setStatus('Sign in with your approved Google email.');return;}const email=session.user.email||'';login.hidden=true;signOut.hidden=false;setStatus('Checking access for '+email+'…');try{if(await getApproval(email)){open.hidden=false;setStatus('Approved: '+email+'. Tap “Open my workbook.”');}else{open.hidden=true;setStatus('Signed in as '+email+', but this email is not approved yet. Send this exact Gmail to RichMadeIt after payment.',true);}}catch(error){open.hidden=true;setStatus('Access could not be checked. Please try again or contact RichMadeIt.',true);}}
-  login.addEventListener('click',async()=>{setStatus('Opening Google sign-in…');const redirectTo=new URL('workbook-login.html',location.href).href;const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo}});if(error)setStatus(error.message,true);});
-  open.addEventListener('click',launchWorkbook);
-  signOut.addEventListener('click',async()=>{await client.auth.signOut();await refresh();});
-  client.auth.onAuthStateChange(()=>setTimeout(refresh,0));
-  refresh();
-})();
-</script>
-</body>
-</html>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#150e14;color:#fff1df;font:16px/1.6 system-ui,-apple-system,sans-serif}.card{max-width:530px;margin:8vh auto;padding:30px;border:1px solid #654553;border-radius:18px;background:#21151e}h1{font:42px/1.1 Georgia;margin:15px 0}p{margin:15px 0}a{color:#edb5c6}button{font:700 16px system-ui;cursor:pointer;background:#edb5c6;color:#25141d;border:1px solid #edb5c6;border-radius:8px;padding:14px 18px;min-height:48px}button:disabled{opacity:.55;cursor:wait}.buttons{display:flex;flex-wrap:wrap;gap:10px}.secondary{background:transparent;color:#fff1df}.small{font-size:13px;color:#d0b8c5}.status{padding:14px;background:#31202b;border-radius:8px;overflow-wrap:anywhere}.error{border-left:3px solid #ffbba0}#reader{position:fixed;inset:0;background:#150e14;z-index:5;display:flex;flex-direction:column}#reader header{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 16px}#reader header strong{margin-right:auto;font-size:13px}#reader button{min-height:40px;padding:8px 12px;font-size:13px}iframe{display:block;width:100%;flex:1;min-height:0;border:0;background:#fff}[hidden]{display:none!important}button:focus-visible,a:focus-visible{outline:3px solid white;outline-offset:3px}@media(max-width:560px){.card{margin:20px 14px;padding:24px}h1{font-size:36px}}
+</style><script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="supabase-config.js?v=buyer-access-1"></script><script defer src="workbook-access.js?v=buyer-access-1"></script></head>
+<body><main class="card"><p class="small">RICHMADEIT UNIVERSITY · PAID BUYER ACCESS</p><h1>Your workbook.<br>Your approved email.</h1><p>Continue with the Google account you gave RichMadeIt after payment. Access opens only after that email is approved.</p><div class="buttons"><button id="login" disabled>Continue with Google</button><button id="open" hidden>Open workbook</button><button id="refresh" class="secondary" hidden>Check approval again</button><button id="logout" class="secondary" hidden>Sign out</button></div><p id="status" class="status" role="status" aria-live="polite">Checking sign-in…</p><p class="small">Paid already? Send your Google email and payment confirmation to <a href="mailto:rich.madeit3@gmail.com">rich.madeit3@gmail.com</a> or <a href="https://ig.me/m/richmadeit_university">University on Instagram</a>.</p><p class="small">If Google sign-in does not open inside Instagram, open this page in Safari or Chrome. This login is not a payment page.</p><a href="./">Back to free prompts</a></main><section id="reader" hidden aria-label="Approved buyer workbook"><header><strong>RichMadeIt University</strong><button id="closeReader" class="secondary">Back to access</button><button id="readerLogout" class="secondary">Sign out</button></header><iframe id="workbook" title="RichMadeIt University workbook" sandbox="allow-scripts allow-same-origin allow-downloads allow-forms allow-modals"></iframe></section></body></html>
