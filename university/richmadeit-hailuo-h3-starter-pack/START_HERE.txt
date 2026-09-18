@@ -1,0 +1,22 @@
+RICHMADEIT UNIVERSITY
+FREE HAILUO H3 CHARACTER-REPLACEMENT STARTER PACK
+
+WHAT IS INCLUDED
+1. HAILUO_H3_CHARACTER_REPLACEMENT_PROMPT.txt
+2. REFERENCE_IMAGE_SETUP.txt
+3. RICHMADEIT_RESULT_DEMO.mp4
+4. HAILUO_AFFILIATE_LINK.txt
+
+FAST START
+1. Open Hailuo AI and choose MiniMax H3 with Omni Reference.
+2. Upload your replacement male as @Image1.
+3. Upload your replacement female as @Image2.
+4. Upload a motion video you created, licensed, or have permission to use as @Video1.
+5. Paste the prompt from this pack.
+6. Match the output duration and aspect ratio to your source when possible.
+7. Generate, then inspect identity, hands, clothing, shot order, and reveal timing.
+
+IMPORTANT
+The included RichMadeIt video is a watermarked result demonstration, not a reusable motion source. Third-party source footage is not included. Use your own original or properly licensed clip.
+
+Want the complete RichMadeIt prompt library, reusable templates, updates, and private creator group? Get the $49 RichMadeIt University Workbook from the University page.

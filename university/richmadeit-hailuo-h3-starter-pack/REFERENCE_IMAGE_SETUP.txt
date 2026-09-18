@@ -1,0 +1,24 @@
+REFERENCE IMAGE SETUP
+
+@Image1 — REPLACEMENT MALE
+- Use one clear identity.
+- A multi-angle character sheet works best.
+- Show the exact outfit, accessories, hair, and facial hair wanted in the result.
+- If the image contains multiple panels, every panel must show the same person.
+
+@Image2 — REPLACEMENT FEMALE
+- Use a clear, full-body or three-quarter reference when possible.
+- Show the exact outfit, hair, jewelry, and styling wanted in the result.
+- Avoid extra people, cropped faces, heavy filters, or conflicting outfits.
+
+@Video1 — MOTION REFERENCE
+- Use a clip you created, licensed, or have permission to use.
+- The video controls the shot order, camera movement, timing, environment, and physical motion.
+- A clean 4–15 second clip is easiest to test.
+- Do not use the RichMadeIt demo MP4 as your motion reference.
+
+FINAL CHECK
+- Image1 and Image2 are different people with clearly assigned roles.
+- The source clip contains the correct number of people.
+- The requested duration and aspect ratio match the clip.
+- The prompt says whether the scene is silent, spoken, or lip-synced.
