@@ -1,7 +1,7 @@
 /* Manual sales. Contact destinations explicitly supplied by the owner.
    No website checkout or payment credentials are needed. */
 window.RMU_OFFER = {
-  instagramHandle: "rich_madeit_",
+  instagramHandle: "richmadeit_university",
   facebookUsername: "richmadeit1",
   contactEmail: "rich.madeit3@gmail.com",
   buyerLoginUrl: "", // Add your existing working buyer-login URL after testing it.
