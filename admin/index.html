@@ -221,7 +221,7 @@ const toSec = v => { const m = (v || "").match(/^(\d{1,2}):([0-5]\d)$/); return 
 const styleName = s => ({ realistic: "Realistic", anime: "Anime", gta: "Game style" })[s] || "No style picked";
 
 const parseContact = raw => {
-  const out = { email:"", socialPlatform:"", social:"", phone:"", legacy:"" };
+  const out = { email:"", socialPlatform:"", social:"", phone:"", legacy:"", source:"", look:"", details:[] };
   const s = (raw || "").trim();
   if (!s) return out;
 
@@ -232,6 +232,9 @@ const parseContact = raw => {
       let m;
       if ((m = part.match(/^Email:\s*(.+)$/i))) out.email = m[1].trim();
       else if ((m = part.match(/^Phone:\s*(.+)$/i))) out.phone = m[1].trim();
+      else if ((m = part.match(/^Source:\s*(.+)$/i))) {out.source=m[1].trim();out.details.push({k:"Source",v:out.source});}
+      else if ((m = part.match(/^Requested look:\s*(.+)$/i))) {out.look=m[1].trim();out.details.push({k:"Requested look",v:out.look});}
+      else if ((m = part.match(/^(Artist profile|Traffic source|Campaign|\$20 purchase intent|Materials permission|Application contact|Public showcase permission|Free\/paid teaching permission|Consent version|Consent recorded|Creative idea|Review):\s*(.*)$/i))) out.details.push({k:m[1],v:m[2].trim()});
       else if ((m = part.match(/^Social:\s*(.*)$/i))) {
         const rest = m[1].trim();
         const sm = rest.match(/^(TikTok|Instagram|Facebook|Other)\s+(.+)$/i);
@@ -272,6 +275,8 @@ const renderDelivery = (root, info, ref, artist) => {
   if (info.phone) rows.push({k:"Phone", v:info.phone, href:"tel:"+info.phone.replace(/[^\d+]/g,"")});
   if (info.legacy) rows.push({k:"Contact", v:info.legacy, href:""});
 
+  (info.details || []).forEach(d=>rows.push({...d,href:""}));
+
   if (!rows.length) {
     const d = document.createElement("div");
     d.className = "delivery-row";
@@ -306,13 +311,15 @@ const renderDelivery = (root, info, ref, artist) => {
   const q = document.createElement("div");
   q.className = "quick";
 
+  const isToon = info.source === "toonclipz";
+  const brand = isToon ? "ToonClipz" : "RichMadeIt";
   if (info.email) {
     // STARTER EMAIL — send this BEFORE doing any work.
     const starterEmail = document.createElement("a");
-    const starterSubject = "Confirm your RichMadeIt preview request — " + ref;
+    const starterSubject = "Confirm your " + brand + " preview request — " + ref;
     const starterBody =
       "Hey " + (artist || "there") + ",\n\n" +
-      "I got your RichMadeIt music-video preview request 🎬\n\n" +
+      "I got your " + brand + " music-video preview request 🎬\n\n" +
       "Before I start working on it, reply YES to this email so I know you still want the preview and I have the right contact info.\n\n" +
       "I won’t start the preview until I hear back from you.\n\n" +
       "Reference: " + ref + "\n\n" +
@@ -335,8 +342,9 @@ const renderDelivery = (root, info, ref, artist) => {
 
     // PREVIEW EMAIL — send this after the preview is finished.
     const a = document.createElement("a");
-    const subject = "Your RichMadeIt preview is ready — " + ref;
-    const body =
+    const subject = "Your " + brand + " preview is ready — " + ref;
+    const body = isToon ?
+      "Hey " + (artist || "there") + ",\n\nYour 15-second ToonClipz preview is ready!\n\nLove it? $20 unlocks this exact clean 15-second clip without the watermark. Revisions, new concepts and longer videos are quoted separately. No obligation to buy.\n\nPAYMENT OPTIONS\nZelle: 281-222-9301\nApple Pay: 313-858-0435\nCash App: $toonclipz\nhttps://cash.app/$toonclipz\n\nInclude reference " + ref + " with payment, then reply with your payment confirmation and the sender name. I will verify payment before sending the clean clip.\n\nRichMadeIt / ToonClipz" :
       "Hey " + (artist || "there") + ",\n\n" +
       "Your 15-second RichMadeIt preview is ready 🎬\n\n" +
       "Love it? $60 unlocks the full 30-second music promo.\n\n" +
@@ -382,7 +390,8 @@ const renderDelivery = (root, info, ref, artist) => {
 
     // PREVIEW TEXT — send this after the preview is finished.
     const a = document.createElement("a");
-    const previewSms =
+    const previewSms = isToon ?
+      "Your ToonClipz preview is ready! Love it? $20 unlocks this exact clean 15-second clip. Changes are quoted separately. Zelle: 281-222-9301 | Apple Pay: 313-858-0435 | Cash App: $toonclipz. Include reference " + ref + ". Reply with your payment confirmation and sender name. The clean clip is sent after payment verification." :
       "Your RichMadeIt preview is ready 🎬\n\n" +
       "Love it? $60 unlocks the full 30-second promo — clean first 15 sec + second 15 built and stitched together.\n\n" +
       "PAYMENT OPTIONS\n" +
@@ -475,7 +484,7 @@ async function card(r) {
     <div class="who">${esc(r.artist_name) || "<span>No name given</span>"}</div>
     <div class="contact delivery"></div>
     <div class="window"><b>${esc(r.start_time)}</b> to <b>${esc(r.end_time)}</b>${len ? " · " + len : ""}</div>
-    <span class="stylechip${r.style ? "" : " none"}">${styleName(r.style)}</span>
+    <span class="stylechip${r.style ? "" : " none"}">${esc(contactInfo.look || styleName(r.style))}</span>
     <div class="shots"></div>
     <div class="audio"></div>
     <div class="acts"></div>
@@ -543,7 +552,8 @@ async function card(r) {
       contactInfo.social ? "SOCIAL: " + (contactInfo.socialPlatform ? contactInfo.socialPlatform + " " : "") + contactInfo.social : "",
       contactInfo.phone ? "PHONE: " + contactInfo.phone : "",
       contactInfo.legacy ? "CONTACT: " + contactInfo.legacy : "",
-      "STYLE: " + styleName(r.style),
+      "STYLE: " + (contactInfo.look || styleName(r.style)),
+      ...(contactInfo.details || []).map(d=>d.k.toUpperCase()+": "+d.v),
       "WINDOW: " + (r.start_time || "?") + " to " + (r.end_time || "?") +
         (len ? "  (" + len + ")" : ""),
       "PHOTOS: " + photoUrls.length,
@@ -551,7 +561,7 @@ async function card(r) {
       r.seconds_paid ? "PAID FOR: " + r.seconds_paid + " seconds ($" + r.seconds_paid + ")" : "",
       "",
       "Cut " + (r.start_time || "?") + " to " + (r.end_time || "?") +
-        " and build the seven-cut prompt in " + styleName(r.style).toLowerCase() + "."
+        " and build the seven-cut prompt in " + (contactInfo.look || styleName(r.style)).toLowerCase() + "."
     ].filter(Boolean);
     return lines.join("\n");
   };
@@ -707,3 +717,4 @@ sb.auth.getSession().then(({ data }) => { if (data.session) show(); });
 </script>
 </body>
 </html>
+
