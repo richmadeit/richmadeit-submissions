@@ -234,7 +234,7 @@ const parseContact = raw => {
       else if ((m = part.match(/^Phone:\s*(.+)$/i))) out.phone = m[1].trim();
       else if ((m = part.match(/^Source:\s*(.+)$/i))) {out.source=m[1].trim();out.details.push({k:"Source",v:out.source});}
       else if ((m = part.match(/^Requested look:\s*(.+)$/i))) {out.look=m[1].trim();out.details.push({k:"Requested look",v:out.look});}
-      else if ((m = part.match(/^(Artist profile|Traffic source|Campaign|\$20 purchase intent|Materials permission|Application contact|Public showcase permission|Free\/paid teaching permission|Consent version|Consent recorded|Creative idea|Review):\s*(.*)$/i))) out.details.push({k:m[1],v:m[2].trim()});
+      else if ((m = part.match(/^(Artist profile|Social profile|Offer|Payment|Materials|Traffic source|Campaign|\$20 purchase intent|Materials permission|Application contact|Public showcase permission|Free\/paid teaching permission|Consent version|Consent recorded|Creative idea|Review):\s*(.*)$/i))) out.details.push({k:m[1],v:m[2].trim()});
       else if ((m = part.match(/^Social:\s*(.*)$/i))) {
         const rest = m[1].trim();
         const sm = rest.match(/^(TikTok|Instagram|Facebook|Other)\s+(.+)$/i);
@@ -313,11 +313,18 @@ const renderDelivery = (root, info, ref, artist) => {
 
   const isToon = info.source === "toonclipz";
   const brand = isToon ? "ToonClipz" : "RichMadeIt";
+  const offer = (info.details || []).find(d=>d.k.toLowerCase()==="offer")?.v || "";
+  const hybrid = !isToon && (/^\$25 upfront/.test(offer) || /^\$35 preview-first/.test(offer));
+  const upfront = hybrid && /^\$25 upfront/.test(offer);
+  const paymentInstructions = "Zelle: 281-222-9301\nApple Pay: 313-858-0435\nCash App: $toonclipz\nhttps://cash.app/$toonclipz\nInclude reference " + ref + ". Reply with your sender name and payment confirmation. Payment is verified before production or clean delivery.";
+  const hybridStarter = "Hey " + (artist || "there") + ",\n\n" + (upfront ? "Your RichMadeIt materials are saved. Your clean 15-second video is $25 upfront. Production starts after payment is verified; typically 1–6 business hours after payment and complete materials, including selected weekends.\n\n" + paymentInstructions : "Your free RichMadeIt preview request is saved. I’ll review your social profile and materials. Selected requests receive a watermarked preview after paid orders. If you like it, $35 unlocks that exact clean 15-second clip. No payment is due now and there’s no obligation to buy.") + "\n\nReference: " + ref;
+  const hybridDelivery = "Hey " + (artist || "there") + ",\n\n" + (upfront ? "Your RichMadeIt 15-second video is ready. Your agreed price is $25 total; if your payment is already verified, no additional payment is due. The clean file is delivered after verification." : "Your RichMadeIt 15-second watermarked preview is ready. Love it? $35 unlocks this exact clip without the watermark. No obligation to buy. Changes and new concepts are quoted separately.\n\n" + paymentInstructions) + "\n\nReference: " + ref;
+
   if (info.email) {
     // STARTER EMAIL — send this BEFORE doing any work.
     const starterEmail = document.createElement("a");
-    const starterSubject = "Confirm your " + brand + " preview request — " + ref;
-    const starterBody =
+    const starterSubject = hybrid ? (upfront ? "Your $25 RichMadeIt payment instructions — " : "Your RichMadeIt preview request — ") + ref : "Confirm your " + brand + " preview request — " + ref;
+    const starterBody = hybrid ? hybridStarter :
       "Hey " + (artist || "there") + ",\n\n" +
       "I got your " + brand + " music-video preview request 🎬\n\n" +
       "Before I start working on it, reply YES to this email so I know you still want the preview and I have the right contact info.\n\n" +
@@ -343,7 +350,7 @@ const renderDelivery = (root, info, ref, artist) => {
     // PREVIEW EMAIL — send this after the preview is finished.
     const a = document.createElement("a");
     const subject = "Your " + brand + " preview is ready — " + ref;
-    const body = isToon ?
+    const body = hybrid ? hybridDelivery : isToon ?
       "Hey " + (artist || "there") + ",\n\nYour 15-second ToonClipz preview is ready!\n\nLove it? $20 unlocks this exact clean 15-second clip without the watermark. Revisions, new concepts and longer videos are quoted separately. No obligation to buy.\n\nPAYMENT OPTIONS\nZelle: 281-222-9301\nApple Pay: 313-858-0435\nCash App: $toonclipz\nhttps://cash.app/$toonclipz\n\nInclude reference " + ref + " with payment, then reply with your payment confirmation and the sender name. I will verify payment before sending the clean clip.\n\nRichMadeIt / ToonClipz" :
       "Hey " + (artist || "there") + ",\n\n" +
       "Your 15-second RichMadeIt preview is ready 🎬\n\n" +
@@ -381,7 +388,7 @@ const renderDelivery = (root, info, ref, artist) => {
 
     // STARTER TEXT — send this BEFORE doing any work.
     const starterText = document.createElement("a");
-    const starterSms =
+    const starterSms = hybrid ? hybridStarter :
       "Hey " + (artist || "there") + ", this is RichMadeIt 🎬 I got your music-video preview request (" + ref + "). " +
       "Reply YES so I know I have the right number and you still want me to make it. I won’t start until I hear back from you.";
     starterText.href = "sms:" + num + "?&body=" + encodeURIComponent(starterSms);
@@ -390,7 +397,7 @@ const renderDelivery = (root, info, ref, artist) => {
 
     // PREVIEW TEXT — send this after the preview is finished.
     const a = document.createElement("a");
-    const previewSms = isToon ?
+    const previewSms = hybrid ? hybridDelivery : isToon ?
       "Your ToonClipz preview is ready! Love it? $20 unlocks this exact clean 15-second clip. Changes are quoted separately. Zelle: 281-222-9301 | Apple Pay: 313-858-0435 | Cash App: $toonclipz. Include reference " + ref + ". Reply with your payment confirmation and sender name. The clean clip is sent after payment verification." :
       "Your RichMadeIt preview is ready 🎬\n\n" +
       "Love it? $60 unlocks the full 30-second promo — clean first 15 sec + second 15 built and stitched together.\n\n" +
