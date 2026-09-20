@@ -324,12 +324,7 @@ console.info('[RICHMADEIT tracking] Meta Pixel loaded: 1073144191970422');
       <label for="creativeIdea">Your mood and scene <span class="req">required</span></label>
       <textarea id="creativeIdea" required maxlength="500" placeholder="For example: reflective mood on a rainy rooftop. Include must-haves and anything to avoid."></textarea>
       <p class="hint">One artist, one 15-second concept. $25 upfront or $35 after preview. Revisions and new concepts are quoted separately. Preview-first customers have no obligation to buy.</p>
-      <fieldset class="intent-options"><legend>Can I feature your project? <span class="mini">Optional — neither is required for a preview.</span></legend>
-        <label class="check"><input type="checkbox" id="showcaseOK"><span>I permit RichMadeIt to show the finished clip, artist name and submitted artist profile on RichMadeIt’s public social pages and portfolio. This does not include paid ads or raw file downloads.</span></label>
-        <label class="check"><input type="checkbox" id="teachingOK"><span>I permit RichMadeIt University to show this clip and its creation process, using excerpts of my submitted song and images, in free tutorials and paid lessons. Do not include my contact details or redistribute my source files.</span></label>
-      </fieldset>
-      <p class="hint">Only grant permission for material you own or are authorized to license. If neither box is checked, your application stays private.</p>
-      <label class="check"><input type="checkbox" id="contactOK"><span>RichMadeIt may contact me by email (or text if I provide a number) about this order. Free-preview requests are reviewed; preview creation is not guaranteed.</span></label>
+      <p class="hint">We’ll email you about your order or preview request. Free-preview requests are reviewed; preview creation is not guaranteed.</p>
       <details><summary>What happens after I apply?</summary><p>For the $25 upfront option, we save your materials and email payment instructions. Production starts after payment is verified. For preview-first, we review your profile and materials; selected requests receive a watermarked clip and $35 unlock instructions. Cash App, Zelle and Apple Pay are accepted. Any applicable tax is shown in your payment instructions. Extra work is quoted separately.</p></details>
       <details><summary>What if the preview isn’t right for me?</summary><p>You can decline to purchase. The watermarked preview lets you assess the result before paying. Selection does not include unlimited revisions.</p></details>
     </section>
@@ -581,7 +576,7 @@ function updateOffer(){
 function tally(){
   const songOK = !!song;
   const styleEl = document.querySelector('input[name="style"]:checked');
-  const ok = [ !isPreviewOrder() || !!artistProfileUrl(), validEmail(), validPhone(), !!styleEl, photos.length>=3 && photos.length<=5, songOK, checkWindow(), $("creativeIdea").value.trim().length>0, $("eligible").checked, ($("intentReady").checked || $("intentPreview").checked) && $("contactOK").checked ];
+  const ok = [ !isPreviewOrder() || !!artistProfileUrl(), validEmail(), validPhone(), !!styleEl, photos.length>=3 && photos.length<=5, songOK, checkWindow(), $("creativeIdea").value.trim().length>0, $("eligible").checked, ($("intentReady").checked || $("intentPreview").checked) ];
   const n = ok.filter(Boolean).length;
   $("tallyn").textContent = n+" of "+ok.length;
   $("tally").classList.toggle("done", n===ok.length);
@@ -589,7 +584,7 @@ function tally(){
   return n===ok.length;
 }
 
-["eligible","contactOK"].forEach(id=>$(id).addEventListener("change",tally));
+["eligible"].forEach(id=>$(id).addEventListener("change",tally));
 document.querySelectorAll('input[name="purchaseIntent"]').forEach(r=>r.addEventListener("change",updateOffer));
 document.querySelectorAll('a[href="#previewIntent"]').forEach(a=>a.addEventListener('click',()=>{
  if(submitting)return;
@@ -699,7 +694,7 @@ $("f").addEventListener("submit", async e=>{
     const {error:ie}=await sb.from("submissions").insert({
       ref:id,
       artist_name:$("name").value.trim() || "Artist name pending",
-      contact:`Email: ${$("email").value.trim()} | Phone: ${$("phone").value.trim()} | Artist profile: ${artistProfileUrl() || "not supplied"} | Requested look: ${selectedStyleName()} | Source: ${previewSource} | Offer: ${isPreviewOrder() ? "$35 preview-first unlock" : "$25 upfront"} | Payment: ${isPreviewOrder() ? "not required for watermarked preview; collect $35 before clean delivery" : "UNVERIFIED - send payment instructions and verify before production"} | Materials permission: confirmed | Application contact: agreed | Public showcase permission: ${$("showcaseOK").checked ? "YES" : "NO"} | Free/paid teaching permission: ${$("teachingOK").checked ? "YES" : "NO"} | Consent version: hybrid-2026-09-20 | Consent recorded: ${new Date().toISOString()} | Creative idea: ${$("creativeIdea").value.trim().replace(/[\r\n|]+/g," ") || "RichMadeIt directs"} | Review: ${isPreviewOrder() ? "review social profile before creating preview; paid orders first" : "materials saved; awaiting upfront payment verification"}`,
+      contact:`Email: ${$("email").value.trim()} | Phone: ${$("phone").value.trim()} | Artist profile: ${artistProfileUrl() || "not supplied"} | Requested look: ${selectedStyleName()} | Source: ${previewSource} | Offer: ${isPreviewOrder() ? "$35 preview-first unlock" : "$25 upfront"} | Payment: ${isPreviewOrder() ? "not required for watermarked preview; collect $35 before clean delivery" : "UNVERIFIED - send payment instructions and verify before production"} | Materials permission: confirmed | Application contact: order updates by email; optional phone supplied by customer | Public showcase permission: NO | Free/paid teaching permission: NO | Consent version: hybrid-no-public-use-2026-09-20 | Consent recorded: ${new Date().toISOString()} | Creative idea: ${$("creativeIdea").value.trim().replace(/[\r\n|]+/g," ") || "RichMadeIt directs"} | Review: ${isPreviewOrder() ? "review social profile before creating preview; paid orders first" : "materials saved; awaiting upfront payment verification"}`,
       photo_paths:photoPaths,
       song_path:songPath,
       song_url: null,
@@ -718,7 +713,7 @@ $("f").addEventListener("submit", async e=>{
     $("receiptStatus").textContent=isPreviewOrder() ? "Nothing has been charged. We’ll review your profile and materials. If selected, we’ll email your watermarked preview after paid orders. Pay $35 only if you want to unlock that exact clean 15-second clip. No obligation to buy." : "Nothing has been charged yet. We’ll email instructions for your $25 upfront payment. Your order starts after payment is verified. Typical delivery is 1–6 business hours after payment and complete materials; selected weekends. Keep your reference below.";
     bar.style.display="none";
     $("rid").textContent=id;
-    $("permissionReceipt").textContent="Requested look: " + selectedStyleName() + ". Your choices — public showcase: " + ($("showcaseOK").checked ? "yes" : "no") + "; free/paid teaching: " + ($("teachingOK").checked ? "yes" : "no") + ".";
+    $("permissionReceipt").textContent="Requested look: " + selectedStyleName() + ".";
     $("receipt").style.display="block";
     const receipt = $("receipt");
     receipt.setAttribute("tabindex","-1");

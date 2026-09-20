@@ -7,9 +7,9 @@ const admin=readFileSync(new URL('../admin/index.html',import.meta.url),'utf8');
 for(const file of [html,admin])for(const m of file.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))new vm.Script(m[1]);
 function setup(preview){
  const elements=new Map();const $=id=>{if(!elements.has(id))elements.set(id,{value:'',checked:false,textContent:'',classList:{toggle(){}}});return elements.get(id);};
- $('intentPreview').checked=preview;$('intentReady').checked=!preview;$('email').value='test@example.com';$('creativeIdea').value='Reflective rooftop';$('eligible').checked=true;$('contactOK').checked=true;
+ $('intentPreview').checked=preview;$('intentReady').checked=!preview;$('email').value='test@example.com';$('creativeIdea').value='Reflective rooftop';$('eligible').checked=true;
  const ctx=vm.createContext({$,document:{querySelector:()=>({value:'realistic'})},photos:[1,2,3],song:{},checkWindow:()=>true,submitting:false});
- vm.runInContext(html.slice(html.indexOf('function validEmail()'),html.indexOf('["eligible","contactOK"]')),ctx);return {$,ctx};
+ vm.runInContext(html.slice(html.indexOf('function validEmail()'),html.indexOf('["eligible"]')),ctx);return {$,ctx};
 }
 test('upfront defaults to $25, no artist name or social profile needed',()=>{const h=setup(false);h.ctx.updateOffer();assert.equal(h.ctx.tally(),true);assert.equal(h.$('artistProfile').required,false);assert.match(h.$('go').textContent,/\$25/);});
 test('preview requires social profile; all three platforms accepted',()=>{const h=setup(true);h.ctx.updateOffer();assert.equal(h.ctx.tally(),false);assert.equal(h.$('artistProfile').required,true);for(const v of ['Instagram @artist','TikTok @artist','Facebook @artist']){h.$('artistProfile').value=v;assert.equal(h.ctx.tally(),true);}h.$('artistProfile').value=' ';assert.equal(h.ctx.tally(),false);});
