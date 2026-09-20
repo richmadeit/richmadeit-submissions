@@ -221,7 +221,7 @@ console.info('[RICHMADEIT tracking] Meta Pixel loaded: 1066699776252161');
     <section class="block" id="previewIntent" aria-labelledby="intentTitle">
       <h2 id="intentTitle">How would you like to order?</h2>
       <fieldset class="intent-options"><legend>One 15-second music video</legend>
-        <label class="check offer-choice"><input type="radio" name="purchaseIntent" value="upfront" id="intentReady" checked><span><b>Pay $25 upfront · Save $10</b><br>Clean MP4. Priority production after payment. Save your materials, then receive payment instructions.</span></label>
+        <label class="check offer-choice"><input type="radio" name="purchaseIntent" value="upfront" id="intentReady" checked><span><b>Pay $25 upfront · Save $10</b><br>Clean MP4. Priority production after payment. Save your materials, then pay securely through Stripe.</span></label>
         <label class="check offer-choice"><input type="radio" name="purchaseIntent" value="preview" id="intentPreview"><span><b>Free preview first · $35 to unlock</b><br>No payment today. We review your profile and materials. If selected, receive a watermarked preview by email. Pay $35 only if you want the clean clip. Paid orders come first.</span></label>
       </fieldset>
       <p class="hint" id="offerSummary" aria-live="polite"></p>
@@ -325,11 +325,11 @@ console.info('[RICHMADEIT tracking] Meta Pixel loaded: 1066699776252161');
       <textarea id="creativeIdea" required maxlength="500" placeholder="For example: reflective mood on a rainy rooftop. Include must-haves and anything to avoid."></textarea>
       <p class="hint">One artist, one 15-second concept. $25 upfront or $35 after preview. Revisions and new concepts are quoted separately. Preview-first customers have no obligation to buy.</p>
       <p class="hint">We’ll email you about your order or preview request. Free-preview requests are reviewed; preview creation is not guaranteed.</p>
-      <details><summary>What happens after I apply?</summary><p>For the $25 upfront option, we save your materials and email payment instructions. Production starts after payment is verified. For preview-first, we review your profile and materials; selected requests receive a watermarked clip and $35 unlock instructions. Cash App, Zelle and Apple Pay are accepted. Any applicable tax is shown in your payment instructions. Extra work is quoted separately.</p></details>
+      <details><summary>What happens after I apply?</summary><p>For the $25 upfront option, we save your materials and send you to secure Stripe checkout. Production starts after payment is verified. For preview-first, we review your profile and materials; selected requests receive a watermarked clip and $35 unlock instructions. Cash App, Zelle and Apple Pay are accepted. Any applicable tax is shown at checkout. Extra work is quoted separately.</p></details>
       <details><summary>What if the preview isn’t right for me?</summary><p>You can decline to purchase. The watermarked preview lets you assess the result before paying. Selection does not include unlimited revisions.</p></details>
     </section>
 <div class="send">
-      <button type="submit" class="go" id="go" disabled>Save details & get $25 payment instructions</button>
+      <button type="submit" class="go" id="go" disabled>Continue to secure checkout — $25</button>
       <div class="bar" id="bar"><i></i></div>
       <div class="msg" id="msg" role="status" aria-live="polite"></div>
     </div>
@@ -343,6 +343,7 @@ console.info('[RICHMADEIT tracking] Meta Pixel loaded: 1066699776252161');
     <p class="idl">Your reference — screenshot this</p>
     <p>Keep your reference number for payment and delivery questions.</p>
     <p id="permissionReceipt"></p>
+    <a class="apply-link" id="stripeCheckout" hidden>Pay $25 securely with Stripe ↗</a>
     <a class="apply-link" href="/university/">Watch free lessons while you wait</a>
   </section>
 
@@ -569,8 +570,8 @@ function updateOffer(){
  $("artistProfile").required=preview;
  $("profileRequirement").textContent=preview ? "required for free preview" : "optional";
  $("artistProfileHint").textContent=preview ? "We review your page before creating a free preview. Share one Instagram, TikTok or Facebook profile we can view. Include the platform if using a username." : "Optional for upfront orders. Share one Instagram, TikTok or Facebook profile if you’d like us to see your content.";
- $("offerSummary").textContent=preview ? "No card or payment needed today. $35 only if you unlock. Preview requests are subject to review and follow paid orders." : "$25 before production. Typically ready in 1–6 hours after verified payment and complete materials. Any applicable tax is shown in your payment instructions.";
- $("go").textContent=preview ? "Request my free preview — $0 today" : "Save details & get $25 payment instructions";
+ $("offerSummary").textContent=preview ? "No card or payment needed today. $35 only if you unlock. Preview requests are subject to review and follow paid orders." : "$25 before production. Typically ready in 1–6 hours after verified payment and complete materials. Any applicable tax is shown at checkout.";
+ $("go").textContent=preview ? "Request my free preview — $0 today" : "Continue to secure checkout — $25";
  tally();
 }
 function tally(){
@@ -646,7 +647,7 @@ function rmiTrackSuccessfulLead(ref){
     window.fbq("track", "Lead", {
       content_name: "15-second music video preview",
       content_category: "music promo",
-      application_type: isPreviewOrder() ? "artist_preview_review" : "upfront_payment_instructions"
+      application_type: isPreviewOrder() ? "artist_preview_review" : "upfront_checkout"
     });
   }
   console.info("[RICHMADEIT tracking] Lead", p);
@@ -710,11 +711,21 @@ $("f").addEventListener("submit", async e=>{
     fill.style.width="100%";
     go.textContent="Details saved";
     $("receiptTitle").textContent=isPreviewOrder() ? "Your preview request is saved" : "Your details are saved — payment is next";
-    $("receiptStatus").textContent=isPreviewOrder() ? "Nothing has been charged. We’ll review your profile and materials. If selected, we’ll email your watermarked preview after paid orders. Pay $35 only if you want to unlock that exact clean 15-second clip. No obligation to buy." : "Nothing has been charged yet. We’ll email instructions for your $25 upfront payment. Your order starts after payment is verified. Typical delivery is 1–6 hours after payment and complete materials. Keep your reference below.";
+    $("receiptStatus").textContent=isPreviewOrder() ? "Nothing has been charged. We’ll review your profile and materials. If selected, we’ll email your watermarked preview after paid orders. Pay $35 only if you want to unlock that exact clean 15-second clip. No obligation to buy." : "Nothing has been charged yet. Continue to Stripe to complete your $25 upfront payment. Your order starts after payment is verified. Typical delivery is 1–6 hours after payment and complete materials. Keep your reference below.";
     bar.style.display="none";
     $("rid").textContent=id;
     $("permissionReceipt").textContent="Requested look: " + selectedStyleName() + ".";
     $("receipt").style.display="block";
+    if(!isPreviewOrder()){
+      const checkout=new URL('https://buy.stripe.com/9B6cN6e7b5T1aA70IP2wU02');
+      checkout.searchParams.set('client_reference_id',id);
+      checkout.searchParams.set('prefilled_email',$("email").value.trim());
+      $("stripeCheckout").href=checkout.href;
+      $("stripeCheckout").hidden=false;
+      try{if(typeof window.fbq==='function')window.fbq('track','InitiateCheckout',{value:25,currency:'USD',content_name:'RichMadeIt 15-second music video'});}catch{}
+      window.location.assign(checkout.href);
+    }
+
     const receipt = $("receipt");
     receipt.setAttribute("tabindex","-1");
     receipt.focus({preventScroll:true});
