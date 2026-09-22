@@ -179,6 +179,7 @@ select:focus-visible{outline:2px solid var(--gold)}
 .preview-secondary{display:block;margin-top:18px;color:var(--gold);font-weight:600;text-underline-offset:4px}.offer-choice{padding:18px!important;border:1px solid var(--line);border-radius:10px;margin-bottom:12px!important}.offer-choice:has(input:checked){border-color:var(--gold);background:rgba(215,177,99,.08)}.offer-choice span{line-height:1.6}.offer-choice b{color:var(--paper)}#offerSummary{line-height:1.65}#artistProfileHint{line-height:1.5}
 
 .thumb{height:auto!important;overflow:visible!important;padding-bottom:0}.thumb img{height:110px;object-fit:cover}.thumb input{width:100%;min-width:0;padding:8px 4px;font-size:14px}.thumb{width:calc(33.33% - 10px)}
+.help-message{position:fixed;bottom:16px;right:16px;z-index:1000;max-width:calc(100vw - 32px);padding:13px 18px;border-radius:24px;background:#a6ff63;color:#10150a;font:700 14px system-ui;text-decoration:none;box-shadow:0 4px 20px #0008}body{padding-bottom:85px}#validationHelp{margin:12px 0;color:#ffc7a0}#validationHelp button{background:none;border:0;color:inherit;text-decoration:underline;text-align:left;cursor:pointer;padding:6px;font:inherit}.photo-label{font-size:12px;display:block;margin:8px 0 3px}
 </style>
 
 <!-- Meta Pixel Code -->
@@ -319,8 +320,9 @@ console.info('[RICHMADEIT tracking] Meta Pixel loaded: 1066699776252161');
       <details><summary>Can my group be in the video?</summary><p>Yes. Solo artists, duos and groups all cost $50 for one 30-second video. Upload a clear picture for each person, label their photos, and tell us who sings each part. There are no extra artist fees.</p></details>
     </section>
 <div class="send">
-      <button type="submit" class="go" id="go" disabled>Save my video details — $50</button>
+      <button type="submit" class="go" id="go">Save my video details — $50</button>
       <div class="bar" id="bar"><i></i></div>
+      <div id="validationHelp" role="status" aria-live="polite"></div>
       <div class="msg" id="msg" role="status" aria-live="polite"></div>
     </div>
   </div><!-- applicationBody -->
@@ -342,7 +344,7 @@ console.info('[RICHMADEIT tracking] Meta Pixel loaded: 1066699776252161');
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/preview/offer-config.js"></script>
 <script>
-const CHECKOUT_URL = window.RMI_OFFER.checkoutUrl;
+const CHECKOUT_URL = window.RMI_OFFER?.checkoutUrl || "https://buy.stripe.com/dRm6oI4wB0yHaA7crx2wU03";
 /* ============================================================
    SETUP — paste your two Supabase values here.
    Project settings > API > Project URL and anon public key.
@@ -353,7 +355,7 @@ const BUCKET = "submissions";
 /* ========================================================== */
 
 const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-let submitting = false, waveVersion = 0;
+let submitting = false, waveVersion = 0, attemptedSubmit = false;
 const $ = id => document.getElementById(id);
 
 // Record campaign source; every visitor chooses their own style.
@@ -383,7 +385,7 @@ function checkWindow(){
   const d = b - a;
   if(d<=0){ n.textContent="The end has to come after the start."; n.className="tcnote bad"; return false; }
   if(d!==30){ n.textContent="Choose exactly 30 seconds for your video."; n.className="tcnote bad"; return false; }
-  if(dur && b > dur){ n.textContent="That’s past the end of the song."; n.className="tcnote bad"; return false; }
+  if(dur && b > dur + 0.15){ n.textContent="That’s past the end of the song."; n.className="tcnote bad"; return false; }
   n.textContent = d+" seconds"; n.className="tcnote good"; return true;
 }
 
@@ -396,7 +398,7 @@ function drawThumbs(){
     const b=document.createElement("button"); b.type="button"; b.textContent="\u00d7";
     b.setAttribute("aria-label","Remove photo "+(i+1));
     b.onclick=()=>{ photos.splice(i,1); drawThumbs(); tally(); };
-    const owner=document.createElement("input"); owner.type="text"; owner.placeholder="Artist name"; owner.maxLength=80; owner.value=photoOwners.get(f)||""; owner.setAttribute("aria-label","Artist in photo "+(i+1)); owner.addEventListener("input",()=>{photoOwners.set(f,owner.value.trim());tally();}); d.append(img,b,owner); w.append(d);
+    const owner=document.createElement("input"); owner.type="text"; owner.placeholder="Artist name"; owner.maxLength=80; owner.value=photoOwners.get(f)||""; owner.setAttribute("aria-label","Artist in photo "+(i+1)); owner.addEventListener("input",()=>{photoOwners.set(f,owner.value.trim());tally();}); owner.id="photoOwner"+i; const label=document.createElement("label"); label.htmlFor=owner.id; label.className="photo-label"; label.textContent="Artist name (required)"; d.append(img,b,label,owner); w.append(d);
   });
 }
 function addPhotos(list){
@@ -433,7 +435,7 @@ function placeSel(){
 }
 function syncFields(){
   $("ts").value = mmss(winStart);
-  $("te").value = mmss(Math.min(winStart+WIN,dur));
+  $("te").value = mmss(winStart+WIN);
   tally();
 }
 function setWin(sec){
@@ -562,15 +564,38 @@ function updateOffer(){
  $("go").textContent=CHECKOUT_URL ? "Continue to payment — $50" : "Save my video details — $50";
  tally();
 }
+function requirements(){
+  return [
+    ["email", validEmail(), "Enter a valid delivery email."],
+    ["phone", validPhone(), "Check your phone number, or leave it blank."],
+    ["stReal", !!document.querySelector('input[name="style"]:checked'), "Choose Realistic, Game or Cartoon."],
+    ["pdrop", photos.length>=1 && photos.length<=20, "Upload at least one artist photo."],
+    ["pthumbs", photos.every(f=>!!photoOwners.get(f)), "Enter the artist name underneath each photo."],
+    ["groupMembers", !!$("groupMembers").value.trim(), "List the featured artist or group members."],
+    ["adrop", !!song, "Upload your song file."],
+    ["ts", checkWindow(), "Choose a 30-second song section within your file."],
+    ["creativeIdea", !!$("creativeIdea").value.trim(), "Describe the mood or scene for your video."],
+    ["eligible", $("eligible").checked, "Confirm permission to use the song and images."]
+  ];
+}
+function showRequirements(items){
+  const box=$("validationHelp"); box.replaceChildren();
+  const missing=items.filter(item=>!item[1]);
+  if(!missing.length) return;
+  const title=document.createElement("p");title.textContent="Before payment, please complete:";box.append(title);
+  for(const [id,,message] of missing){
+    const button=document.createElement("button");button.type="button";button.textContent=message;
+    button.onclick=()=>{const target=$(id);target.scrollIntoView({behavior:"smooth",block:"center"});(target.matches("input,textarea")?target:target.querySelector("input")||target).focus({preventScroll:true});};
+    const row=document.createElement("div");row.append(button);box.append(row);
+  }
+}
 function tally(){
-  const songOK = !!song;
-  const styleEl = document.querySelector('input[name="style"]:checked');
-  const ok = [ validEmail(), validPhone(), !!styleEl, photos.length>=1 && photos.length<=20 && photos.every(f=>!!photoOwners.get(f)), songOK, checkWindow(), $("creativeIdea").value.trim().length>0, $("eligible").checked, $("groupMembers").value.trim().length>0 ];
-  const n = ok.filter(Boolean).length;
-  $("tallyn").textContent = n+" of "+ok.length;
-  $("tally").classList.toggle("done", n===ok.length);
-  $("go").disabled = submitting || n!==ok.length;
-  return n===ok.length;
+  const items=requirements(), n=items.filter(item=>item[1]).length;
+  $("tallyn").textContent=n+" of "+items.length;
+  $("tally").classList.toggle("done",n===items.length);
+  $("go").disabled=submitting;
+  if(attemptedSubmit)showRequirements(items);
+  return n===items.length;
 }
 
 ["eligible"].forEach(id=>$(id).addEventListener("change",tally));
@@ -589,7 +614,7 @@ zone("adrop","ain",files=>{
   if(!/\.(mp3|m4a|wav|aac|aiff|flac|mp4|mov|m4v)$/i.test(f.name)){ $("msg").textContent="Upload an audio file or screen recording in one of the listed formats."; return; }
   song=f; $("msg").textContent=""; drawSong(); tally(); loadWave(f);
 });
-["ts","te"].forEach(id=>$(id).addEventListener("input",e=>{ fmtTC(e.target); if(checkWindow()){winStart=toSec($("ts").value);placeSel();} tally(); }));
+["ts","te"].forEach(id=>$(id).addEventListener("input",e=>{ fmtTC(e.target); const start=toSec($("ts").value); if(id==="ts" && start!==null)$("te").value=mmss(start+WIN); if(checkWindow()){winStart=start;placeSel();} tally(); }));
 ["email","phone","name","artistProfile","creativeIdea","groupMembers"].forEach(id=>$(id).addEventListener("input",tally));
 document.querySelectorAll('input[name="style"]').forEach(r=>r.addEventListener("change",tally));
 
@@ -643,7 +668,9 @@ const clean=n=>n.replace(/[^a-zA-Z0-9._-]/g,"_");
 
 $("f").addEventListener("submit", async e=>{
   e.preventDefault();
-  if(submitting || !tally()) return;
+  if(submitting) return;
+   attemptedSubmit=true;
+   if(!tally()){$("validationHelp").scrollIntoView({behavior:"smooth",block:"center"});return;}
   if(!sb){$("msg").textContent="The upload service could not load. Refresh the page and try again.";return;}
   submitting=true;
 
@@ -718,7 +745,7 @@ $("f").addEventListener("submit", async e=>{
       });
     });
   }catch(err){
-    msg.textContent="That didn't go through. Check your connection and hit send again — your form is still filled in.";
+    msg.textContent="Your details could not be saved, so payment has not started. "+(err.message || "Check your connection and try again.")+" Your form is still filled in. Use Message RichMadeIt below if you need help.";
     console.error(err);
     submitting=false; $("applicationFields").disabled=false; updateOffer();
     bar.style.display="none"; fill.style.width="0";
@@ -733,5 +760,6 @@ document.querySelectorAll(".example video").forEach(video=>{
 document.querySelectorAll(".artist-video").forEach(video=>video.addEventListener("play",()=>{document.querySelectorAll(".artist-video").forEach(other=>{if(other!==video)other.pause();});}));
 updateOffer();
 </script>
+<a class="help-message" href="https://ig.me/m/rich_madeit_" target="_blank" rel="noopener noreferrer">Need help? Message RichMadeIt ↗</a>
 </body>
 </html>
