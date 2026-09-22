@@ -343,6 +343,7 @@ console.info('[RICHMADEIT tracking] Meta Pixel loaded: 1066699776252161');
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/preview/offer-config.js"></script>
+<script src="/preview/activity.js"></script>
 <script>
 const CHECKOUT_URL = window.RMI_OFFER?.checkoutUrl || "https://buy.stripe.com/dRm6oI4wB0yHaA7crx2wU03";
 /* ============================================================
@@ -591,6 +592,9 @@ function showRequirements(items){
 }
 function tally(){
   const items=requirements(), n=items.filter(item=>item[1]).length;
+  if(photos.length)window.richmadeitActivity?.("photos_ready");
+  if(song)window.richmadeitActivity?.("song_ready");
+  if(song && checkWindow())window.richmadeitActivity?.("clip_selected");
   $("tallyn").textContent=n+" of "+items.length;
   $("tally").classList.toggle("done",n===items.length);
   $("go").disabled=submitting;
@@ -649,6 +653,7 @@ function rmiTrackBuildClick(){
 }
 
 function rmiTrackSuccessfulLead(ref){
+  window.richmadeitActivity?.("details_saved");
   const p = {...rmiTrackingPayload(), submission_ref: ref};
   if(typeof window.fbq === "function"){
     window.fbq("track", "Lead", {
@@ -732,7 +737,8 @@ $("f").addEventListener("submit", async e=>{
       $("stripeCheckout").href=checkout.href;
       $("stripeCheckout").hidden=false;
       try{if(typeof window.fbq==='function')window.fbq('track','InitiateCheckout',{value:50,currency:'USD',content_name:'RichMadeIt 30-second music video'});}catch{}
-      window.location.assign(checkout.href);
+      window.richmadeitActivity?.("checkout");
+       window.location.assign(checkout.href);
     }
 
     const receipt = $("receipt");
@@ -745,7 +751,8 @@ $("f").addEventListener("submit", async e=>{
       });
     });
   }catch(err){
-    msg.textContent="Your details could not be saved, so payment has not started. "+(err.message || "Check your connection and try again.")+" Your form is still filled in. Use Message RichMadeIt below if you need help.";
+    window.richmadeitActivity?.("form_error");
+     msg.textContent="Your details could not be saved, so payment has not started. "+(err.message || "Check your connection and try again.")+" Your form is still filled in. Use Message RichMadeIt below if you need help.";
     console.error(err);
     submitting=false; $("applicationFields").disabled=false; updateOffer();
     bar.style.display="none"; fill.style.width="0";
