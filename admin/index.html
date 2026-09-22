@@ -234,7 +234,7 @@ const parseContact = raw => {
       else if ((m = part.match(/^Phone:\s*(.+)$/i))) out.phone = m[1].trim();
       else if ((m = part.match(/^Source:\s*(.+)$/i))) {out.source=m[1].trim();out.details.push({k:"Source",v:out.source});}
       else if ((m = part.match(/^Requested look:\s*(.+)$/i))) {out.look=m[1].trim();out.details.push({k:"Requested look",v:out.look});}
-      else if ((m = part.match(/^(Artist profile|Social profile|Offer|Payment|Materials|Traffic source|Campaign|\$20 purchase intent|Materials permission|Application contact|Public showcase permission|Free\/paid teaching permission|Consent version|Consent recorded|Creative idea|Review):\s*(.*)$/i))) out.details.push({k:m[1],v:m[2].trim()});
+      else if ((m = part.match(/^(Artist profile|Social profile|Offer|Payment|Featured artists|Photo mapping|Materials|Traffic source|Campaign|\$20 purchase intent|Materials permission|Application contact|Public showcase permission|Free\/paid teaching permission|Consent version|Consent recorded|Creative idea|Review):\s*(.*)$/i))) out.details.push({k:m[1],v:m[2].trim()});
       else if ((m = part.match(/^Social:\s*(.*)$/i))) {
         const rest = m[1].trim();
         const sm = rest.match(/^(TikTok|Instagram|Facebook|Other)\s+(.+)$/i);
@@ -314,16 +314,17 @@ const renderDelivery = (root, info, ref, artist) => {
   const isToon = info.source === "toonclipz";
   const brand = isToon ? "ToonClipz" : "RichMadeIt";
   const offer = (info.details || []).find(d=>d.k.toLowerCase()==="offer")?.v || "";
-  const hybrid = !isToon && (/^\$25 upfront/.test(offer) || /^\$35 preview-first/.test(offer));
+  const flat50 = /^\$50 flat/.test(offer);
+  const hybrid = flat50 || !isToon && (/^\$25 upfront/.test(offer) || /^\$35 preview-first/.test(offer));
   const upfront = hybrid && /^\$25 upfront/.test(offer);
   const paymentInstructions = "Zelle: 281-222-9301\nApple Pay: 313-858-0435\nCash App: $toonclipz\nhttps://cash.app/$toonclipz\nInclude reference " + ref + ". Reply with your sender name and payment confirmation. Payment is verified before production or clean delivery.";
-  const hybridStarter = "Hey " + (artist || "there") + ",\n\n" + (upfront ? "Your RichMadeIt materials are saved. Your clean 15-second video is $25 upfront. Production starts after payment is verified; typically 1–6 hours after payment and complete materials.\n\n" + paymentInstructions : "Your free RichMadeIt preview request is saved. I’ll review your social profile and materials. Selected requests receive a watermarked preview after paid orders. If you like it, $35 unlocks that exact clean 15-second clip. No payment is due now and there’s no obligation to buy.") + "\n\nReference: " + ref;
-  const hybridDelivery = "Hey " + (artist || "there") + ",\n\n" + (upfront ? "Your RichMadeIt 15-second video is ready. Your agreed price is $25 total; if your payment is already verified, no additional payment is due. The clean file is delivered after verification." : "Your RichMadeIt 15-second watermarked preview is ready. Love it? $35 unlocks this exact clip without the watermark. No obligation to buy. Changes and new concepts are quoted separately.\n\n" + paymentInstructions) + "\n\nReference: " + ref;
+  const hybridStarter = flat50 ? "Hey " + (artist || "there") + ",\n\nYour RichMadeIt order details are saved. Your 30-second video is $50 total, including your group. Production begins after verified payment and complete materials. We’ll send your payment link when it is ready.\n\nReference: " + ref : "Hey " + (artist || "there") + ",\n\n" + (upfront ? "Your RichMadeIt materials are saved. Your clean 15-second video is $25 upfront. Production starts after payment is verified; typically 1–6 hours after payment and complete materials.\n\n" + paymentInstructions : "Your free RichMadeIt preview request is saved. I’ll review your social profile and materials. Selected requests receive a watermarked preview after paid orders. If you like it, $35 unlocks that exact clean 15-second clip. No payment is due now and there’s no obligation to buy.") + "\n\nReference: " + ref;
+  const hybridDelivery = flat50 ? "Hey " + (artist || "there") + ",\n\nYour RichMadeIt 30-second video is ready. Your agreed price is $50 total, including your group. If payment is already verified, nothing more is due.\n\nReference: " + ref : "Hey " + (artist || "there") + ",\n\n" + (upfront ? "Your RichMadeIt 15-second video is ready. Your agreed price is $25 total; if your payment is already verified, no additional payment is due. The clean file is delivered after verification." : "Your RichMadeIt 15-second watermarked preview is ready. Love it? $35 unlocks this exact clip without the watermark. No obligation to buy. Changes and new concepts are quoted separately.\n\n" + paymentInstructions) + "\n\nReference: " + ref;
 
   if (info.email) {
     // STARTER EMAIL — send this BEFORE doing any work.
     const starterEmail = document.createElement("a");
-    const starterSubject = hybrid ? (upfront ? "Your $25 RichMadeIt payment instructions — " : "Your RichMadeIt preview request — ") + ref : "Confirm your " + brand + " preview request — " + ref;
+    const starterSubject = flat50 ? "Your $50 RichMadeIt video order — " + ref : hybrid ? (upfront ? "Your $25 RichMadeIt payment instructions — " : "Your RichMadeIt preview request — ") + ref : "Confirm your " + brand + " preview request — " + ref;
     const starterBody = hybrid ? hybridStarter :
       "Hey " + (artist || "there") + ",\n\n" +
       "I got your " + brand + " music-video preview request 🎬\n\n" +
