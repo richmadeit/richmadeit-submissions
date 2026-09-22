@@ -1,2 +1,2 @@
-// Add the approved $50 purchase URL here. An empty value never redirects or reports checkout.
-window.RMI_OFFER = Object.freeze({ price: 50, seconds: 30, checkoutUrl: "" });
+// Checkout for the 30-second music video offer.
+window.RMI_OFFER = Object.freeze({ price: 50, seconds: 30, checkoutUrl: "https://buy.stripe.com/dRm6oI4wB0yHaA7crx2wU03" });
