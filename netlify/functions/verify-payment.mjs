@@ -16,7 +16,7 @@ export default async function handler(request){
     const res=await fetch(url,{headers:{Authorization:'Bearer '+key},signal:AbortSignal.timeout(10000)});
     if(!res.ok) return reply(res.status===404?404:502,{error:'Unable to verify this payment. Keep your Stripe receipt and try again shortly.'});
     const s=await res.json();
-    if(s.livemode!==!test||s.mode!=='payment'||s.payment_link?.url!==(test?process.env.STRIPE_TEST_PAYMENT_LINK_URL:'https://buy.stripe.com/9B6cN6e7b5T1aA70IP2wU02')) return reply(404,{error:'Payment not found for this store'});
+    if(s.livemode!==!test||s.mode!=='payment'||s.payment_link?.url!==(test?process.env.STRIPE_TEST_PAYMENT_LINK_URL:'https://buy.stripe.com/dRm6oI4wB0yHaA7crx2wU03')) return reply(404,{error:'Payment not found for this store'});
     if(s.status!=='complete'||s.payment_status!=='paid') return reply(200,{paid:false,test,status:s.status==='expired'?'expired':'pending'});
     const charge=s.payment_intent?.latest_charge;
     const card=charge?.payment_method_details?.card;
