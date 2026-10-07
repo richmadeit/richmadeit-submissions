@@ -1,5 +1,6 @@
 [build]
   publish = "."
+  command = "node scripts/build-downloads.cjs"
 
 [functions]
   directory = "netlify/functions"
@@ -7,3 +8,9 @@
 
 [functions."generate-reference"]
   timeout = 26
+
+[[headers]]
+  for = "/university/downloads/Three-Singer-Method-Free-Project.zip"
+  [headers.values]
+    Content-Type = "application/zip"
+    Content-Disposition = "attachment; filename=\"Three-Singer-Method-Free-Project.zip\""

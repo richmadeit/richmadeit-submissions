@@ -1,0 +1,12 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const crypto = require('node:crypto');
+const root = path.resolve(__dirname, '..');
+const source = path.join(root, 'download-source/three-singer');
+const data = Buffer.concat([1,2,3,4].map(n => fs.readFileSync(path.join(source, 'part-' + n))));
+const hash = crypto.createHash('sha256').update(data).digest('hex');
+if (data.length !== 32025179 || hash !== 'e03af60c79110be7241ca441597e6c0f36a00fa88a6728253e031af8154424aa') throw new Error('Project ZIP integrity check failed');
+const out = path.join(root, 'university/downloads');
+fs.mkdirSync(out, {recursive:true});
+fs.writeFileSync(path.join(out, 'Three-Singer-Method-Free-Project.zip'), data);
+console.log('Published Three-Singer Method ZIP: ' + data.length + ' bytes');
