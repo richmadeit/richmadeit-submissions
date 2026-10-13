@@ -1,0 +1,2 @@
+[functions.bigshot-leaderboard]
+verify_jwt = false
