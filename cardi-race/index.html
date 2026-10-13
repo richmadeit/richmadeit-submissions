@@ -29,7 +29,7 @@ function clamp(v,a,b){return Math.max(a,Math.min(b,v))}function mod(v,n){return(
 function notify(t,d=1.5){$('#message').textContent=t;noticeTime=d;$('#message').style.opacity=1}function safeBest(){try{return Number(localStorage.getItem('toonclipz-cardi-competitive-win-v1'))||0}catch{return 0}}
 function playClip(){audio.volume=Number($('#volume').value);audio.play().then(()=>{$('#audioStatus').textContent='Music playing';}).catch(()=>{$('#audioStatus').textContent='Tap Music, then Play music to enable audio.';$('#mute').textContent='Play music';})}
 function playMusic(){playClip()}
-function reset(){hazards=makeHazards();crashes=0;dodges=0;clean=0;draft=0;draftCooldown=0;oilTime=0;lapStart=0;lapTimes=[];bestLap=0;z=0;px=0;lateral=0;cameraX=0;bumps=0;particles=[];speed=0;time=0;boost=1;boostTime=0;driftCharge=0;bags=0;hit=0;shake=0;lap=1;rank=6;oldPlayerZ=PLAYERZ;countdown=3.1;finished=false;started=true;running=true;collected.clear();collided.clear();confetti=[];cars=colors.map((color,i)=>({z:PLAYERZ+380+i*380,x:[0,.48,-.5,.65,-.3][i],lane:[0,.48,-.5,.65,-.3][i],vx:0,stun:0,cool:0,angle:0,base:2970+i*26,color,phase:i*1.7,boostTime:0,boostWait:5+i*1.8,finishedAt:null}));['start','finish','paused','musicpanel'].forEach(id=>$('#'+id).classList.add('hidden'));keys={};touchSteer=0;drifting=false;$('#racehint').textContent='DODGE • DRAFT • BOOST';$('#battle span').textContent='0';$('#place').textContent='6th';$('#lap').textContent='1 / 3';$('#timer').textContent='0:00.0';$('#speed strong').textContent='0';$('#boostmeter i').style.width='100%';$('#progress i').style.height='0%';audio.currentTime=0;playMusic();}
+function reset(){hazards=makeHazards();crashes=0;dodges=0;clean=0;draft=0;draftCooldown=0;oilTime=0;lapStart=0;lapTimes=[];bestLap=0;z=0;px=0;lateral=0;cameraX=0;bumps=0;particles=[];speed=0;time=0;boost=1;boostTime=0;driftCharge=0;bags=0;hit=0;shake=0;lap=1;rank=6;oldPlayerZ=PLAYERZ;countdown=3.1;finished=false;started=true;running=true;collected.clear();collided.clear();confetti=[];cars=colors.map((color,i)=>({z:PLAYERZ+380+i*380,x:[0,.48,-.5,.65,-.3][i],lane:[0,.48,-.5,.65,-.3][i],vx:0,stun:0,cool:0,angle:0,base:3120+i*30,color,phase:i*1.7,boostTime:0,boostWait:5+i*1.8,finishedAt:null}));['start','finish','paused','musicpanel'].forEach(id=>$('#'+id).classList.add('hidden'));keys={};touchSteer=0;drifting=false;$('#racehint').textContent='DODGE • DRAFT • BOOST';$('#battle span').textContent='0';$('#place').textContent='6th';$('#lap').textContent='1 / 3';$('#timer').textContent='0:00.0';$('#speed strong').textContent='0';$('#boostmeter i').style.width='100%';$('#progress i').style.height='0%';audio.currentTime=0;playMusic();}
 $('#play').onclick=reset;$('#again').onclick=reset;$('#restart').onclick=reset;
 function pause(){if(!started||finished)return;running=false;keys={};touchSteer=0;drifting=false;$('#paused').classList.remove('hidden');audio.pause()}
 function resume(){if(!started||finished)return;running=true;$('#paused').classList.add('hidden');playMusic();last=performance.now()}
@@ -73,9 +73,9 @@ function update(dt){if(!running)return;if(countdown>0){countdown-=dt;notify(coun
  cars.forEach((c,i)=>{if(c.finishedAt!==null)return;c.cool=Math.max(0,c.cool-dt);c.stun=Math.max(0,c.stun-dt);c.boostTime=Math.max(0,c.boostTime-dt);c.boostWait-=dt;
  const gap=c.z-now;const aiLap=Math.min(3,Math.floor(c.z/TRACK)+1);
  // Rivals accelerate normally, choose gaps, and use limited bursts; they never teleport.
- if(c.boostWait<=0&&c.stun<=0){c.boostTime=1.05+i*.09;c.boostWait=8+i*.7;}
+ if(c.boostWait<=0&&c.stun<=0){c.boostTime=1.15+i*.09;c.boostWait=7.2+i*.6;}
  const chase=gap < -1400 ? Math.min(160,(-gap-1400)*.05) : gap>7000 ? -Math.min(100,(gap-7000)*.025) : 0;
- const aiSpeed=(c.base+(aiLap-1)*45+chase+Math.sin(time*.65+c.phase)*45)*(c.stun>0?.64:1)*(c.boostTime>0?1.18:1);
+ const aiSpeed=(c.base+(aiLap-1)*55+chase+Math.sin(time*.65+c.phase)*45)*(c.stun>0?.64:1)*(c.boostTime>0?1.21:1);
  const oldZ=c.z;c.z+=aiSpeed*dt;
  const ahead=hazards.find(h=>h.q>c.z&&h.q-c.z<4200);
  let goal=c.lane+Math.sin(time*.65+c.phase)*.1;
