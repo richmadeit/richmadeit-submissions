@@ -37,7 +37,7 @@ function purchase(p){
 }
 async function check(){
   $('retry').hidden=true;
-  for(const id of ['details','status','receipt','uploadMaterials'])$(id).hidden=true;
+  for(const id of ['details','status','receipt','uploadMaterials','manualHandoff'])$(id).hidden=true;
   if(!session){$('title').textContent='Your payment confirmation';$('message').textContent='After checkout, Stripe will bring you here with your payment details. If you already paid, keep your Stripe receipt—do not pay again.';return;}
   $('title').textContent='Checking your payment…';
   try{
@@ -57,7 +57,15 @@ async function check(){
     $('uploadMaterials').hidden=!!(p.test||p.refunded);
     if(p.test||p.refunded)$('next').textContent=p.test?'Sandbox verification is complete. Test payments are excluded from live advertising Purchase tracking.':'Contact Rich Madeit if you have questions about this refunded payment.';
     purchase(p);
-  }catch(e){$('title').textContent='We couldn’t check your payment';$('message').textContent=e.message;$('retry').hidden=false;}
+  }catch(e){
+    $('title').textContent='Send your song and photos';
+    $('message').textContent='We can’t confirm your payment automatically right now. If Stripe charged you, keep your receipt and do not pay again.';
+    let ref='RMI-D-'+session.slice(-10);
+    try{const saved=JSON.parse(localStorage.getItem('richmadeit.pending-order'));if(saved?.expiresAt>Date.now()&&/^RMI-D(?:30|60|180)?-[a-zA-Z0-9]{8,32}$/.test(saved.reference))ref=saved.reference;}catch{}
+    $('manualUpload').href='/submit/?ref='+encodeURIComponent(ref);
+    $('manualHandoff').hidden=false;
+    $('retry').hidden=false;
+  }
 }
 $('retry').addEventListener('click',check);check();
 })();
