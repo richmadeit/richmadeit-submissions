@@ -426,6 +426,23 @@
     { id:'demo3', created_at: new Date(Date.now()-1*86400000).toISOString(), name:'Keisha Brown', instagram:'@keisha_official', email:'keisha@email.com', phone:'281-555-0303', artist_name:'K. Brown', genre:'rnb', package:'custom', song_title:'Forever Mine', song_link:'https://youtube.com', video_vibe:'love_story,luxury', settings:'mansion_estate', color_palette:'warm_red_orange', artist_in_video:'yes_some', paid:false, date_paid:null, deadline_date:null, status:'pending' },
   ];
 
+  const escapeCustomerText = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function safeCustomerRow(record) {
+    const row = {...record};
+    for (const [key,value] of Object.entries(row)) {
+      if (typeof value !== 'string') continue;
+      if (key === 'id') { row[key] = /^[a-zA-Z0-9-]+$/.test(value) ? value : ''; continue; }
+      if (key === 'scenes') {
+        try { row[key] = JSON.stringify(JSON.parse(value).map(scene => Object.fromEntries(Object.entries(scene).map(([k,v]) => [k, typeof v === 'string' ? escapeCustomerText(v) : v])))); } catch { row[key] = '[]'; }
+        continue;
+      }
+      if (['song_link','song_url'].includes(key) && !/^https?:\/\//i.test(value)) { row[key] = ''; continue; }
+      if (key === 'photo_urls') { row[key] = value.split(' , ').filter(v=>/^https?:\/\//i.test(v)).map(escapeCustomerText).join(' , '); continue; }
+      row[key] = escapeCustomerText(value);
+    }
+    return row;
+  }
+
   // ── LOGIN ─────────────────────────────────────────────
   async function doLogin() {
     const err = document.getElementById('loginErr');
@@ -462,7 +479,7 @@
         CONFIG.SUPABASE_URL &&
         CONFIG.SUPABASE_URL !== 'https://YOUR_PROJECT_ID.supabase.co') {
       const { createClient } = supabase;
-      db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+      db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, {auth:{persistSession:false}});
       isDemo = false;
     } else {
       isDemo = false;
@@ -495,7 +512,7 @@
       if (!data || !data.length) { document.getElementById('leadsEmpty').style.display='block'; return; }
       document.getElementById('leadsCount').textContent = data.length + ' lead' + (data.length===1?'':'s');
       const body = document.getElementById('leadsBody');
-      data.forEach((row, i) => {
+      data.map(safeCustomerRow).forEach((row, i) => {
         const when = row.created_at ? new Date(row.created_at).toLocaleDateString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
         // photos: may be multiple URLs joined by ' , '
         let photos = '<span style="color:var(--muted);">—</span>';
@@ -541,7 +558,7 @@
   function renderIntakes(data) {
     const list = document.getElementById('intakesList');
     list.innerHTML = '';
-    data.forEach((row, i) => {
+    data.map(safeCustomerRow).forEach((row, i) => {
       const date = new Date(row.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
       const pkg = ({ '60sec':'60-Sec', 'full_song':'Full Song', 'custom':'Custom', 'full_650':'Full Song', '60sec_200':'60-Sec' }[row.package] || row.package || '—');
       const fmt = row.video_format === 'portrait_916' ? '9:16' : '16:9';
@@ -617,7 +634,7 @@
           .select('*')
           .order('created_at', { ascending: false });
         if (error) throw error;
-        allData = data || [];
+        allData = (data || []).map(safeCustomerRow);
       } catch(e) {
         console.error(e);
         allData = [];
@@ -713,7 +730,7 @@
         <div class="m-card-actions">
           ${!row.paid ? `<button class="pay" onclick="openPayModal('${row.id}')">✓ Mark Paid</button>` : ''}
           <button onclick="openDetail('${row.id}')">View Details</button>
-          <button class="del" onclick="deleteLead('${row.id}','${(row.name||'').replace(/'/g,'').replace(/"/g,'')}')">✕</button>
+          <button class="del" onclick="deleteLead('${row.id}','this lead')">✕</button>
         </div>`;
       mc.appendChild(card);
     });
@@ -721,7 +738,7 @@
     const tbody = document.getElementById('subBody');
     tbody.innerHTML = '';
 
-    data.forEach((row, i) => {
+    data.map(safeCustomerRow).forEach((row, i) => {
       const tr = document.createElement('tr');
       tr.onclick = (e) => { if (!e.target.classList.contains('act-btn')) openDetail(row.id); };
 
@@ -752,7 +769,7 @@
         <td>${paidBadge}</td>
         <td>${deadline}</td>
         <td>${statusBadge}</td>
-        <td class="actions">${payBtn}<button class="act-btn" onclick="event.stopPropagation();openDetail('${row.id}')">Details</button><button class="act-btn del-btn" onclick="event.stopPropagation();deleteLead('${row.id}','${(row.name||'').replace(/'/g,'').replace(/"/g,'')}')">✕</button></td>`;
+        <td class="actions">${payBtn}<button class="act-btn" onclick="event.stopPropagation();openDetail('${row.id}')">Details</button><button class="act-btn del-btn" onclick="event.stopPropagation();deleteLead('${row.id}','this lead')">✕</button></td>`;
       tbody.appendChild(tr);
     });
   }
@@ -853,7 +870,7 @@
 
       <div class="delete-zone">
         <div class="delete-zone-label">⚠ Danger Zone</div>
-        <button class="dp-delete-btn" onclick="deleteLead('${row.id}','${(row.name||'').replace(/'/g,'').replace(/"/g,'')}')">🗑 Delete This Lead Permanently</button>
+        <button class="dp-delete-btn" onclick="deleteLead('${row.id}','this lead')">🗑 Delete This Lead Permanently</button>
       </div>`;
 
     document.getElementById('detailOverlay').classList.add('on');
