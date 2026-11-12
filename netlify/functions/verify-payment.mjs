@@ -1,3 +1,4 @@
+import {matchSession,OFFER} from '../lib/length-offer.mjs';
 import {createHash} from 'node:crypto';
 const reply=(status,data)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 export default async function handler(request){
@@ -16,9 +17,11 @@ export default async function handler(request){
     const res=await fetch(url,{headers:{Authorization:'Bearer '+key},signal:AbortSignal.timeout(10000)});
     if(!res.ok) return reply(res.status===404?404:502,{error:'Unable to verify this payment. Keep your Stripe receipt and try again shortly.'});
     const s=await res.json();
+    const lengthOrder=matchSession(s);
+    if(s.metadata?.offer===OFFER&&!lengthOrder)return reply(404,{error:'Payment does not match this order'});
     const deposit=!test && s.payment_link?.url==='https://buy.stripe.com/14AbJ25AF2GP4bJajp2wU0k';
     if(deposit&&(s.currency!=='usd'||s.amount_subtotal!==500||s.amount_total!==500))return reply(404,{error:'Payment does not match the $5 deposit'});
-    if(s.livemode!==!test||s.mode!=='payment'||!(deposit||s.payment_link?.url===(test?process.env.STRIPE_TEST_PAYMENT_LINK_URL:'https://buy.stripe.com/dRm6oI4wB0yHaA7crx2wU03'))) return reply(404,{error:'Payment not found for this store'});
+    if(s.livemode!==!test||s.mode!=='payment'||!(lengthOrder||deposit||s.payment_link?.url===(test?process.env.STRIPE_TEST_PAYMENT_LINK_URL:'https://buy.stripe.com/dRm6oI4wB0yHaA7crx2wU03'))) return reply(404,{error:'Payment not found for this store'});
     if(s.status!=='complete'||s.payment_status!=='paid') return reply(200,{paid:false,test,status:s.status==='expired'?'expired':'pending'});
     const charge=s.payment_intent?.latest_charge;
     const card=charge?.payment_method_details?.card;
@@ -27,8 +30,8 @@ export default async function handler(request){
     const email=s.customer_details?.email||s.customer_email||'';
     const maskedEmail=email.includes('@')?email.slice(0,1)+'•••@'+email.split('@')[1]:null;
     return reply(200,{paid:true,test,amount:s.amount_total,currency:s.currency,tax:s.total_details?.amount_tax||0,
-      deposit:!!deposit,duration:deposit?null:30,reference:s.client_reference_id||(deposit?'RMI-D-':'RMI-')+id.slice(-10),hasOrderReference:!!s.client_reference_id,
+      offer:lengthOrder?OFFER:null,preview:lengthOrder?.kind==='preview',deposit:!!deposit,duration:lengthOrder?.seconds||(deposit?null:30),reference:s.client_reference_id||(deposit?'RMI-D-':'RMI-')+id.slice(-10),hasOrderReference:!!s.client_reference_id,
       email:maskedEmail,method:card?card.brand+' •••• '+card.last4:charge?.payment_method_details?.type||'Stripe',receipt,
-      refunded:!!charge?.refunded,eventId:'rmi_'+createHash('sha256').update(id).digest('hex').slice(0,32)});
+      refunded:!!(charge?.refunded||charge?.disputed||charge?.amount_refunded>0),eventId:'rmi_'+createHash('sha256').update(id).digest('hex').slice(0,32)});
   }catch{return reply(502,{error:'Unable to check payment right now. Please try again; do not pay again.'});}
 }
