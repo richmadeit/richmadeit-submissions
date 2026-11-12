@@ -286,10 +286,12 @@
   <div class="login-box">
     <div class="login-logo">RichmadeiT<svg class="logo-flame" width="18" height="14" viewBox="0 0 28 20"><path d="M2 4 C6 1,18 2,24 10 C26 14,22 19,14 18" stroke="#FFD700" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <div class="login-sub">Director Dashboard</div>
+    <label>Owner email</label>
+    <input type="email" id="ownerEmail" autocomplete="username" placeholder="Owner account email">
     <label>Password</label>
     <input type="password" id="pwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">Enter Dashboard →</button>
-    <div class="login-err" id="loginErr">Wrong password. Try again.</div>
+    <div class="login-err" id="loginErr">Owner sign-in is unavailable or access was not authorized. Contact support to finish secure owner access.</div>
   </div>
 </div>
 
@@ -425,23 +427,33 @@
   ];
 
   // ── LOGIN ─────────────────────────────────────────────
-  function doLogin() {
-    const pw = document.getElementById('pwInput').value;
-    const correct = typeof CONFIG !== 'undefined' ? CONFIG.DASHBOARD_PASSWORD : 'richmadeit2024';
-    if (pw === correct) {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      initDB();
-      loadData();
-    } else {
-      document.getElementById('loginErr').style.display = 'block';
+  async function doLogin() {
+    const err = document.getElementById('loginErr');
+    err.style.display = 'none';
+    initDB();
+    if (!db) { err.style.display = 'block'; return; }
+    const {data,error} = await db.auth.signInWithPassword({
+      email: document.getElementById('ownerEmail').value.trim(),
+      password: document.getElementById('pwInput').value
+    });
+    // This client check is UX only; database RLS must independently authorize the owner.
+    if (error || data?.user?.id !== '10663a1b-7f8a-4218-836b-ebd3283ef468') {
+      await db.auth.signOut();
+      err.style.display = 'block';
+      return;
     }
+    document.getElementById('pwInput').value = '';
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadData();
   }
-
-  function logout() {
+  async function logout() {
+    if (db) await db.auth.signOut();
+    allData = [];
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('pwInput').value = '';
+    location.reload();
   }
 
   // ── DB INIT ───────────────────────────────────────────
@@ -453,7 +465,7 @@
       db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
       isDemo = false;
     } else {
-      isDemo = true;
+      isDemo = false;
       document.getElementById('setupNotice').style.display = 'block';
     }
   }

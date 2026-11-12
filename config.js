@@ -3,9 +3,6 @@ const CONFIG = {
   SUPABASE_URL: 'https://molqlfdjlmnlkscecngz.supabase.co',
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vbHFsZmRqbG1ubGtzY2Vjbmd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODEzNjMsImV4cCI6MjA5MzE1NzM2M30._CR9A4H7-E7CYzIWdEO4PgRcCgBcORP2wAZqXrXE4Ec',
 
-  // ─── DASHBOARD PASSWORD ────────────────────────────────────────────────────
-  DASHBOARD_PASSWORD: 'richmadeit2024',
-
   // ─── STRIPE PAYMENT LINKS (PUBLIC — used on intake forms) ─────────────────
   // Created at dashboard.stripe.com → Payment Links (LIVE mode)
   // Test link starts with https://buy.stripe.com/test_...

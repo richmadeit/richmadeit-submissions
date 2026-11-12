@@ -453,9 +453,11 @@
       const { createClient } = supabase;
       const db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
 
-      // Get next order number
-      const { count } = await db.from('production_intakes').select('*', { count: 'exact', head: true });
-      const orderNum = String((count || 0) + 1).padStart(3, '0');
+      // Allocate a unique reference without exposing or counting customer records.
+      const referenceResponse = await fetch('/.netlify/functions/intake-reference', {method:'POST'});
+      if (!referenceResponse.ok) throw new Error('Could not create submission reference. Please try again.');
+      const {reference: orderNum} = await referenceResponse.json();
+      if (!/^RMI-[0-9a-f-]{36}$/.test(orderNum)) throw new Error('Invalid submission reference');
       const folderName = `${orderNum}-${required.artist_name.replace(/\s+/g,'-').toLowerCase()}`;
 
       btn.textContent = 'Uploading files...';
@@ -465,7 +467,7 @@
 
       async function uploadFile(file, subfolder) {
         const path = `${folderName}/${subfolder}/${file.name}`;
-        const { data, error } = await db.storage.from('client-files').upload(path, file, { upsert: true });
+        const { data, error } = await db.storage.from('client-files').upload(path, file, { upsert: false });
         return error ? null : path;
       }
 

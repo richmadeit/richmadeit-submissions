@@ -672,10 +672,6 @@
   }
 
   // ── SUBMIT ───────────────────────────────────────────
-  function generateOrderNumber() {
-    const digits = Math.floor(1000000 + Math.random() * 9000000);
-    return `RMI-${digits}`;
-  }
 
   async function submitForm() {
     const btn = document.getElementById('submitBtn');
@@ -683,7 +679,18 @@
     btn.textContent = 'Locking in your spot...';
 
     // Generate order number + stash for thankyou page
-    const orderNumber = generateOrderNumber();
+    let orderNumber;
+    try {
+      const response = await fetch('/.netlify/functions/intake-reference', {method:'POST'});
+      if (!response.ok) throw new Error('Reference unavailable');
+      ({reference: orderNumber} = await response.json());
+      if (!/^RMI-[0-9a-f-]{36}$/.test(orderNumber)) throw new Error('Invalid reference');
+    } catch (error) {
+      btn.disabled = false;
+      btn.textContent = 'Try again';
+      alert('Could not create your submission reference. Please try again.');
+      return;
+    }
 
     const payload = {
       ...formData,
